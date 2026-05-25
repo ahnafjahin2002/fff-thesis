@@ -1,0 +1,463 @@
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Kalpurush';
+  src: url('https://cdn.jsdelivr.net/npm/kalpurush@1.0.0/Kalpurush.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* ── CSS Design Tokens ── */
+:root {
+  --bg-cream:        #FFF8E7;
+  --bg-blue-tint:    #E8F4FD;
+  --bg-yellow-tint:  #FFFDE7;
+  --bg-white:        #FFFFFF;
+  --text-primary:    #2D1B00;
+  --text-black:      #111111;
+  --text-navy:       #1A2B4A;
+  --accent-primary:  #FF4B4B; /* More vibrant red-orange for Duo feel */
+  --accent-secondary:#58CC02; /* Duolingo Green */
+  --highlight-phoneme:#FFC800; /* Duolingo Yellow */
+  --error-gentle:    #FF9600;
+  --game-bg:         #F0FFF4;
+  --border-subtle:   #E5E5E5;
+  --card-shadow:     0 2px 16px rgba(45,27,0,0.08);
+  
+  /* Duolingo Colors */
+  --duo-green:       #58CC02;
+  --duo-green-shadow:#58A700;
+  --duo-blue:        #1CB0F6;
+  --duo-blue-shadow: #1899D6;
+  --duo-red:         #FF4B4B;
+  --duo-red-shadow:  #EA2B2B;
+  --duo-yellow:      #FFC800;
+  --duo-yellow-shadow:#E5B400;
+  --duo-gray:        #E5E5E5;
+  --duo-gray-shadow: #CECECE;
+  
+  --pref-font-size:       22px;
+  --pref-font-family:     'Noto Sans Bengali', sans-serif;
+  --pref-line-height:     2.2;
+  --pref-letter-spacing:  3px;
+  --pref-word-spacing:    8px;
+  --pref-bg-color:        var(--bg-white);
+  --pref-text-color:      var(--text-primary);
+  --pref-column-width:    70%;
+  --pref-highlight-color: #FFC800;
+}
+
+/* ── Gamified UI Utilities ── */
+.duo-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px; border-radius: 16px;
+  font-family: 'Noto Sans Bengali', sans-serif; font-weight: 700; font-size: 15px;
+  cursor: pointer; transition: all 0.1s ease;
+  user-select: none; border: 2px solid transparent;
+}
+.duo-btn:active:not(:disabled) {
+  transform: translateY(4px);
+  border-bottom-width: 2px !important;
+  margin-top: 2px; margin-bottom: -2px; /* Keep layout stable */
+}
+.duo-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.duo-btn-outline {
+  background: #FFFFFF; color: var(--text-primary);
+  border: 2px solid var(--duo-gray);
+  border-bottom-width: 4px;
+}
+.duo-btn-outline:hover:not(:disabled) { background: #F7F7F7; }
+
+.duo-btn-primary {
+  background: var(--duo-green); color: #FFFFFF;
+  border-color: var(--duo-green-shadow);
+  border-bottom-width: 4px;
+}
+.duo-btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+.duo-btn-secondary {
+  background: var(--duo-blue); color: #FFFFFF;
+  border-color: var(--duo-blue-shadow);
+  border-bottom-width: 4px;
+}
+.duo-btn-secondary:hover:not(:disabled) { filter: brightness(1.1); }
+
+.duo-card {
+  background: #FFFFFF; border-radius: 20px;
+  border: 2px solid var(--duo-gray);
+  border-bottom-width: 6px;
+  padding: 24px; transition: transform 0.2s;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0;
+  font-family: 'Noto Sans Bengali', 'Atkinson Hyperlegible', sans-serif;
+  background-color: var(--bg-cream);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── App Header ── */
+.app-header {
+  position: sticky; top: 0; z-index: 30;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 10px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.app-header-left { display: flex; align-items: center; gap: 10px; }
+.app-header-left .back-btn {
+  width: 44px; height: 44px; border-radius: 16px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 4px;
+  background: #fff; color: var(--text-primary); font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; transition: all 0.1s;
+}
+.app-header-left .back-btn:active {
+  transform: translateY(4px); border-bottom-width: 2px;
+}
+.app-header-left .back-btn:hover { background: #f7f7f7; }
+.app-brand { display: flex; align-items: center; gap: 8px; }
+.app-brand-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, #FFD700, #E06B2E);
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.app-brand-name {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 17px; font-weight: 700; color: var(--text-primary);
+}
+.app-brand-star { color: #FFD700; font-size: 18px; }
+.app-header-actions { display: flex; gap: 8px; align-items: center; }
+.header-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 16px; border-radius: 16px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 4px;
+  background: #fff; cursor: pointer; font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 14px; color: var(--text-primary); font-weight: 700;
+  transition: all 0.1s; min-height: 44px;
+}
+.header-btn:active { transform: translateY(4px); border-bottom-width: 2px; }
+.header-btn:hover { background: #F7F7F7; }
+.header-btn.active { background: #E8F4FD; border-color: var(--duo-blue-shadow); color: var(--duo-blue); }
+
+/* ── Reading Content Area ── */
+.reading-content {
+  font-size: var(--pref-font-size);
+  font-family: var(--pref-font-family);
+  line-height: var(--pref-line-height);
+  letter-spacing: var(--pref-letter-spacing);
+  word-spacing: var(--pref-word-spacing);
+  color: var(--pref-text-color);
+  max-width: 680px; margin: 0 auto;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+.reading-main-area {
+  background: var(--pref-bg-color);
+  border-radius: 24px; padding: 32px 28px;
+  margin: 20px auto; max-width: 900px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 6px;
+  transition: background 0.2s ease;
+  position: relative;
+}
+.reading-text-section { display: flex; gap: 24px; align-items: flex-start; }
+.reading-text-col { flex: 1; }
+.live-word-panel {
+  width: 260px; flex-shrink: 0; padding: 20px;
+  background: #fff; border-radius: 20px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 6px;
+  min-height: 200px;
+}
+@media (max-width: 640px) {
+  .reading-text-section { flex-direction: column; }
+  .live-word-panel { width: 100%; order: -1; min-height: auto; }
+}
+
+/* ── Word Styles ── */
+.conjunct-word {
+  text-decoration: underline; text-decoration-color: var(--accent-primary);
+  text-decoration-thickness: 2.5px; text-underline-offset: 5px; cursor: pointer;
+}
+.vowel-mark { color: #C0620A; }
+.high-freq-word { font-weight: 700; }
+.reph-word::before {
+  content: '◌'; font-size: 0.5em; vertical-align: super;
+  color: var(--accent-primary); margin-right: 2px;
+}
+.word-span {
+  display: inline-block; border-radius: 4px; padding: 1px 2px;
+  cursor: pointer; transition: background 0.15s ease, transform 0.1s ease;
+}
+.word-span:hover { background: rgba(224,107,46,0.12); transform: scale(1.03); }
+.word-span:active { transform: scale(0.98); }
+.reading-para { margin-bottom: 1.2em; }
+
+/* ── Navigation Footer ── */
+.nav-footer {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding: 14px 20px; margin: 0 auto; max-width: 900px;
+}
+.nav-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 12px 24px; border-radius: 16px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 4px;
+  background: #fff; cursor: pointer; font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 15px; color: var(--text-primary); font-weight: 700;
+  transition: all 0.1s; min-height: 48px;
+}
+.nav-btn:active:not(:disabled) { transform: translateY(4px); border-bottom-width: 2px; }
+.nav-btn:hover:not(:disabled) { background: #F7F7F7; }
+.nav-btn:disabled { opacity: 0.5; border-color: var(--duo-gray); cursor: not-allowed; }
+.nav-counter {
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-size: 15px; font-weight: 700; color: var(--text-primary);
+  background: #F5EDE0; padding: 8px 16px; border-radius: 10px;
+}
+
+/* ── Conjunct Popup (White Card) ── */
+.conjunct-card {
+  position: absolute; bottom: calc(100% + 12px); left: 50%;
+  transform: translateX(-50%); z-index: 200;
+  background: #fff; border-radius: 14px;
+  padding: 16px 20px; min-width: 200px;
+  box-shadow: 0 8px 32px rgba(45,27,0,0.18);
+  border: 1px solid var(--border-subtle);
+}
+.conjunct-card-arrow {
+  position: absolute; top: 100%; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 10px solid transparent; border-right: 10px solid transparent;
+  border-top: 10px solid #fff;
+}
+.conjunct-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.conjunct-card-title {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 13px; font-weight: 600; color: var(--accent-primary);
+}
+.conjunct-card-close {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: none; background: #F5EDE0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #666; transition: background 0.15s;
+}
+.conjunct-card-close:hover { background: #E2D5C3; }
+.conjunct-card-body { text-align: center; margin-bottom: 10px; }
+.conjunct-big {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 36px; font-weight: 700; color: var(--text-primary);
+  line-height: 1.3;
+}
+.conjunct-formula {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; flex-wrap: wrap;
+}
+.conjunct-part-box {
+  background: #FFF8E7; border: 1.5px solid var(--border-subtle);
+  border-radius: 8px; padding: 8px 14px; text-align: center;
+  min-width: 40px;
+}
+.conjunct-part-char {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 22px; font-weight: 600; color: var(--text-primary);
+  display: block;
+}
+.conjunct-plus {
+  font-size: 18px; font-weight: 700; color: #999;
+}
+.conjunct-equals {
+  font-size: 20px; font-weight: 700; color: var(--accent-primary);
+}
+.conjunct-pronunciation {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 10px; padding-top: 10px; border-top: 1px solid #F0E8D8;
+}
+.conjunct-pron-text {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 12px; color: #888;
+}
+.conjunct-pron-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--border-subtle); background: #fff;
+  cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.conjunct-pron-btn:hover { background: #FFF0E0; border-color: var(--accent-primary); }
+
+/* ── Showcase Cards Grid ── */
+.showcase-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px; padding: 20px; max-width: 960px; margin: 0 auto;
+}
+.showcase-card {
+  background: #fff; border-radius: 20px; padding: 24px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 6px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.showcase-card:hover { transform: translateY(-4px); border-color: var(--duo-blue-shadow); }
+.showcase-card-title {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 14px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #F0E8D8;
+}
+.showcase-word-big {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 42px; font-weight: 700; color: var(--text-primary);
+  text-align: center; line-height: 1.4; margin-bottom: 12px;
+}
+.showcase-decomp-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.showcase-decomp-box {
+  background: #E8F4FD; border: 1.5px solid #B3D9F2;
+  border-radius: 8px; padding: 6px 12px; text-align: center;
+}
+.showcase-decomp-box.conjunct { background: #FFF0E0; border-color: var(--accent-primary); }
+.showcase-decomp-char {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 18px; font-weight: 600; display: block;
+}
+.showcase-decomp-label {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 10px; color: #888; display: block;
+}
+.showcase-table {
+  width: 100%; border-collapse: collapse; margin-top: 10px;
+}
+.showcase-table td {
+  padding: 4px 8px; font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 13px; border: 1px solid #F0E8D8; text-align: center;
+}
+.showcase-table tr:first-child td { font-weight: 600; background: #FFF8E7; }
+.showcase-pron {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px;
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 13px; color: #666;
+}
+
+/* ── Level Selector ── */
+.level-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+@media (max-width: 500px) { .level-grid { grid-template-columns: repeat(2, 1fr); } }
+.level-card {
+  background: #fff; border-radius: 16px; padding: 14px 10px;
+  text-align: center; cursor: pointer; border: 2px solid var(--duo-gray); border-bottom-width: 4px;
+  transition: all 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.level-card.active { border-color: var(--duo-green-shadow); background: #F0FFF4; border-bottom-width: 4px; }
+.level-card:active { transform: translateY(4px); border-bottom-width: 2px; }
+.level-card:hover:not(.active) { background: #f7f7f7; }
+.level-card-label {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 12px; font-weight: 600; color: var(--text-primary);
+  display: block; margin-bottom: 4px;
+}
+.level-card-sample {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 10px; color: #888; display: block; margin-bottom: 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.level-stars { color: #FFD700; font-size: 14px; letter-spacing: 2px; }
+
+/* ── Custom Input Section ── */
+.custom-input-section {
+  max-width: 900px; margin: 20px auto; padding: 0 20px;
+}
+.custom-input-card {
+  background: #fff; border-radius: 20px; padding: 24px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 6px;
+}
+.custom-input-title {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 15px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.custom-textarea {
+  width: 100%; min-height: 80px; border-radius: 10px;
+  border: 1.5px solid var(--border-subtle); padding: 12px 14px;
+  font-family: 'Noto Sans Bengali', sans-serif; font-size: 16px;
+  color: var(--text-primary); resize: vertical; outline: none;
+  transition: border-color 0.2s;
+}
+.custom-textarea:focus { border-color: var(--accent-primary); }
+.custom-textarea::placeholder { color: #ccc; }
+.custom-analyze-btn {
+  margin-top: 14px; padding: 12px 24px; border-radius: 16px;
+  border: 2px solid var(--duo-green-shadow); border-bottom-width: 4px;
+  background: var(--duo-green); color: #fff;
+  font-family: 'Noto Sans Bengali', sans-serif; font-size: 15px;
+  font-weight: 700; cursor: pointer; transition: all 0.1s;
+  display: block; width: 100%; text-align: center;
+}
+.custom-analyze-btn:active { transform: translateY(4px); border-bottom-width: 2px; }
+.custom-analyze-btn:hover { filter: brightness(1.1); }
+.custom-result-area {
+  margin-top: 14px; padding: 16px; border-radius: 10px;
+  background: var(--pref-bg-color); border: 1px solid var(--border-subtle);
+}
+
+/* ── Vowel Highlight Demo ── */
+.vowel-highlight-demo {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 48px; font-weight: 700; text-align: center;
+  line-height: 1.4; margin-bottom: 8px; position: relative;
+}
+.vowel-highlighted { color: #2E8B57; }
+.vowel-arrow {
+  display: block; text-align: center;
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 13px; color: #2E8B57; font-weight: 600;
+}
+
+/* ── Reph Demo ── */
+.reph-demo-word {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 48px; font-weight: 700; text-align: center;
+  line-height: 1.4; margin-bottom: 8px;
+  color: var(--text-primary);
+}
+.reph-demo-word .reph-marker {
+  color: var(--accent-primary); font-size: 0.5em; vertical-align: super;
+}
+.reph-info {
+  font-family: 'Noto Sans Bengali', sans-serif;
+  font-size: 13px; color: #666; text-align: center; line-height: 1.6;
+}
+
+/* ── Feature Guide ── */
+.feature-guide {
+  max-width: 680px; margin: 24px auto 0; padding: 18px;
+  border-radius: 12px; background: rgba(255,248,231,0.6);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── General ── */
+*:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 3px; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 3px; }
+input[type='range'] {
+  -webkit-appearance: none; width: 100%; height: 6px;
+  border-radius: 3px; background: var(--border-subtle); outline: none;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent-primary); cursor: pointer; transition: transform 0.15s;
+}
+input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
