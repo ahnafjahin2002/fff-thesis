@@ -13,6 +13,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import TextRenderer from '../components/reader/TextRenderer';
 import PreferencesPanel from '../components/reader/PreferencesPanel';
@@ -237,6 +238,7 @@ function LevelShowcase({ currentLevel, onLevelChange }) {
 // ── Main Page Component ──
 export default function ReadingPage() {
   const { isPanelOpen, togglePanel } = usePreferences();
+  const navigate = useNavigate();
   const [tappedWord, setTappedWord] = useState(null);
   const [activeIdx, setActiveIdx] = useState(-1);
   const [currentLevel, setCurrentLevel] = useState('sohoj');
@@ -265,7 +267,7 @@ export default function ReadingPage() {
       {/* ── Top Toolbar ── */}
       <header className="app-header">
         <div className="app-header-left">
-          <button className="back-btn" aria-label="পেছনে যান">←</button>
+          <button className="back-btn" aria-label="পেছনে যান" onClick={() => navigate('/')}>←</button>
           <div className="app-brand">
             <div className="app-brand-avatar">📖</div>
             <span className="app-brand-name">চলো পড়ি</span>
