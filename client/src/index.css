@@ -447,6 +447,342 @@ body {
   border: 1px solid var(--border-subtle);
 }
 
+/* ══════════════════════════════════════════════════════════
+   PHONEME HIGHLIGHTING ENGINE STYLES
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Main Container ── */
+.phoneme-highlighter {
+  padding: 0 16px 24px;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.phoneme-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 12px;
+}
+.phoneme-back-btn {
+  width: 44px; height: 44px; border-radius: 16px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 4px;
+  background: #fff; color: var(--text-primary);
+  font-size: 18px; font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.1s;
+}
+.phoneme-back-btn:active { transform: translateY(4px); border-bottom-width: 2px; }
+.phoneme-header-text { flex: 1; }
+.phoneme-title {
+  font-size: 20px; font-weight: 800; color: #1a1a2e;
+  margin: 0; line-height: 1.3;
+}
+.phoneme-subtitle {
+  font-size: 13px; color: #888; margin: 2px 0 0;
+}
+.phoneme-header-icon { font-size: 28px; }
+
+/* ── Section Labels ── */
+.phoneme-section { margin-bottom: 16px; }
+.phoneme-section-label {
+  font-size: 14px; font-weight: 700; color: #444;
+  margin-bottom: 10px;
+}
+
+/* ── Level Selector Grid ── */
+.phoneme-level-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.phoneme-level-btn {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px; padding: 12px 6px;
+  border-radius: 14px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 4px;
+  background: #fff; cursor: pointer;
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  transition: all 0.1s;
+}
+.phoneme-level-btn:active { transform: translateY(4px); border-bottom-width: 2px; }
+.phoneme-level-btn.active {
+  border-color: var(--duo-green-shadow);
+  background: #F0FFF4;
+}
+.phoneme-level-btn:hover:not(.active) { background: #f7f7f7; }
+.phoneme-level-emoji { font-size: 22px; }
+.phoneme-level-label { font-size: 12px; font-weight: 700; color: #333; }
+
+/* ── Custom Input ── */
+.phoneme-custom-input-wrap {
+  overflow: hidden;
+  margin-top: 10px;
+}
+.phoneme-custom-input {
+  width: 100%; border-radius: 12px;
+  border: 2px solid var(--duo-gray);
+  padding: 12px 14px;
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  font-size: 16px; color: var(--text-primary);
+  resize: vertical; outline: none;
+  transition: border-color 0.2s;
+}
+.phoneme-custom-input:focus { border-color: var(--duo-blue); }
+.phoneme-custom-input::placeholder { color: #ccc; }
+
+/* ── Display Card (main text area) ── */
+.phoneme-display-card {
+  background: #fff; border-radius: 20px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 6px;
+  padding: 20px; margin-bottom: 16px;
+}
+.phoneme-display-label {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; color: #aaa; margin-bottom: 14px;
+}
+.phoneme-live-badge {
+  color: #ff4b4b; font-size: 12px; font-weight: 700;
+}
+.phoneme-text-area {
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  font-size: 22px; line-height: 2.2;
+  letter-spacing: 2px; word-spacing: 8px;
+  color: var(--text-primary);
+  min-height: 60px;
+}
+.phoneme-empty {
+  color: #ccc; font-size: 16px; text-align: center;
+  padding: 20px 0;
+}
+
+/* ── PhonemeWord Component ── */
+.phoneme-word {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 2px 3px;
+  margin: 0 2px;
+  transition: opacity 0.15s ease;
+  position: relative;
+}
+.phoneme-word--dimmed {
+  opacity: 0.45;
+}
+.phoneme-word--active {
+  opacity: 1;
+}
+
+/* ── Phoneme Span (individual syllable) ── */
+.phoneme-span {
+  display: inline;
+  border-radius: 4px;
+  padding: 1px 2px;
+  transition: background-color 0.1s ease, color 0.1s ease, transform 0.1s ease;
+  position: relative;
+}
+.phoneme-active {
+  background-color: var(--phoneme-highlight, #FFD700);
+  color: #1a1a2e;
+  border-radius: 6px;
+  padding: 2px 4px;
+  box-shadow: 0 2px 12px rgba(255, 215, 0, 0.4);
+  animation: phonemePulse 0.6s ease infinite alternate;
+}
+
+@keyframes phonemePulse {
+  from { box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3); }
+  to   { box-shadow: 0 3px 16px rgba(255, 215, 0, 0.6); }
+}
+
+/* ── Breakdown Card ── */
+.phoneme-breakdown-card {
+  background: #fff; border-radius: 18px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 6px;
+  padding: 18px 20px; margin-bottom: 16px;
+}
+.phoneme-breakdown-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.phoneme-breakdown-title {
+  font-size: 14px; font-weight: 700; color: #555;
+}
+.phoneme-breakdown-word {
+  font-size: 20px; font-weight: 800; color: var(--duo-blue);
+}
+.phoneme-breakdown-chips {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  justify-content: center; margin-bottom: 14px;
+}
+.phoneme-chip {
+  background: #E8F4FD; border: 2px solid #B3D9F2;
+  border-radius: 14px; padding: 10px 18px;
+  text-align: center; position: relative;
+  transition: all 0.15s ease;
+  border-bottom-width: 4px;
+}
+.phoneme-chip--active {
+  background: var(--chip-highlight, #FFD700) !important;
+  border-color: rgba(0,0,0,0.15);
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(255, 200, 0, 0.35);
+}
+.phoneme-chip-text {
+  font-size: 22px; font-weight: 800; color: #2d5fa6;
+  display: block;
+}
+.phoneme-chip--active .phoneme-chip-text { color: #1a1a2e; }
+.phoneme-chip-index {
+  font-size: 10px; font-weight: 700; color: #aaa;
+  position: absolute; top: 4px; right: 8px;
+}
+.phoneme-breakdown-formula {
+  text-align: center; font-size: 15px; font-weight: 600;
+  color: #888; letter-spacing: 2px;
+  padding-top: 10px; border-top: 1px solid #f0e8d8;
+}
+
+/* ── Controls Card ── */
+.phoneme-controls-card {
+  background: #fff; border-radius: 20px;
+  border: 2px solid var(--duo-gray); border-bottom-width: 6px;
+  padding: 18px 20px; margin-bottom: 16px;
+}
+.phoneme-controls-row {
+  display: flex; gap: 10px; margin-bottom: 16px;
+}
+.phoneme-ctrl-btn {
+  border-radius: 16px; border: 2px solid transparent;
+  border-bottom-width: 4px;
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.1s;
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+}
+.phoneme-ctrl-btn:active:not(:disabled) {
+  transform: translateY(4px); border-bottom-width: 2px;
+}
+.phoneme-ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.phoneme-ctrl-play {
+  flex: 1; padding: 14px 20px;
+  background: var(--duo-green); color: #fff;
+  border-color: var(--duo-green-shadow);
+}
+.phoneme-ctrl-play.playing {
+  background: var(--duo-yellow); color: #1a1a2e;
+  border-color: var(--duo-yellow-shadow);
+}
+.phoneme-ctrl-play:hover:not(:disabled) { filter: brightness(1.08); }
+.phoneme-ctrl-stop {
+  width: 54px; padding: 14px;
+  background: #fff; color: #666;
+  border-color: var(--duo-gray);
+  font-size: 20px;
+}
+.phoneme-ctrl-stop:hover:not(:disabled) { background: #f7f7f7; }
+
+/* Speed slider row */
+.phoneme-speed-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.phoneme-speed-label { font-size: 18px; }
+.phoneme-speed-slider { flex: 1; }
+.phoneme-speed-value {
+  font-size: 13px; font-weight: 700; color: var(--duo-blue);
+  min-width: 45px; text-align: right;
+}
+
+/* Color picker section */
+.phoneme-color-section { }
+.phoneme-color-toggle {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 12px;
+  border: 1.5px solid #eee; background: #fafafa;
+  cursor: pointer; font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  font-size: 14px; font-weight: 600; color: #555;
+  width: 100%; transition: background 0.15s;
+}
+.phoneme-color-toggle:hover { background: #f0f0f0; }
+.phoneme-color-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+.phoneme-color-arrow { margin-left: auto; font-size: 10px; color: #aaa; }
+.phoneme-color-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; padding-top: 10px; overflow: hidden;
+}
+.phoneme-color-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 10px 6px;
+  border-radius: 12px; border: 2px solid #eee;
+  background: #fff; cursor: pointer;
+  transition: all 0.15s;
+}
+.phoneme-color-btn:hover { border-color: #ccc; }
+.phoneme-color-btn.active {
+  border-color: #333; border-width: 2.5px;
+  background: #f8f8f8;
+}
+.phoneme-color-swatch {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.08);
+}
+.phoneme-color-name { font-size: 11px; font-weight: 600; color: #666; }
+
+/* ── Letter Grid Section ── */
+.phoneme-letter-section {
+  margin-top: 8px;
+}
+.phoneme-letter-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.phoneme-letter-cell {
+  border-radius: 14px; padding: 10px 0;
+  text-align: center; font-size: 22px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  color: #333; background: white;
+  border: 2px solid transparent;
+  border-bottom-width: 4px; border-color: var(--duo-gray);
+  transition: border-color 0.15s;
+}
+.phoneme-letter-cell:active {
+  transform: translateY(4px); border-bottom-width: 2px;
+}
+.phoneme-letter-detail {
+  background: #dbeeff; border-radius: 18px;
+  padding: 20px; margin-top: 16px; text-align: center;
+  border: 2px solid #B3D9F2; border-bottom-width: 6px;
+}
+.phoneme-letter-big {
+  font-size: 56px; font-weight: 800; color: #2d5fa6;
+  margin-bottom: 8px;
+}
+.phoneme-letter-info { font-size: 14px; color: #555; }
+.phoneme-letter-speak-btn {
+  margin-top: 12px; padding: 10px 24px;
+  border-radius: 30px; border: 2px solid var(--duo-blue-shadow);
+  border-bottom-width: 4px;
+  background: var(--duo-blue); color: white;
+  font-weight: 700; font-size: 15px; cursor: pointer;
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  transition: all 0.1s;
+}
+.phoneme-letter-speak-btn:active {
+  transform: translateY(4px); border-bottom-width: 2px;
+}
+.phoneme-letter-speak-btn:hover { filter: brightness(1.08); }
+
+/* ══════════════════════════════════════════════════════════ */
+
 /* ── General ── */
 *:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 3px; }
 ::-webkit-scrollbar { width: 6px; }
