@@ -30,14 +30,15 @@ styleEl.textContent = `
     --radius: 20px;
   }
   .app-wrap {
-    max-width: 430px;
-    margin: 0 auto;
-    min-height: 100vh;
-    background: var(--bg);
-    position: relative;
-    overflow: hidden;
-    padding-bottom: 90px;
-  }
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 90px;
+}
   .page { display: none; }
   .page.active { display: block; }
 
@@ -850,7 +851,7 @@ export default function App() {
 
       {/* Bottom Nav */}
       <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",
-        width:"100%",maxWidth:430,background:"white",
+        width:"100%",maxWidth:"100%",background:"white",
         borderTop:"1px solid #f0ebe0",
         boxShadow:"0 -4px 20px rgba(0,0,0,.08)",
         display:"flex",justifyContent:"space-around",alignItems:"center",
