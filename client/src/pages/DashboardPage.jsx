@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
+import PhonemeHighlighter from "../components/reader/PhonemeHighlighter";
 
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
@@ -805,7 +806,7 @@ function HomePage({
   const navigate = useNavigate();
 
   if (view === "read")    return <ReadingView  onBack={() => setView("home")} />;
-  if (view === "phoneme") return <PhonemeView  onBack={() => setView("home")} />;
+  if (view === "phoneme") return <PhonemeHighlighter onBack={() => setView("home")} />;
   if (view === "game")    return <GameView     onBack={() => setView("home")} />;
   if (view === "trace")   return <TraceView    onBack={() => setView("home")} />;
 
