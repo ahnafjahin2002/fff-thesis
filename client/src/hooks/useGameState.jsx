@@ -84,10 +84,20 @@ function gameReducer(state, action) {
     }
     case 'STOCK_SHOP':
       return {
-         ...state,
-         shops: state.shops.map(shop =>
-           shop.id === action.shopId
-             ? { ...shop, products: action.products, stocked: true }
+        ...state,
+        streetShops: state.streetShops.map(shop =>
+          shop.id === action.shopId
+            ? { ...shop, products: action.products, stocked: true }
+            : shop
+        ),
+      };
+
+    case 'SERVE_CUSTOMERS':
+      return {
+        ...state,
+        streetShops: state.streetShops.map(shop =>
+          shop.id === action.shopId
+            ? { ...shop, customersServed: (shop.customersServed || 0) + (action.count || 1) }
             : shop
         ),
       };

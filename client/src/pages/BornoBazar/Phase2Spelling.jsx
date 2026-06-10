@@ -213,12 +213,5 @@ export default function Phase2Spelling({ shopColor = "#18b368", onComplete, onBa
   );
 }
 
-// Helper: Bengali TTS via Web Speech API
-function speakBengali(text) {
-  if (!window.speechSynthesis) return;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "bn-BD";
-  utter.rate = 0.85;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
-}
+// Helper: Bengali TTS via Web Speech API (now uses high quality model from audio.js)
+import { playBanglaTTS as speakBengali } from '../../utils/audio';

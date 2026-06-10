@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameState } from '../../hooks/useGameState';
 import { getLetterData } from '../../data/letters';
 import { validateStroke } from '../../utils/strokeValidator';
-import { playAudio } from '../../utils/audio';
-import mascotThink from '../../assets/mascot-wave.png'; // fallback
-import mascotCelebrate from '../../assets/mascot-wave.png'; // fallback
-import streetBgBlur from '../../assets/street-empty.png'; // fallback
+import { playBanglaTTS } from '../../utils/audio';
+import imgMascotThink from '../../assets/mascot-think.png';
+import imgMascotCelebrate from '../../assets/mascot-celebrate.png';
+import imgMascotEncourage from '../../assets/mascot-encourage.png';
+import imgStreetBgBlur from '../../assets/street-bg-blur.png';
 
 // ─── Fixed canvas dimensions to avoid CSS scaling issues ──────────────────────
 const CANVAS_W = 460;
@@ -192,7 +193,7 @@ export default function Phase1Tracing({ onComplete, onBack }) {
   const totalStrokes = letterData.strokes.length;
 
   return (
-    <div className="tracing-screen" style={{ backgroundImage: `url(${streetBgBlur})` }}>
+    <div className="tracing-screen" style={{ backgroundImage: `url(${imgStreetBgBlur})` }}>
       {/* Header */}
       <div className="tracing-header">
         <motion.button
@@ -212,7 +213,7 @@ export default function Phase1Tracing({ onComplete, onBack }) {
             <div
               key={i}
               style={{
-                width: 14, height: 14, borderRadius: '50%',
+                width: 16, height: 16, borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
                 background: i < currentStrokeIdx ? '#18b368'
                           : i === currentStrokeIdx ? '#ffc107'
                           : '#e0e0e0',
@@ -233,7 +234,7 @@ export default function Phase1Tracing({ onComplete, onBack }) {
           style={{ width: 44, height: 44 }}
           onClick={() => {
             if (state.audioEnabled && state.currentLetter) {
-              playAudio(state.currentLetter);
+              playBanglaTTS(state.currentLetter);
             }
           }}
           aria-label={`Play sound for ${state.currentLetter}`}
@@ -291,7 +292,7 @@ export default function Phase1Tracing({ onComplete, onBack }) {
           )}
         </AnimatePresence>
         <img
-          src={mascotState === 'celebrate' ? mascotCelebrate : mascotThink}
+          src={mascotState === 'celebrate' ? imgMascotCelebrate : mascotState === 'encourage' ? imgMascotEncourage : imgMascotThink}
           alt="Mascot"
           style={{ width: '100%', height: 'auto' }}
         />

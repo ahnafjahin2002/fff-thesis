@@ -1,9 +1,16 @@
 // client/src/data/words.js
 
+import imgMilk from '../assets/product-milk.png';
+import imgBanana from '../assets/product-banana.png';
+import imgFish from '../assets/product-fish.png';
+import imgEgg from '../assets/product-egg.png';
+import imgBread from '../assets/product-bread.png';
+import imgMango from '../assets/product-mango.png';
 export const PHASE2_WORDS = [
   {
     id: "milk",
     emoji: "🥛",
+    image: imgMilk,
     product: "দুধ",
     letters: ["দ", "ু", "ধ"],
     audioClue: "সাদা, ঠান্ডা, গরুর থেকে আসে",
@@ -12,6 +19,7 @@ export const PHASE2_WORDS = [
   {
     id: "banana",
     emoji: "🍌",
+    image: imgBanana,
     product: "কলা",
     letters: ["ক", "ল", "া"],
     audioClue: "হলুদ, মিষ্টি, বানর পছন্দ করে",
@@ -20,6 +28,7 @@ export const PHASE2_WORDS = [
   {
     id: "fish",
     emoji: "🐟",
+    image: imgFish,
     product: "মাছ",
     letters: ["ম", "া", "ছ"],
     audioClue: "পানিতে থাকে, আঁশ আছে",
@@ -28,6 +37,7 @@ export const PHASE2_WORDS = [
   {
     id: "egg",
     emoji: "🥚",
+    image: imgEgg,
     product: "ডিম",
     letters: ["ড", "ি", "ম"],
     audioClue: "গোল, মুরগি দেয়",
@@ -36,6 +46,7 @@ export const PHASE2_WORDS = [
   {
     id: "bread",
     emoji: "🫓",
+    image: imgBread,
     product: "রুটি",
     letters: ["র", "ু", "ট", "ি"],
     audioClue: "গোল, সকালে খাই",
@@ -44,6 +55,7 @@ export const PHASE2_WORDS = [
   {
     id: "mango",
     emoji: "🥭",
+    image: imgMango,
     product: "আম",
     letters: ["আ", "ম"],
     audioClue: "হলুদ-সবুজ, ফলের রাজা",

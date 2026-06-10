@@ -15,6 +15,7 @@ import ShopBuiltCelebration from './ShopBuiltCelebration';
 import SessionRestPrompt from './SessionRestPrompt';
 import './BornoBazar.css';
 import Phase2Spelling from './Phase2Spelling';
+import Phase3Conversation from './Phase3Conversation';
 
 // ─── Screen Flow States ───────────────────────────────────────────────────────
 const SCREENS = {
@@ -23,7 +24,8 @@ const SCREENS = {
   TRACING: 'tracing',
   COLOR_PICK: 'color_pick',
   CELEBRATION: 'celebration',
-  PHASE2: 'phase2', 
+  PHASE2: 'phase2',
+  PHASE3: 'phase3',
 };
 
 function BornoBazarInner({ onBack }) {
@@ -74,17 +76,29 @@ function BornoBazarInner({ onBack }) {
   }, [dispatch]);
 
   const handleTapShop = useCallback((shopId) => {
-  const shop = state.streetShops?.find(s => s.id === shopId);
+    const shop = state.streetShops?.find(s => s.id === shopId);
+    setSelectedShop(shop || { id: shopId, color: '#18b368' });
+    checkSession();
 
-  setSelectedShop(shop || { id: shopId, color: '#18b368' });
-  checkSession();
-  dispatch({ type: 'SET_PHASE', phase: 2 });
-  setScreen(SCREENS.PHASE2);
-}, [state.streetShops, checkSession, dispatch]);
+    // If shop has products stocked, go to Phase 3; otherwise Phase 2
+    if (shop?.products && shop.products.length >= 3) {
+      dispatch({ type: 'SET_PHASE', phase: 3 });
+      setScreen(SCREENS.PHASE3);
+    } else {
+      dispatch({ type: 'SET_PHASE', phase: 2 });
+      setScreen(SCREENS.PHASE2);
+    }
+  }, [state.streetShops, checkSession, dispatch]);
 
   const handlePhase2Complete = useCallback((products) => {
     dispatch({ type: 'STOCK_SHOP', shopId: selectedShop?.id, products });
     dispatch({ type: 'EARN_STAR', count: products.length });
+    setScreen(SCREENS.STREET);
+  }, [dispatch, selectedShop]);
+
+  const handlePhase3Complete = useCallback((servedCount) => {
+    dispatch({ type: 'SERVE_CUSTOMERS', shopId: selectedShop?.id, count: servedCount });
+    dispatch({ type: 'EARN_STAR', count: servedCount * 2 });
     setScreen(SCREENS.STREET);
   }, [dispatch, selectedShop]);
 
@@ -181,6 +195,22 @@ function BornoBazarInner({ onBack }) {
             <Phase2Spelling
               shopColor={selectedShop?.color || '#18b368'}
               onComplete={handlePhase2Complete}
+              onBack={handleBackToStreet}
+            />
+          </motion.div>
+        )}
+        {screen === SCREENS.PHASE3 && (
+          <motion.div
+           key="phase3"
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           exit={{ opacity: 0 }}
+           transition={{ duration: 0.25 }}
+           className="borno-screen"
+          >
+            <Phase3Conversation
+              shopColor={selectedShop?.color || '#18b368'}
+              onComplete={handlePhase3Complete}
               onBack={handleBackToStreet}
             />
           </motion.div>
