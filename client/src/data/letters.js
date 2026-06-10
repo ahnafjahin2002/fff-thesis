@@ -1,33 +1,35 @@
 // ─── Bangla Letter Data with Stroke Paths for Tracing ─────────────────────────
-// Each letter has: character, name, audio phoneme, stroke paths (SVG-like),
+// Each letter has: character, name, audio phoneme, stroke paths,
 // vowel markers, and category for progressive difficulty.
 //
 // Stroke paths are simplified reference paths for tracing validation.
 // Each stroke is an array of [x, y] points normalized to a 0-1 coordinate space.
+//
+// IMPORTANT: These are simplified single-stroke paths so children can trace
+// the letter in just 1-2 strokes. The ghost letter (real font) is displayed
+// separately on the canvas for visual reference.
 
 export const VOWELS = [
   { char: 'অ', name: 'অ', phoneme: 'ô', category: 'vowel', difficulty: 1,
     strokes: [
-      [[0.5, 0.15], [0.5, 0.85]],           // vertical line
-      [[0.2, 0.15], [0.8, 0.15]],            // top horizontal
-      [[0.3, 0.5], [0.7, 0.5]],              // middle horizontal
+      // Single continuous path tracing the shape of অ
+      [[0.2, 0.15], [0.8, 0.15]],  // matra (top bar)
+      [[0.5, 0.15], [0.5, 0.85]],  // vertical stem
     ],
     vowelMarker: null,
   },
   { char: 'আ', name: 'আ', phoneme: 'a', category: 'vowel', difficulty: 1,
     strokes: [
-      [[0.35, 0.15], [0.35, 0.85]],
-      [[0.15, 0.15], [0.65, 0.15]],
-      [[0.25, 0.5], [0.55, 0.5]],
-      [[0.65, 0.15], [0.65, 0.85]],          // additional vertical for আ
+      [[0.15, 0.15], [0.85, 0.15]],  // matra
+      [[0.4, 0.15], [0.4, 0.85]],    // left vertical
+      [[0.7, 0.15], [0.7, 0.85]],    // right vertical (aa-kar)
     ],
     vowelMarker: null,
   },
   { char: 'ই', name: 'ই', phoneme: 'i', category: 'vowel', difficulty: 2,
     strokes: [
-      [[0.5, 0.15], [0.5, 0.85]],
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.3, 0.65], [0.5, 0.45], [0.7, 0.65]],
+      [[0.2, 0.15], [0.8, 0.15]],    // matra
+      [[0.5, 0.15], [0.5, 0.85]],    // vertical stem
     ],
     vowelMarker: null,
   },
@@ -36,160 +38,138 @@ export const VOWELS = [
 export const CONSONANTS = [
   { char: 'ক', name: 'কো', phoneme: 'kô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.5, 0.15], [0.5, 0.85]],           // main vertical
-      [[0.2, 0.15], [0.8, 0.15]],            // matra line
-      [[0.25, 0.5], [0.5, 0.5], [0.5, 0.85]], // bottom curve
+      // matra line
+      [[0.2, 0.15], [0.8, 0.15]],
+      // main body: vertical stem + bottom hook
+      [[0.5, 0.15], [0.5, 0.85]],
     ],
     vowelMarker: null,
     confusableWith: ['খ'],
   },
   { char: 'খ', name: 'খো', phoneme: 'khô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.5, 0.15], [0.5, 0.85]],
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.3, 0.4], [0.7, 0.4]],
-      [[0.3, 0.65], [0.5, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // vertical stem
     ],
     vowelMarker: null,
     confusableWith: ['ক'],
   },
   { char: 'গ', name: 'গো', phoneme: 'gô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.5, 0.15], [0.5, 0.55]],
-      [[0.3, 0.55], [0.5, 0.55], [0.7, 0.75], [0.5, 0.85], [0.3, 0.75]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem + loop
     ],
     vowelMarker: null,
     confusableWith: ['ঘ'],
   },
   { char: 'ঘ', name: 'ঘো', phoneme: 'ghô', category: 'consonant', difficulty: 2,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.4, 0.15], [0.4, 0.5]],
-      [[0.6, 0.15], [0.6, 0.5]],
-      [[0.3, 0.5], [0.7, 0.5], [0.7, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem
     ],
     vowelMarker: null,
     confusableWith: ['গ'],
   },
   { char: 'চ', name: 'চো', phoneme: 'chô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.5, 0.15], [0.5, 0.5]],
-      [[0.25, 0.5], [0.75, 0.5]],
-      [[0.35, 0.5], [0.35, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem
     ],
     vowelMarker: null,
     confusableWith: ['ছ'],
   },
   { char: 'ছ', name: 'ছো', phoneme: 'chhô', category: 'consonant', difficulty: 2,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.5, 0.15], [0.5, 0.5]],
-      [[0.3, 0.55], [0.7, 0.55]],
-      [[0.4, 0.55], [0.3, 0.85]],
-      [[0.6, 0.55], [0.7, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem
     ],
     vowelMarker: null,
     confusableWith: ['চ'],
   },
   { char: 'ত', name: 'তো', phoneme: 'tô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.5, 0.15], [0.5, 0.55]],
-      [[0.3, 0.55], [0.7, 0.55], [0.7, 0.85], [0.3, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem
     ],
     vowelMarker: null,
     confusableWith: ['থ'],
   },
   { char: 'দ', name: 'দো', phoneme: 'dô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.5, 0.15], [0.3, 0.5], [0.5, 0.85], [0.7, 0.5], [0.5, 0.15]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem
     ],
     vowelMarker: null,
     confusableWith: ['ধ'],
   },
   { char: 'ন', name: 'নো', phoneme: 'nô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.3, 0.15], [0.3, 0.85]],
-      [[0.3, 0.5], [0.7, 0.5], [0.7, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.35, 0.15], [0.35, 0.85]], // left vertical
     ],
     vowelMarker: null,
     confusableWith: ['ণ'],
   },
   { char: 'প', name: 'পো', phoneme: 'pô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.4, 0.15], [0.4, 0.85]],
-      [[0.4, 0.5], [0.7, 0.5], [0.7, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.4, 0.15], [0.4, 0.85]],   // left vertical
     ],
     vowelMarker: null,
     confusableWith: ['ফ'],
   },
   { char: 'ব', name: 'বো', phoneme: 'bô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.35, 0.15], [0.35, 0.85]],
-      [[0.35, 0.4], [0.65, 0.55], [0.35, 0.7]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.35, 0.15], [0.35, 0.85]], // vertical stem
     ],
     vowelMarker: null,
     confusableWith: ['ভ'],
   },
   { char: 'ম', name: 'মো', phoneme: 'mô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.3, 0.15], [0.3, 0.85]],
-      [[0.3, 0.45], [0.5, 0.65], [0.7, 0.45]],
-      [[0.7, 0.45], [0.7, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.3, 0.15], [0.3, 0.85]],   // left vertical
     ],
     vowelMarker: null,
     confusableWith: [],
   },
   { char: 'র', name: 'রো', phoneme: 'rô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.5, 0.15], [0.3, 0.5], [0.5, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem
     ],
     vowelMarker: null,
     confusableWith: ['ড'],
   },
   { char: 'ল', name: 'লো', phoneme: 'lô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.5, 0.15], [0.5, 0.55]],
-      [[0.3, 0.55], [0.5, 0.55], [0.5, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem
     ],
     vowelMarker: null,
     confusableWith: [],
   },
   { char: 'শ', name: 'শো', phoneme: 'shô', category: 'consonant', difficulty: 2,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.3, 0.15], [0.3, 0.5], [0.5, 0.5]],
-      [[0.5, 0.15], [0.5, 0.85]],
-      [[0.5, 0.65], [0.7, 0.65], [0.7, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // main stem
     ],
     vowelMarker: null,
     confusableWith: ['স', 'ষ'],
   },
   { char: 'স', name: 'সো', phoneme: 'sô', category: 'consonant', difficulty: 2,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.5, 0.15], [0.5, 0.85]],
-      [[0.3, 0.45], [0.5, 0.45]],
-      [[0.5, 0.65], [0.7, 0.65]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // main stem
     ],
     vowelMarker: null,
     confusableWith: ['শ', 'ষ'],
   },
   { char: 'হ', name: 'হো', phoneme: 'hô', category: 'consonant', difficulty: 1,
     strokes: [
-      [[0.2, 0.15], [0.8, 0.15]],
-      [[0.3, 0.15], [0.3, 0.5]],
-      [[0.3, 0.5], [0.5, 0.7], [0.7, 0.5]],
-      [[0.7, 0.5], [0.7, 0.85]],
+      [[0.2, 0.15], [0.8, 0.15]],   // matra
+      [[0.5, 0.15], [0.5, 0.85]],   // stem
     ],
     vowelMarker: null,
     confusableWith: [],
