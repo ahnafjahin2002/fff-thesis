@@ -82,6 +82,15 @@ function gameReducer(state, action) {
         totalStarsEarned: state.totalStarsEarned + 1,
       };
     }
+    case 'STOCK_SHOP':
+      return {
+         ...state,
+         shops: state.shops.map(shop =>
+           shop.id === action.shopId
+             ? { ...shop, products: action.products, stocked: true }
+            : shop
+        ),
+      };
 
     case 'EARN_STAR':
       return { ...state, playerStars: state.playerStars + (action.count || 1), totalStarsEarned: state.totalStarsEarned + (action.count || 1) };

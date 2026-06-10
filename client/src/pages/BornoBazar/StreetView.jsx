@@ -51,27 +51,42 @@ export default function StreetView({ onBuild, onTapShop, onBack }) {
           </>
         ) : (
           // Built shops
-          streetShops.map((shop, i) => (
-            <motion.div 
-              key={shop.id}
-              className="street-shop"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              onClick={() => onTapShop(shop.id)}
-            >
-              <div className="shop-facade">
-                <div 
-                  className="shop-awning" 
-                  style={{ '--shop-color': shop.color.accent }}
-                />
-                <div className="shop-body" style={{ background: shop.color.color }}>
-                  <div className="shop-sign">{shop.letter}</div>
-                </div>
-                <div className="shop-counter" />
-              </div>
-            </motion.div>
-          ))
+streetShops.map((shop, i) => {
+  const shopMainColor =
+    typeof shop.color === 'string'
+      ? shop.color
+      : shop.color?.color || '#18b368';
+
+  const shopAccentColor =
+    typeof shop.color === 'string'
+      ? shop.color
+      : shop.color?.accent || shopMainColor;
+
+  return (
+    <motion.div 
+      key={shop.id}
+      className="street-shop"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: i * 0.1 }}
+      onClick={() => onTapShop(shop.id)}
+      whileHover={{ scale: 1.04 }}
+      whileTap={{ scale: 0.95 }}
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="shop-facade">
+        <div 
+          className="shop-awning" 
+          style={{ '--shop-color': shopAccentColor }}
+        />
+        <div className="shop-body" style={{ background: shopMainColor }}>
+          <div className="shop-sign">{shop.letter}</div>
+        </div>
+        <div className="shop-counter" />
+      </div>
+    </motion.div>
+  );
+})
         )}
       </div>
 

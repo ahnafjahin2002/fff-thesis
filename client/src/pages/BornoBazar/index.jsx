@@ -14,6 +14,7 @@ import ShopColorPicker from './ShopColorPicker';
 import ShopBuiltCelebration from './ShopBuiltCelebration';
 import SessionRestPrompt from './SessionRestPrompt';
 import './BornoBazar.css';
+import Phase2Spelling from './Phase2Spelling';
 
 // ─── Screen Flow States ───────────────────────────────────────────────────────
 const SCREENS = {
@@ -22,11 +23,13 @@ const SCREENS = {
   TRACING: 'tracing',
   COLOR_PICK: 'color_pick',
   CELEBRATION: 'celebration',
+  PHASE2: 'phase2', 
 };
 
 function BornoBazarInner({ onBack }) {
   const [screen, setScreen] = useState(SCREENS.STREET);
   const [showRest, setShowRest] = useState(false);
+  const [selectedShop, setSelectedShop] = useState(null);
   const { state, dispatch, isSessionExpired } = useGameState();
 
   // Check session time periodically
@@ -71,10 +74,19 @@ function BornoBazarInner({ onBack }) {
   }, [dispatch]);
 
   const handleTapShop = useCallback((shopId) => {
-    // Phase 2 entry — for now, just show a message
-    // This will be implemented in Phase 2
-    console.log('Shop tapped:', shopId);
-  }, []);
+  const shop = state.streetShops?.find(s => s.id === shopId);
+
+  setSelectedShop(shop || { id: shopId, color: '#18b368' });
+  checkSession();
+  dispatch({ type: 'SET_PHASE', phase: 2 });
+  setScreen(SCREENS.PHASE2);
+}, [state.streetShops, checkSession, dispatch]);
+
+  const handlePhase2Complete = useCallback((products) => {
+    dispatch({ type: 'STOCK_SHOP', shopId: selectedShop?.id, products });
+    dispatch({ type: 'EARN_STAR', count: products.length });
+    setScreen(SCREENS.STREET);
+  }, [dispatch, selectedShop]);
 
   return (
     <div className="borno-bazar-root">
@@ -154,6 +166,22 @@ function BornoBazarInner({ onBack }) {
           >
             <ShopBuiltCelebration
               onDone={handleCelebrationDone}
+            />
+          </motion.div>
+        )}
+        {screen === SCREENS.PHASE2 && (
+          <motion.div
+           key="phase2"
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           exit={{ opacity: 0 }}
+           transition={{ duration: 0.25 }}
+           className="borno-screen"
+          >
+            <Phase2Spelling
+              shopColor={selectedShop?.color || '#18b368'}
+              onComplete={handlePhase2Complete}
+              onBack={handleBackToStreet}
             />
           </motion.div>
         )}

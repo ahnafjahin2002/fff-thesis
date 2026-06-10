@@ -1,0 +1,394 @@
+/* client/src/pages/BornoBazar/Phase2Spelling.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+
+/* ─── ROOT VARIABLES ─── */
+:root {
+  --green: #18b368;
+  --mint-bg: #e8f7ee;
+  --cream: #fdf6e3;
+  --sky: #4fc3f7;
+  --gold: #ffc107;
+  --error: #ef9a9a;
+  --dark-text: #1a2e1a;
+  --white: #ffffff;
+  --teal: #26C6DA;
+}
+
+/* ─── CONTAINER ─── */
+.phase2-container {
+  font-family: 'Hind Siliguri', sans-serif;
+  background: var(--mint-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  color: var(--dark-text);
+}
+
+/* ─── TOP BAR ─── */
+.phase2-topbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--white);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.p2-back-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--dark-text);
+  transition: background 0.2s;
+}
+.p2-back-btn:hover { background: var(--mint-bg); }
+
+.p2-shop-label {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.p2-progress-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.p2-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ccc;
+  transition: background 0.3s;
+}
+.p2-dot.filled {
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+}
+
+/* ─── SHELF ─── */
+.phase2-shelf {
+  width: 90%;
+  max-width: 480px;
+  margin: 16px auto 8px;
+}
+
+.shelf-board {
+  background: #c8a96e;
+  border-radius: 12px;
+  min-height: 80px;
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 4px 0 #a07840, inset 0 -2px 8px rgba(0,0,0,0.15);
+}
+
+.shelf-empty-hint {
+  color: #fdf6e3aa;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.shelf-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.shelf-emoji { font-size: 32px; }
+.shelf-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+  background: rgba(0,0,0,0.25);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+/* Drop-in animation for shelf items */
+@keyframes dropIn {
+  0%  { transform: translateY(-40px) scale(0.7); opacity: 0; }
+  70% { transform: translateY(6px) scale(1.05); }
+  100%{ transform: translateY(0) scale(1); opacity: 1; }
+}
+.drop-in { animation: dropIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* ─── PRODUCT CLUE ─── */
+.phase2-clue-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--cream);
+  border-radius: 16px;
+  padding: 16px 24px;
+  margin: 8px 16px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  position: relative;
+}
+
+.clue-emoji { font-size: 56px; line-height: 1; margin-bottom: 8px; }
+
+.clue-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--dark-text);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.audio-btn {
+  background: var(--teal);
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(38, 198, 218, 0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.audio-btn:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 6px rgba(38, 198, 218, 0.3);
+}
+
+/* ─── WORD SLOTS ─── */
+.phase2-slots {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 12px 16px;
+  width: 90%;
+  max-width: 480px;
+}
+
+.word-slot {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: var(--cream);
+  border: 3px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--dark-text);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.word-slot.filled {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(24, 179, 104, 0.25);
+}
+
+/* Wave animation on word complete */
+@keyframes wordSuccessWave {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+.word-slot.word-correct {
+  animation: wordSuccessWave 0.5s ease;
+  border-color: var(--gold);
+  box-shadow: 0 0 12px var(--gold);
+}
+
+/* ─── TILE POOL ─── */
+.phase2-tiles {
+  width: 90%;
+  max-width: 480px;
+  background: var(--white);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 8px 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.tile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.letter-tile {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: var(--white);
+  border: 3px solid var(--green);
+  font-family: 'Hind Siliguri', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--dark-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s, box-shadow 0.12s;
+  min-width: 44px;
+  min-height: 44px;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.12);
+}
+.letter-tile:active {
+  transform: scale(0.92);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+.letter-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(24, 179, 104, 0.2);
+}
+
+/* Wrong tile wiggle */
+@keyframes wiggle {
+  0%  { transform: translateX(0); }
+  20% { transform: translateX(4px); }
+  40% { transform: translateX(-4px); }
+  60% { transform: translateX(3px); }
+  80% { transform: translateX(-3px); }
+  100%{ transform: translateX(0); }
+}
+.letter-tile.wiggle {
+  animation: wiggle 0.35s ease;
+  border-color: var(--error) !important;
+}
+
+/* Hint pulse */
+@keyframes hintPulse {
+  0%, 100% { box-shadow: 0 0 0 0px rgba(255, 193, 7, 0.5); }
+  50%       { box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); }
+}
+.letter-tile.hint-pulse {
+  animation: hintPulse 1s infinite;
+  border-color: var(--gold) !important;
+  background: #fffde7;
+}
+
+/* Undo button */
+.undo-btn {
+  background: none;
+  border: 2px solid #ccc;
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-family: 'Hind Siliguri', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #888;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  min-height: 44px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.undo-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* ─── MASCOT ─── */
+.phase2-mascot {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+.mascot-emoji { font-size: 48px; }
+
+.mascot-bubble {
+  background: var(--white);
+  border-radius: 16px;
+  border: 2px solid var(--green);
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark-text);
+  margin-bottom: 6px;
+  max-width: 160px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  animation: bubbleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes bubbleIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Mascot bounce on celebrate */
+@keyframes mascotBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+.phase2-mascot.mascot-celebrate .mascot-emoji {
+  animation: mascotBounce 0.5s ease 2;
+}
+
+/* ─── CELEBRATION OVERLAY ─── */
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(24, 179, 104, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.4s ease;
+}
+
+.celebration-text {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--white);
+  text-align: center;
+  padding: 0 24px;
+  line-height: 1.6;
+}
+
+.celebration-stars {
+  font-size: 40px;
+  margin-top: 16px;
+  letter-spacing: 8px;
+  animation: starPop 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes starPop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 375px) {
+  .letter-tile { width: 54px; height: 54px; font-size: 24px; }
+  .word-slot   { width: 54px; height: 54px; font-size: 24px; }
+  .clue-emoji  { font-size: 44px; }
+}
