@@ -1,0 +1,523 @@
+/* ─── বর্ণের দোকান — Global Game Styles ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+
+:root {
+  --bb-green: #18b368;
+  --bb-green-dark: #0f9055;
+  --bb-mint: #e8f7ee;
+  --bb-cream: #fdf6e3;
+  --bb-blue: #4fc3f7;
+  --bb-yellow: #ffc107;
+  --bb-purple: #ab47bc;
+  --bb-orange: #ff8f00;
+  --bb-error: #ef9a9a;
+  --bb-white: #ffffff;
+  --bb-text: #1a2e1a;
+  --bb-teal: #26C6DA;
+}
+
+.borno-bazar-root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Hind Siliguri', sans-serif;
+  position: relative;
+  background: #f0faf4;
+}
+
+.borno-screen {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+/* ── Street View ── */
+.street-view {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.street-bg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.street-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(253,246,227,0.3) 0%, rgba(232,247,238,0.5) 100%);
+}
+
+.street-header {
+  position: relative; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 24px 12px;
+}
+
+.street-title {
+  font-size: 28px; font-weight: 700;
+  color: var(--bb-text);
+  text-shadow: 0 1px 4px rgba(255,255,255,0.7);
+}
+
+.star-display {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.85);
+  padding: 8px 16px; border-radius: 50px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.star-icon { font-size: 20px; }
+.star-count { font-size: 18px; font-weight: 700; color: var(--bb-text); }
+
+.street-shops-area {
+  flex: 1; position: relative; z-index: 5;
+  display: flex; flex-wrap: wrap;
+  justify-content: center; align-items: flex-end;
+  gap: 16px; padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.empty-plot {
+  width: 140px; height: 170px;
+  border: 3px dashed rgba(24,179,104,0.3);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.25);
+  animation: plotPulse 3s ease-in-out infinite;
+}
+
+@keyframes plotPulse {
+  0%, 100% { border-color: rgba(24,179,104,0.2); }
+  50% { border-color: rgba(24,179,104,0.5); }
+}
+
+.street-bottom {
+  position: relative; z-index: 10;
+  padding: 16px 24px 28px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+
+.shop-count-text {
+  font-size: 16px; font-weight: 600;
+  color: var(--bb-text);
+  opacity: 0.7;
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  min-height: 56px; min-width: 200px;
+  padding: 14px 36px;
+  border: none; border-radius: 50px;
+  background: var(--bb-green);
+  color: white;
+  font-family: 'Hind Siliguri', sans-serif;
+  font-size: 20px; font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(24,179,104,0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(24,179,104,0.4); }
+.btn-primary:active { transform: scale(0.95); }
+
+.btn-back {
+  width: 48px; height: 48px;
+  border: none; border-radius: 14px;
+  background: rgba(255,255,255,0.9);
+  font-size: 22px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  transition: transform 0.1s;
+}
+.btn-back:active { transform: scale(0.9); }
+
+.btn-audio {
+  width: 56px; height: 56px;
+  border: none; border-radius: 50%;
+  background: var(--bb-teal);
+  color: white; font-size: 24px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s;
+  box-shadow: 0 3px 12px rgba(38,198,218,0.3);
+}
+.btn-audio:active { transform: scale(0.9); }
+
+/* ── Letter Selection ── */
+.letter-select {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #e8f7ee 0%, #fdf6e3 100%);
+  padding: 24px;
+}
+
+.letter-select-header {
+  width: 100%;
+  display: flex; justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.letter-select-prompt {
+  font-size: 24px; font-weight: 700;
+  color: var(--bb-text);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.letter-cards {
+  display: flex; gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.letter-card {
+  width: 140px; height: 160px;
+  border: none; border-radius: 24px;
+  background: var(--bb-white);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transition: transform 0.15s, box-shadow 0.15s;
+  font-family: 'Hind Siliguri', sans-serif;
+}
+.letter-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+.letter-card:active { transform: scale(0.92); }
+
+.letter-card-char {
+  font-size: 72px; font-weight: 700;
+  line-height: 1; color: var(--bb-text);
+}
+
+.letter-card-name {
+  font-size: 14px; font-weight: 600;
+  color: #687076;
+}
+
+/* ── Tracing Screen ── */
+.tracing-screen {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  background-size: cover; background-position: center;
+  position: relative;
+}
+
+.tracing-screen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(253,246,227,0.85);
+  backdrop-filter: blur(12px);
+}
+
+.tracing-header {
+  position: relative; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 24px;
+}
+
+.tracing-letter-display {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding: 8px 24px;
+}
+
+.tracing-target-letter {
+  font-size: 80px; font-weight: 700;
+  color: var(--bb-text); line-height: 1;
+}
+
+.tracing-canvas-area {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px 24px;
+  position: relative; z-index: 10;
+}
+
+.tracing-canvas-wrapper {
+  width: 100%; max-width: 460px;
+  aspect-ratio: 4/3;
+  background: var(--bb-cream);
+  border: 4px solid var(--bb-green);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.tracing-canvas {
+  display: block;
+  width: 100%; height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.tracing-ghost-letter {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 200px; font-weight: 700;
+  color: rgba(24,179,104,0.12);
+  pointer-events: none;
+  font-family: 'Hind Siliguri', sans-serif;
+  line-height: 1;
+}
+
+.tracing-stroke-indicator {
+  position: relative; z-index: 10;
+  text-align: center;
+  padding: 8px;
+  font-size: 16px; font-weight: 600;
+  color: var(--bb-text);
+  opacity: 0.6;
+}
+
+.tracing-mascot {
+  position: absolute;
+  bottom: 12px; left: 16px;
+  z-index: 20;
+  width: 100px; height: auto;
+  pointer-events: none;
+}
+
+.tracing-hint-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; z-index: 15;
+}
+
+/* ── Stroke completion animation ── */
+.stroke-complete-flash {
+  position: absolute; inset: 0;
+  background: rgba(24,179,104,0.1);
+  pointer-events: none;
+  animation: strokeFlash 0.4s ease-out forwards;
+}
+
+@keyframes strokeFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Wiggle animation for wrong strokes ── */
+@keyframes wiggle {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(3px); }
+  40% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+  80% { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+.wiggle { animation: wiggle 0.3s ease-in-out; }
+
+/* ── Shop Color Picker ── */
+.color-picker-screen {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #e8f7ee 0%, #fdf6e3 100%);
+  gap: 32px; padding: 24px;
+}
+
+.color-picker-title {
+  font-size: 26px; font-weight: 700;
+  color: var(--bb-text); text-align: center;
+}
+
+.color-options {
+  display: flex; gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.color-option {
+  width: 72px; height: 72px;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+.color-option:hover { transform: scale(1.1); }
+.color-option:active { transform: scale(0.9); }
+.color-option.selected { border-color: var(--bb-text); transform: scale(1.15); }
+
+/* ── Celebration Screen ── */
+.celebration-screen {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #e8f7ee 0%, #fdf6e3 100%);
+  gap: 20px; padding: 24px;
+  text-align: center;
+}
+
+.celebration-emoji { font-size: 80px; }
+
+.celebration-title {
+  font-size: 32px; font-weight: 700;
+  color: var(--bb-text);
+}
+
+.celebration-sub {
+  font-size: 18px; color: #687076;
+  font-weight: 500;
+}
+
+/* ── Shop on Street ── */
+.street-shop {
+  width: 140px;
+  display: flex; flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.street-shop:hover { transform: translateY(-4px); }
+.street-shop:active { transform: scale(0.95); }
+
+.shop-facade {
+  width: 130px; height: 150px;
+  border-radius: 16px 16px 4px 4px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.shop-awning {
+  height: 30px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--shop-color) 0px,
+    var(--shop-color) 15px,
+    white 15px,
+    white 30px
+  );
+  border-radius: 16px 16px 0 0;
+}
+
+.shop-body {
+  flex: 1;
+  background: #f5e6c8;
+  display: flex; align-items: center; justify-content: center;
+  padding: 8px;
+}
+
+.shop-sign {
+  width: 90%; height: 50px;
+  background: var(--bb-cream);
+  border: 2px solid #d4c5a0;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700;
+  color: var(--bb-text);
+}
+
+.shop-counter {
+  height: 24px;
+  background: #8B6914;
+  border-radius: 0 0 4px 4px;
+}
+
+.shop-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--bb-text);
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* ── Session Rest Prompt ── */
+.rest-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+
+.rest-card {
+  background: white;
+  border-radius: 28px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 360px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+}
+
+.rest-emoji { font-size: 64px; margin-bottom: 16px; }
+.rest-title { font-size: 24px; font-weight: 700; color: var(--bb-text); margin-bottom: 8px; }
+.rest-sub { font-size: 16px; color: #687076; margin-bottom: 24px; }
+
+.rest-actions {
+  display: flex; gap: 12px;
+  justify-content: center;
+}
+
+/* ── Mascot States ── */
+.mascot-container {
+  position: relative;
+  display: inline-block;
+}
+
+.mascot-speech {
+  position: absolute;
+  bottom: 100%; left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 16px;
+  padding: 10px 16px;
+  font-size: 14px; font-weight: 600;
+  color: var(--bb-text);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  white-space: nowrap;
+  margin-bottom: 8px;
+}
+
+.mascot-speech::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: white;
+}
+
+/* ── Star Float Animation ── */
+@keyframes starFloat {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  50% { opacity: 1; transform: translate(-20px, -60px) scale(1.2); }
+  100% { opacity: 0; transform: translate(-40px, -120px) scale(0.5); }
+}
+
+.star-float {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: starFloat 0.8s ease-out forwards;
+}
+
+/* ── Vowel Marker Animation ── */
+@keyframes floatFromRight { from { transform: translateX(80px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes floatFromLeft { from { transform: translateX(-80px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes floatFromAbove { from { transform: translateY(-60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes floatFromBelow { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.vowel-float-right { animation: floatFromRight 0.6s ease-in-out forwards; }
+.vowel-float-left { animation: floatFromLeft 0.6s ease-in-out forwards; }
+.vowel-float-above { animation: floatFromAbove 0.6s ease-in-out forwards; }
+.vowel-float-below { animation: floatFromBelow 0.6s ease-in-out forwards; }
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .street-title { font-size: 22px; }
+  .letter-card { width: 110px; height: 130px; }
+  .letter-card-char { font-size: 56px; }
+  .tracing-target-letter { font-size: 60px; }
+  .tracing-ghost-letter { font-size: 140px; }
+  .btn-primary { min-width: 180px; font-size: 18px; }
+  .celebration-title { font-size: 26px; }
+}
