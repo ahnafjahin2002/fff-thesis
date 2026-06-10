@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
 import PhonemeHighlighter from "../components/reader/PhonemeHighlighter";
+import BornoBazar from "./BornoBazar";
 
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
@@ -314,7 +315,7 @@ const CloudSVG = ({ w = 50, style = {} }) => (
     <ellipse cx="30" cy="26" rx="28" ry="12" fill="white" />
     <circle cx="20" cy="22" r="11" fill="white" />
     <circle cx="34" cy="18" r="14" fill="white" />
-    <circle cx="46" cy="24" r="9"  fill="white" />
+    <circle cx="46" cy="24" r="9" fill="white" />
   </svg>
 );
 
@@ -322,7 +323,7 @@ const SunSVG = () => (
   <svg width="68" height="68" viewBox="0 0 80 80">
     <circle cx="40" cy="40" r="22" fill="#FFD700" />
     <circle cx="40" cy="40" r="18" fill="#FFEC3D" />
-    {[0,45,90,135,180,225,270,315].map((a, i) => (
+    {[0, 45, 90, 135, 180, 225, 270, 315].map((a, i) => (
       <line key={i} x1="40" y1="40"
         x2={40 + 32 * Math.cos(a * Math.PI / 180)}
         y2={40 + 32 * Math.sin(a * Math.PI / 180)}
@@ -360,8 +361,8 @@ const BookSVG = () => (
     <rect x="6" y="10" width="19" height="32" rx="3" fill="#fff" />
     <rect x="27" y="10" width="19" height="32" rx="3" fill="#f0f0f0" />
     <line x1="26" y1="10" x2="26" y2="42" stroke="#5ba0e0" strokeWidth="2" />
-    {[15,20,25,30].map(y => <line key={y} x1="9" y1={y} x2="22" y2={y} stroke="#ccc" strokeWidth="1.5" />)}
-    {[15,20,25,30].map(y => <line key={y} x1="30" y1={y} x2="43" y2={y} stroke="#ccc" strokeWidth="1.5" />)}
+    {[15, 20, 25, 30].map(y => <line key={y} x1="9" y1={y} x2="22" y2={y} stroke="#ccc" strokeWidth="1.5" />)}
+    {[15, 20, 25, 30].map(y => <line key={y} x1="30" y1={y} x2="43" y2={y} stroke="#ccc" strokeWidth="1.5" />)}
   </svg>
 );
 
@@ -411,12 +412,12 @@ const TrophySVG = () => (
   </svg>
 );
 
-const HomeSVG   = () => <svg width="22" height="22" viewBox="0 0 28 28"><path d="M3 14 L14 4 L25 14 V26 H18 V19 H10 V26 H3 Z" fill="#18b368"/></svg>;
+const HomeSVG = () => <svg width="22" height="22" viewBox="0 0 28 28"><path d="M3 14 L14 4 L25 14 V26 H18 V19 H10 V26 H3 Z" fill="#18b368" /></svg>;
 const SettingsSVG = () => (
   <svg width="22" height="22" viewBox="0 0 28 28">
-    <circle cx="14" cy="14" r="3.5" fill="#8b5cf6"/>
-    <path d="M14 2v3M14 23v3M2 14h3M23 14h3M5.5 5.5l2.1 2.1M20.4 20.4l2.1 2.1M20.4 5.5l-2.1 2.1M7.6 20.4l-2.1 2.1" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round"/>
-    <circle cx="14" cy="14" r="5.5" fill="none" stroke="#8b5cf6" strokeWidth="2.2"/>
+    <circle cx="14" cy="14" r="3.5" fill="#8b5cf6" />
+    <path d="M14 2v3M14 23v3M2 14h3M23 14h3M5.5 5.5l2.1 2.1M20.4 20.4l2.1 2.1M20.4 5.5l-2.1 2.1M7.6 20.4l-2.1 2.1" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" />
+    <circle cx="14" cy="14" r="5.5" fill="none" stroke="#8b5cf6" strokeWidth="2.2" />
   </svg>
 );
 
@@ -428,75 +429,75 @@ const DEFAULT_USER = {
 };
 
 const DEFAULT_ACTIVITIES = [
-  { id: "read",    title: "পড়া",     sub: "সহজ গল্প পড়ি\nআর নতুন শব্দ শিখি", bg: "#eef9f1", accent: "#18b368", icon: <BookSVG /> },
-  { id: "phoneme", title: "ফোনেমস",  sub: "অক্ষর চিনি\nশব্দ গঠন শিখি",       bg: "#fffbee", accent: "#f5a623", icon: <BoardSVG /> },
-  { id: "game",    title: "খেলা",    sub: "খেলার মাধ্যমে\nশিখি আর মজা করি",   bg: "#f0efff", accent: "#7c75dd", icon: <GamepadSVG /> },
-  { id: "trace",   title: "ট্রেনিং", sub: "লেখা ও বানান চর্চা\nকরি প্রতিদিন", bg: "#fff0f5", accent: "#f06292", icon: <PencilSVG /> },
+  { id: "read", title: "পড়া", sub: "সহজ গল্প পড়ি\nআর নতুন শব্দ শিখি", bg: "#eef9f1", accent: "#18b368", icon: <BookSVG /> },
+  { id: "phoneme", title: "ফোনেমস", sub: "অক্ষর চিনি\nশব্দ গঠন শিখি", bg: "#fffbee", accent: "#f5a623", icon: <BoardSVG /> },
+  { id: "game", title: "বর্ণের দোকান", sub: "খেলার মাধ্যমে\nশিখি আর মজা করি", bg: "#f0efff", accent: "#7c75dd", icon: <GamepadSVG /> },
+  { id: "trace", title: "ট্রেনিং", sub: "লেখা ও বানান চর্চা\nকরি প্রতিদিন", bg: "#fff0f5", accent: "#f06292", icon: <PencilSVG /> },
 ];
 
 const DEFAULT_PROGRESS = 70;
 
 const DEFAULT_ACHIEVEMENTS = [
   { num: "১২", label: "গল্প পড়া হয়েছে", color: "#18b368", bg: "#e8f4ff", icon: <BookSVG /> },
-  { num: "৩৪", label: "অক্ষর শিখেছি",   color: "#f5a623", bg: "#fff8e8", icon: <BoardSVG /> },
-  { num: "১৮", label: "খেলা সম্পন্ন",   color: "#7c75dd", bg: "#f0efff", icon: <GamepadSVG /> },
-  { num: "১২৫",label: "তারকা পয়েন্ট",  color: "#18b368", bg: "#fffbdd", icon: <StarSVG size={36} /> },
+  { num: "৩৪", label: "অক্ষর শিখেছি", color: "#f5a623", bg: "#fff8e8", icon: <BoardSVG /> },
+  { num: "১৮", label: "খেলা সম্পন্ন", color: "#7c75dd", bg: "#f0efff", icon: <GamepadSVG /> },
+  { num: "১২৫", label: "তারকা পয়েন্ট", color: "#18b368", bg: "#fffbdd", icon: <StarSVG size={36} /> },
 ];
 
 const NAV_ITEMS = [
-  { id: "home",     label: "হোম",     icon: <HomeSVG /> },
-  { id: "read",     label: "পড়া",     icon: <BookSVG /> },
-  { id: "phoneme",  label: "ফোনেমস",  icon: <BoardSVG /> },
-  { id: "game",     label: "খেলা",    icon: <GamepadSVG /> },
-  { id: "trace",    label: "ট্রেনিং", icon: <PencilSVG /> },
-  { id: "rewards",  label: "অর্জন",   icon: <TrophySVG /> },
-  { id: "settings", label: "সেটিংস",  icon: <SettingsSVG /> },
+  { id: "home", label: "হোম", icon: <HomeSVG /> },
+  { id: "read", label: "পড়া", icon: <BookSVG /> },
+  { id: "phoneme", label: "ফোনেমস", icon: <BoardSVG /> },
+  { id: "game", label: "বর্ণের দোকান", icon: <GamepadSVG /> },
+  { id: "trace", label: "ট্রেনিং", icon: <PencilSVG /> },
+  { id: "rewards", label: "অর্জন", icon: <TrophySVG /> },
+  { id: "settings", label: "সেটিংস", icon: <SettingsSVG /> },
 ];
 
 // ─── Sub-pages ────────────────────────────────────────────────────────────────
 function ProgressPage() {
   const stats = [
-    { label:"মোট পড়া", value:"১২ টি", color:"#4a90d9" },
-    { label:"স্ট্রিক",  value:"৫ দিন", color:"#f5a623" },
-    { label:"স্কোর",   value:"৮৫%",   color:"#3cb371" },
-    { label:"ব্যাজ",   value:"৩ টি",  color:"#8b5cf6" },
+    { label: "মোট পড়া", value: "১২ টি", color: "#4a90d9" },
+    { label: "স্ট্রিক", value: "৫ দিন", color: "#f5a623" },
+    { label: "স্কোর", value: "৮৫%", color: "#3cb371" },
+    { label: "ব্যাজ", value: "৩ টি", color: "#8b5cf6" },
   ];
-  const days = ["সো","মঙ","বু","বৃ","শু","শ","র"];
-  const done = [true,true,true,true,true,false,false];
+  const days = ["সো", "মঙ", "বু", "বৃ", "শু", "শ", "র"];
+  const done = [true, true, true, true, true, false, false];
   return (
-    <div style={{padding:"24px 20px"}}>
-      <h2 style={{fontSize:22,fontWeight:700,color:"#1d2b2a",marginBottom:20}}>আমার অগ্রগতি</h2>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:24}}>
-        {stats.map(s=>(
-          <motion.div key={s.label} whileHover={{scale:1.03}}
-            style={{background:"white",borderRadius:20,padding:"18px 14px",boxShadow:"0 4px 16px rgba(0,0,0,.06)",textAlign:"center"}}>
-            <div style={{fontSize:26,fontWeight:800,color:s.color}}>{s.value}</div>
-            <div style={{fontSize:13,color:"#888",marginTop:4}}>{s.label}</div>
+    <div style={{ padding: "24px 20px" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1d2b2a", marginBottom: 20 }}>আমার অগ্রগতি</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
+        {stats.map(s => (
+          <motion.div key={s.label} whileHover={{ scale: 1.03 }}
+            style={{ background: "white", borderRadius: 20, padding: "18px 14px", boxShadow: "0 4px 16px rgba(0,0,0,.06)", textAlign: "center" }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: s.color }}>{s.value}</div>
+            <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>{s.label}</div>
           </motion.div>
         ))}
       </div>
-      <div style={{background:"white",borderRadius:20,padding:20,boxShadow:"0 4px 16px rgba(0,0,0,.06)",marginBottom:20}}>
-        <h3 style={{fontSize:16,fontWeight:700,marginBottom:14,color:"#333"}}>এই সপ্তাহের স্ট্রিক</h3>
-        <div style={{display:"flex",gap:8,justifyContent:"space-between"}}>
-          {days.map((d,i)=>(
-            <div key={d} style={{textAlign:"center"}}>
-              <div style={{width:36,height:36,borderRadius:"50%",background:done[i]?"#ffd700":"#f0f0f0",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,marginBottom:4}}>
-                {done[i]?"⭐":"○"}
+      <div style={{ background: "white", borderRadius: 20, padding: 20, boxShadow: "0 4px 16px rgba(0,0,0,.06)", marginBottom: 20 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 14, color: "#333" }}>এই সপ্তাহের স্ট্রিক</h3>
+        <div style={{ display: "flex", gap: 8, justifyContent: "space-between" }}>
+          {days.map((d, i) => (
+            <div key={d} style={{ textAlign: "center" }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: done[i] ? "#ffd700" : "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 4 }}>
+                {done[i] ? "⭐" : "○"}
               </div>
-              <div style={{fontSize:11,color:"#888"}}>{d}</div>
+              <div style={{ fontSize: 11, color: "#888" }}>{d}</div>
             </div>
           ))}
         </div>
       </div>
-      <div style={{background:"white",borderRadius:20,padding:20,boxShadow:"0 4px 16px rgba(0,0,0,.06)"}}>
-        <h3 style={{fontSize:16,fontWeight:700,marginBottom:14,color:"#333"}}>সাম্প্রতিক কার্যক্রম</h3>
-        {[{t:"পড়া — পাঠ ৩",d:"আজ",s:"★★★"},{t:"ফোনেমস চর্চা",d:"গতকাল",s:"★★☆"},{t:"শব্দ খেলা লেভেল ৪",d:"২ দিন আগে",s:"★★★"}].map((r,i)=>(
-          <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 0",borderBottom:i<2?"1px solid #f0f0f0":"none"}}>
+      <div style={{ background: "white", borderRadius: 20, padding: 20, boxShadow: "0 4px 16px rgba(0,0,0,.06)" }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 14, color: "#333" }}>সাম্প্রতিক কার্যক্রম</h3>
+        {[{ t: "পড়া — পাঠ ৩", d: "আজ", s: "★★★" }, { t: "ফোনেমস চর্চা", d: "গতকাল", s: "★★☆" }, { t: "শব্দ খেলা লেভেল ৪", d: "২ দিন আগে", s: "★★★" }].map((r, i) => (
+          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: i < 2 ? "1px solid #f0f0f0" : "none" }}>
             <div>
-              <div style={{fontWeight:600,fontSize:14}}>{r.t}</div>
-              <div style={{fontSize:12,color:"#aaa"}}>{r.d}</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{r.t}</div>
+              <div style={{ fontSize: 12, color: "#aaa" }}>{r.d}</div>
             </div>
-            <div style={{color:"#f5a623",fontSize:16}}>{r.s}</div>
+            <div style={{ color: "#f5a623", fontSize: 16 }}>{r.s}</div>
           </div>
         ))}
       </div>
@@ -506,26 +507,28 @@ function ProgressPage() {
 
 function RewardsPage() {
   const badges = [
-    {emoji:"🏆",label:"পাঠ চ্যাম্পিয়ন",earned:true},
-    {emoji:"⭐",label:"৫ দিনের স্ট্রিক",earned:true},
-    {emoji:"🎯",label:"নিখুঁত স্কোর",earned:true},
-    {emoji:"📚",label:"১০ টি পাঠ",earned:false},
-    {emoji:"🎮",label:"গেম মাস্টার",earned:false},
-    {emoji:"✏️",label:"ট্রেসিং হিরো",earned:false},
+    { emoji: "🏆", label: "পাঠ চ্যাম্পিয়ন", earned: true },
+    { emoji: "⭐", label: "৫ দিনের স্ট্রিক", earned: true },
+    { emoji: "🎯", label: "নিখুঁত স্কোর", earned: true },
+    { emoji: "📚", label: "১০ টি পাঠ", earned: false },
+    { emoji: "🎮", label: "গেম মাস্টার", earned: false },
+    { emoji: "✏️", label: "ট্রেসিং হিরো", earned: false },
   ];
   return (
-    <div style={{padding:"24px 20px"}}>
-      <h2 style={{fontSize:22,fontWeight:700,color:"#1d2b2a",marginBottom:6}}>পুরস্কার</h2>
-      <p style={{fontSize:14,color:"#888",marginBottom:20}}>তুমি এখন পর্যন্ত ৩ টি ব্যাজ পেয়েছ!</p>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14}}>
-        {badges.map((b,i)=>(
-          <motion.div key={i} whileHover={{scale:1.05}} whileTap={{scale:.95}}
-            style={{background:b.earned?"white":"#f9f9f9",borderRadius:16,padding:"16px 8px",textAlign:"center",
-              boxShadow:b.earned?"0 4px 16px rgba(0,0,0,.08)":"none",
-              border:b.earned?"2px solid #ffd700":"2px dashed #ddd",opacity:b.earned?1:.5}}>
-            <div style={{fontSize:32,marginBottom:8}}>{b.emoji}</div>
-            <div style={{fontSize:11,fontWeight:600,color:b.earned?"#333":"#aaa",lineHeight:1.3}}>{b.label}</div>
-            {b.earned && <div style={{fontSize:10,color:"#f5a623",marginTop:4}}>✓ অর্জিত</div>}
+    <div style={{ padding: "24px 20px" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1d2b2a", marginBottom: 6 }}>পুরস্কার</h2>
+      <p style={{ fontSize: 14, color: "#888", marginBottom: 20 }}>তুমি এখন পর্যন্ত ৩ টি ব্যাজ পেয়েছ!</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+        {badges.map((b, i) => (
+          <motion.div key={i} whileHover={{ scale: 1.05 }} whileTap={{ scale: .95 }}
+            style={{
+              background: b.earned ? "white" : "#f9f9f9", borderRadius: 16, padding: "16px 8px", textAlign: "center",
+              boxShadow: b.earned ? "0 4px 16px rgba(0,0,0,.08)" : "none",
+              border: b.earned ? "2px solid #ffd700" : "2px dashed #ddd", opacity: b.earned ? 1 : .5
+            }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>{b.emoji}</div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: b.earned ? "#333" : "#aaa", lineHeight: 1.3 }}>{b.label}</div>
+            {b.earned && <div style={{ fontSize: 10, color: "#f5a623", marginTop: 4 }}>✓ অর্জিত</div>}
           </motion.div>
         ))}
       </div>
@@ -535,25 +538,27 @@ function RewardsPage() {
 
 function ActivityPage() {
   const lessons = [
-    {title:"পাঠ ১ — আমার পরিবার",level:"সহজ",done:true,icon:"📖"},
-    {title:"পাঠ ২ — আমাদের গ্রাম",level:"সহজ",done:true,icon:"🏡"},
-    {title:"পাঠ ৩ — পাখির গান",level:"মধ্যম",done:false,icon:"🐦"},
-    {title:"পাঠ ৪ — আকাশ ও তারা",level:"মধ্যম",done:false,icon:"⭐"},
+    { title: "পাঠ ১ — আমার পরিবার", level: "সহজ", done: true, icon: "📖" },
+    { title: "পাঠ ২ — আমাদের গ্রাম", level: "সহজ", done: true, icon: "🏡" },
+    { title: "পাঠ ৩ — পাখির গান", level: "মধ্যম", done: false, icon: "🐦" },
+    { title: "পাঠ ৪ — আকাশ ও তারা", level: "মধ্যম", done: false, icon: "⭐" },
   ];
   return (
-    <div style={{padding:"24px 20px"}}>
-      <h2 style={{fontSize:22,fontWeight:700,color:"#1d2b2a",marginBottom:20}}>কার্যক্রম</h2>
-      <div style={{display:"flex",flexDirection:"column",gap:14}}>
-        {lessons.map((l,i)=>(
-          <motion.div key={i} whileHover={{x:4}} whileTap={{scale:.98}}
-            style={{background:"white",borderRadius:18,padding:"16px 18px",display:"flex",alignItems:"center",gap:14,
-              boxShadow:"0 4px 16px rgba(0,0,0,.06)",borderLeft:`4px solid ${l.done?"#18b368":"#e0e0e0"}`}}>
-            <div style={{fontSize:28}}>{l.icon}</div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:700,fontSize:15,color:"#333"}}>{l.title}</div>
-              <div style={{fontSize:12,color:"#aaa",marginTop:2}}>{l.level}</div>
+    <div style={{ padding: "24px 20px" }}>
+      <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1d2b2a", marginBottom: 20 }}>কার্যক্রম</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {lessons.map((l, i) => (
+          <motion.div key={i} whileHover={{ x: 4 }} whileTap={{ scale: .98 }}
+            style={{
+              background: "white", borderRadius: 18, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14,
+              boxShadow: "0 4px 16px rgba(0,0,0,.06)", borderLeft: `4px solid ${l.done ? "#18b368" : "#e0e0e0"}`
+            }}>
+            <div style={{ fontSize: 28 }}>{l.icon}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: "#333" }}>{l.title}</div>
+              <div style={{ fontSize: 12, color: "#aaa", marginTop: 2 }}>{l.level}</div>
             </div>
-            <div style={{fontSize:20}}>{l.done?"✅":"🔒"}</div>
+            <div style={{ fontSize: 20 }}>{l.done ? "✅" : "🔒"}</div>
           </motion.div>
         ))}
       </div>
@@ -572,138 +577,138 @@ function SettingsPage() {
   const [syllable, setSyllable] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [narrationSpeed, setNarrationSpeed] = useState(0.85);
-  const bgs = ["#FFF8E7","#E8F4FD","#FFFDE7","#F3E5F5","#FFFFFF"];
+  const bgs = ["#FFF8E7", "#E8F4FD", "#FFFDE7", "#F3E5F5", "#FFFFFF"];
   const sampleText = "আমি বাংলা পড়তে ভালোবাসি। আকাশ নীল, মাঠ সবুজ।";
-  const Toggle = ({val,set,label}) => (
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-      <span style={{fontSize:14,fontWeight:600,color:"#444"}}>{label}</span>
-      <motion.div onClick={()=>set(!val)} whileTap={{scale:.9}}
-        style={{width:48,height:26,borderRadius:13,background:val?"#18b368":"#ddd",cursor:"pointer",position:"relative",transition:"background .2s"}}>
-        <motion.div animate={{x:val?24:2}} style={{width:22,height:22,borderRadius:"50%",background:"white",position:"absolute",top:2,boxShadow:"0 2px 4px rgba(0,0,0,.2)"}}/>
+  const Toggle = ({ val, set, label }) => (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+      <span style={{ fontSize: 14, fontWeight: 600, color: "#444" }}>{label}</span>
+      <motion.div onClick={() => set(!val)} whileTap={{ scale: .9 }}
+        style={{ width: 48, height: 26, borderRadius: 13, background: val ? "#18b368" : "#ddd", cursor: "pointer", position: "relative", transition: "background .2s" }}>
+        <motion.div animate={{ x: val ? 24 : 2 }} style={{ width: 22, height: 22, borderRadius: "50%", background: "white", position: "absolute", top: 2, boxShadow: "0 2px 4px rgba(0,0,0,.2)" }} />
       </motion.div>
     </div>
   );
-  const Slider = ({label,min,max,step=1,val,set,unit=""}) => (
-    <div style={{marginBottom:18}}>
-      <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
-        <span style={{fontSize:14,fontWeight:600,color:"#444"}}>{label}</span>
-        <span style={{fontSize:13,color:"#18b368",fontWeight:700}}>{val}{unit}</span>
+  const Slider = ({ label, min, max, step = 1, val, set, unit = "" }) => (
+    <div style={{ marginBottom: 18 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#444" }}>{label}</span>
+        <span style={{ fontSize: 13, color: "#18b368", fontWeight: 700 }}>{val}{unit}</span>
       </div>
-      <input type="range" min={min} max={max} step={step} value={val} onChange={e=>set(Number(e.target.value))} style={{width:"100%"}}/>
+      <input type="range" min={min} max={max} step={step} value={val} onChange={e => set(Number(e.target.value))} style={{ width: "100%" }} />
     </div>
   );
   return (
-    <div style={{padding:"24px 20px"}}>
-      <h2 style={{fontSize:20,fontWeight:800,color:"#1d2b2a",marginBottom:4}}>অ্যাডাপ্টিভ টেক্সট সেটিংস</h2>
-      <p style={{fontSize:13,color:"#888",marginBottom:20}}>তোমার পড়ার সুবিধা অনুযায়ী সাজাও</p>
-      <div style={{borderRadius:20,padding:20,marginBottom:20,background:bg,boxShadow:"0 4px 20px rgba(0,0,0,.08)",position:"relative",overflow:"hidden"}}>
-        <div style={{fontSize:11,color:"#aaa",marginBottom:10}}>লাইভ প্রিভিউ</div>
-        <div style={{fontSize,letterSpacing:`${letterSpacing}px`,lineHeight,wordSpacing:`${wordSpacing}px`,color:textColor,fontFamily:"'Hind Siliguri',sans-serif"}}>
-          {syllable ? sampleText.split("").map((c,i)=><span key={i} style={{background:i%3===0?"rgba(255,215,0,.35)":i%3===1?"rgba(24,179,104,.2)":"transparent",borderRadius:3}}>{c}</span>) : sampleText}
+    <div style={{ padding: "24px 20px" }}>
+      <h2 style={{ fontSize: 20, fontWeight: 800, color: "#1d2b2a", marginBottom: 4 }}>অ্যাডাপ্টিভ টেক্সট সেটিংস</h2>
+      <p style={{ fontSize: 13, color: "#888", marginBottom: 20 }}>তোমার পড়ার সুবিধা অনুযায়ী সাজাও</p>
+      <div style={{ borderRadius: 20, padding: 20, marginBottom: 20, background: bg, boxShadow: "0 4px 20px rgba(0,0,0,.08)", position: "relative", overflow: "hidden" }}>
+        <div style={{ fontSize: 11, color: "#aaa", marginBottom: 10 }}>লাইভ প্রিভিউ</div>
+        <div style={{ fontSize, letterSpacing: `${letterSpacing}px`, lineHeight, wordSpacing: `${wordSpacing}px`, color: textColor, fontFamily: "'Hind Siliguri',sans-serif" }}>
+          {syllable ? sampleText.split("").map((c, i) => <span key={i} style={{ background: i % 3 === 0 ? "rgba(255,215,0,.35)" : i % 3 === 1 ? "rgba(24,179,104,.2)" : "transparent", borderRadius: 3 }}>{c}</span>) : sampleText}
         </div>
       </div>
-      <div style={{background:"white",borderRadius:20,padding:20,boxShadow:"0 4px 16px rgba(0,0,0,.06)",marginBottom:16}}>
-        <h3 style={{fontSize:15,fontWeight:700,marginBottom:14,color:"#333"}}>পটভূমির রং</h3>
-        <div style={{display:"flex",gap:10}}>
-          {bgs.map(c=>(
-            <motion.div key={c} whileTap={{scale:.85}} onClick={()=>setBg(c)}
-              style={{width:36,height:36,borderRadius:"50%",background:c,cursor:"pointer",border:`3px solid ${bg===c?"#18b368":"#ddd"}`,transition:"border .2s"}}/>
+      <div style={{ background: "white", borderRadius: 20, padding: 20, boxShadow: "0 4px 16px rgba(0,0,0,.06)", marginBottom: 16 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 14, color: "#333" }}>পটভূমির রং</h3>
+        <div style={{ display: "flex", gap: 10 }}>
+          {bgs.map(c => (
+            <motion.div key={c} whileTap={{ scale: .85 }} onClick={() => setBg(c)}
+              style={{ width: 36, height: 36, borderRadius: "50%", background: c, cursor: "pointer", border: `3px solid ${bg === c ? "#18b368" : "#ddd"}`, transition: "border .2s" }} />
           ))}
-          <div style={{flex:1}}>
-            <input type="color" value={textColor} onChange={e=>setTextColor(e.target.value)} style={{width:"100%",height:36,border:"none",borderRadius:10,cursor:"pointer",padding:2}}/>
+          <div style={{ flex: 1 }}>
+            <input type="color" value={textColor} onChange={e => setTextColor(e.target.value)} style={{ width: "100%", height: 36, border: "none", borderRadius: 10, cursor: "pointer", padding: 2 }} />
           </div>
         </div>
       </div>
-      <div style={{background:"white",borderRadius:20,padding:20,boxShadow:"0 4px 16px rgba(0,0,0,.06)",marginBottom:16}}>
-        <h3 style={{fontSize:15,fontWeight:700,marginBottom:16,color:"#333"}}>টাইপোগ্রাফি</h3>
-        <Slider label="ফন্ট সাইজ" min={12} max={48} val={fontSize} set={setFontSize} unit="px"/>
-        <Slider label="অক্ষর ফাঁক" min={0} max={20} val={letterSpacing} set={setLetterSpacing} unit="px"/>
-        <Slider label="লাইন উচ্চতা" min={1} max={3} step={0.1} val={lineHeight} set={setLineHeight}/>
-        <Slider label="শব্দ ফাঁক" min={0} max={20} val={wordSpacing} set={setWordSpacing} unit="px"/>
-        <Slider label="নারেশন স্পিড" min={0.5} max={1.5} step={0.05} val={narrationSpeed} set={setNarrationSpeed} unit="x"/>
+      <div style={{ background: "white", borderRadius: 20, padding: 20, boxShadow: "0 4px 16px rgba(0,0,0,.06)", marginBottom: 16 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: "#333" }}>টাইপোগ্রাফি</h3>
+        <Slider label="ফন্ট সাইজ" min={12} max={48} val={fontSize} set={setFontSize} unit="px" />
+        <Slider label="অক্ষর ফাঁক" min={0} max={20} val={letterSpacing} set={setLetterSpacing} unit="px" />
+        <Slider label="লাইন উচ্চতা" min={1} max={3} step={0.1} val={lineHeight} set={setLineHeight} />
+        <Slider label="শব্দ ফাঁক" min={0} max={20} val={wordSpacing} set={setWordSpacing} unit="px" />
+        <Slider label="নারেশন স্পিড" min={0.5} max={1.5} step={0.05} val={narrationSpeed} set={setNarrationSpeed} unit="x" />
       </div>
-      <div style={{background:"white",borderRadius:20,padding:20,boxShadow:"0 4px 16px rgba(0,0,0,.06)"}}>
-        <h3 style={{fontSize:15,fontWeight:700,marginBottom:16,color:"#333"}}>বিশেষ মোড</h3>
-        <Toggle val={ruler} set={setRuler} label="📏 রিডিং রুলার"/>
-        <Toggle val={syllable} set={setSyllable} label="🔤 সিলেবল হাইলাইট"/>
-        <Toggle val={focusMode} set={setFocusMode} label="🎯 ফোকাস মোড"/>
+      <div style={{ background: "white", borderRadius: 20, padding: 20, boxShadow: "0 4px 16px rgba(0,0,0,.06)" }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: "#333" }}>বিশেষ মোড</h3>
+        <Toggle val={ruler} set={setRuler} label="📏 রিডিং রুলার" />
+        <Toggle val={syllable} set={setSyllable} label="🔤 সিলেবল হাইলাইট" />
+        <Toggle val={focusMode} set={setFocusMode} label="🎯 ফোকাস মোড" />
       </div>
     </div>
   );
 }
 
-function ReadingView({onBack}) {
+function ReadingView({ onBack }) {
   const [activeWord, setActiveWord] = useState(null);
   const [playing, setPlaying] = useState(false);
-  const words = ["আমি","বাংলা","পড়তে","ভালোবাসি।","আকাশ","নীল,","মাঠ","সবুজ।","পাখি","গান","গায়।","আমরা","সবাই","খুশি।"];
-  const phonemes = {"আমি":["আ","মি"],"বাংলা":["বাং","লা"],"পড়তে":["পড়","তে"],"ভালোবাসি।":["ভা","লো","বা","সি"],"আকাশ":["আ","কাশ"]};
-  useEffect(()=>{
-    if(!playing){setActiveWord(null);return;}
-    let i=0;
-    const iv=setInterval(()=>{setActiveWord(words[i]);i++;if(i>=words.length){clearInterval(iv);setPlaying(false);setActiveWord(null);}},600);
-    return()=>clearInterval(iv);
-  },[playing]);
+  const words = ["আমি", "বাংলা", "পড়তে", "ভালোবাসি।", "আকাশ", "নীল,", "মাঠ", "সবুজ।", "পাখি", "গান", "গায়।", "আমরা", "সবাই", "খুশি।"];
+  const phonemes = { "আমি": ["আ", "মি"], "বাংলা": ["বাং", "লা"], "পড়তে": ["পড়", "তে"], "ভালোবাসি।": ["ভা", "লো", "বা", "সি"], "আকাশ": ["আ", "কাশ"] };
+  useEffect(() => {
+    if (!playing) { setActiveWord(null); return; }
+    let i = 0;
+    const iv = setInterval(() => { setActiveWord(words[i]); i++; if (i >= words.length) { clearInterval(iv); setPlaying(false); setActiveWord(null); } }, 600);
+    return () => clearInterval(iv);
+  }, [playing]);
   return (
-    <div style={{padding:"20px"}}>
-      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
-        <motion.button whileTap={{scale:.9}} onClick={onBack} style={{width:44,height:44,borderRadius:14,border:"none",background:"white",cursor:"pointer",fontSize:18,boxShadow:"0 2px 10px rgba(0,0,0,.08)"}}>←</motion.button>
-        <h2 style={{fontSize:18,fontWeight:700,color:"#1d2b2a"}}>পাঠ ১ — আমার পরিবার</h2>
+    <div style={{ padding: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <motion.button whileTap={{ scale: .9 }} onClick={onBack} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1d2b2a" }}>পাঠ ১ — আমার পরিবার</h2>
       </div>
-      <div style={{background:"#FFF8E7",borderRadius:24,padding:24,boxShadow:"0 4px 20px rgba(0,0,0,.08)",marginBottom:20,lineHeight:2.2,fontSize:20,letterSpacing:"2px",wordSpacing:"8px",color:"#2D1B00",fontFamily:"'Hind Siliguri',sans-serif"}}>
-        {words.map((w,i)=>(
-          <motion.span key={i} onClick={()=>setActiveWord(w===activeWord?null:w)}
-            animate={{backgroundColor:activeWord===w?"#FFD700":"transparent",scale:activeWord===w?1.08:1}}
-            style={{display:"inline-block",cursor:"pointer",borderRadius:6,padding:"2px 4px",marginRight:4}}>{w}</motion.span>
+      <div style={{ background: "#FFF8E7", borderRadius: 24, padding: 24, boxShadow: "0 4px 20px rgba(0,0,0,.08)", marginBottom: 20, lineHeight: 2.2, fontSize: 20, letterSpacing: "2px", wordSpacing: "8px", color: "#2D1B00", fontFamily: "'Hind Siliguri',sans-serif" }}>
+        {words.map((w, i) => (
+          <motion.span key={i} onClick={() => setActiveWord(w === activeWord ? null : w)}
+            animate={{ backgroundColor: activeWord === w ? "#FFD700" : "transparent", scale: activeWord === w ? 1.08 : 1 }}
+            style={{ display: "inline-block", cursor: "pointer", borderRadius: 6, padding: "2px 4px", marginRight: 4 }}>{w}</motion.span>
         ))}
       </div>
       {activeWord && phonemes[activeWord] && (
-        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} style={{background:"white",borderRadius:20,padding:16,marginBottom:16,boxShadow:"0 4px 16px rgba(0,0,0,.08)"}}>
-          <div style={{fontSize:13,color:"#888",marginBottom:10}}>ফোনেম ভাঙন: {activeWord}</div>
-          <div style={{display:"flex",gap:10}}>
-            {phonemes[activeWord].map((p,i)=>(
-              <div key={i} style={{background:"#d4f3e3",borderRadius:12,padding:"10px 16px",fontSize:20,fontWeight:700,color:"#0f6e3a"}}>{p}</div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ background: "white", borderRadius: 20, padding: 16, marginBottom: 16, boxShadow: "0 4px 16px rgba(0,0,0,.08)" }}>
+          <div style={{ fontSize: 13, color: "#888", marginBottom: 10 }}>ফোনেম ভাঙন: {activeWord}</div>
+          <div style={{ display: "flex", gap: 10 }}>
+            {phonemes[activeWord].map((p, i) => (
+              <div key={i} style={{ background: "#d4f3e3", borderRadius: 12, padding: "10px 16px", fontSize: 20, fontWeight: 700, color: "#0f6e3a" }}>{p}</div>
             ))}
           </div>
         </motion.div>
       )}
-      <div style={{display:"flex",gap:12}}>
-        <motion.button whileTap={{scale:.95}} onClick={()=>setPlaying(!playing)}
-          style={{flex:1,padding:"14px",borderRadius:50,border:"none",background:playing?"#ff6b6b":"#18b368",color:"white",fontSize:16,fontWeight:700,cursor:"pointer"}}>
-          {playing?"⏸ থামো":"▶ পড়া শুরু"}
+      <div style={{ display: "flex", gap: 12 }}>
+        <motion.button whileTap={{ scale: .95 }} onClick={() => setPlaying(!playing)}
+          style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: playing ? "#ff6b6b" : "#18b368", color: "white", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+          {playing ? "⏸ থামো" : "▶ পড়া শুরু"}
         </motion.button>
-        <motion.button whileTap={{scale:.95}} onClick={()=>{setPlaying(false);setActiveWord(null);}}
-          style={{width:52,height:52,borderRadius:14,border:"none",background:"white",cursor:"pointer",fontSize:18,boxShadow:"0 4px 14px rgba(0,0,0,.1)"}}>⏹</motion.button>
+        <motion.button whileTap={{ scale: .95 }} onClick={() => { setPlaying(false); setActiveWord(null); }}
+          style={{ width: 52, height: 52, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 14px rgba(0,0,0,.1)" }}>⏹</motion.button>
       </div>
     </div>
   );
 }
 
-function PhonemeView({onBack}) {
+function PhonemeView({ onBack }) {
   const [active, setActive] = useState(null);
-  const letters = ["অ","আ","ই","ঈ","উ","ঊ","ক","খ","গ","ঘ","চ","ছ","জ","ঝ","ট","ঠ","ড","ঢ","ত","থ","দ","ধ","ন","প","ফ","ব","ভ","ম","য","র","ল","শ","ষ","স","হ"];
-  const colors = ["#d4f3e3","#fff3d4","#f0efff","#ffe0f0","#e8f4ff"];
+  const letters = ["অ", "আ", "ই", "ঈ", "উ", "ঊ", "ক", "খ", "গ", "ঘ", "চ", "ছ", "জ", "ঝ", "ট", "ঠ", "ড", "ঢ", "ত", "থ", "দ", "ধ", "ন", "প", "ফ", "ব", "ভ", "ম", "য", "র", "ল", "শ", "ষ", "স", "হ"];
+  const colors = ["#d4f3e3", "#fff3d4", "#f0efff", "#ffe0f0", "#e8f4ff"];
   return (
-    <div style={{padding:"20px"}}>
-      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
-        <motion.button whileTap={{scale:.9}} onClick={onBack} style={{width:44,height:44,borderRadius:14,border:"none",background:"white",cursor:"pointer",fontSize:18,boxShadow:"0 2px 10px rgba(0,0,0,.08)"}}>←</motion.button>
-        <h2 style={{fontSize:18,fontWeight:700,color:"#1d2b2a"}}>ফোনেমস — অক্ষর চর্চা</h2>
+    <div style={{ padding: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <motion.button whileTap={{ scale: .9 }} onClick={onBack} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1d2b2a" }}>ফোনেমস — অক্ষর চর্চা</h2>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10}}>
-        {letters.map((l,i)=>(
-          <motion.div key={l} whileTap={{scale:.85}}
-            animate={{backgroundColor:active===l?colors[i%5]:"white",scale:active===l?1.1:1}}
-            onClick={()=>setActive(active===l?null:l)}
-            style={{borderRadius:16,padding:"12px 0",textAlign:"center",fontSize:22,fontWeight:700,cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,.06)",fontFamily:"'Hind Siliguri',sans-serif",color:"#333"}}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 10 }}>
+        {letters.map((l, i) => (
+          <motion.div key={l} whileTap={{ scale: .85 }}
+            animate={{ backgroundColor: active === l ? colors[i % 5] : "white", scale: active === l ? 1.1 : 1 }}
+            onClick={() => setActive(active === l ? null : l)}
+            style={{ borderRadius: 16, padding: "12px 0", textAlign: "center", fontSize: 22, fontWeight: 700, cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,.06)", fontFamily: "'Hind Siliguri',sans-serif", color: "#333" }}>
             {l}
           </motion.div>
         ))}
       </div>
       {active && (
-        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}}
-          style={{background:"#d4f3e3",borderRadius:20,padding:20,marginTop:20,textAlign:"center"}}>
-          <div style={{fontSize:56,fontWeight:800,color:"#0f6e3a",marginBottom:8}}>{active}</div>
-          <div style={{fontSize:14,color:"#555"}}>এই অক্ষরটি চেনো!</div>
-          <motion.button whileTap={{scale:.95}} style={{marginTop:12,padding:"10px 28px",borderRadius:50,border:"none",background:"#18b368",color:"white",fontWeight:700,fontSize:15,cursor:"pointer"}}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          style={{ background: "#d4f3e3", borderRadius: 20, padding: 20, marginTop: 20, textAlign: "center" }}>
+          <div style={{ fontSize: 56, fontWeight: 800, color: "#0f6e3a", marginBottom: 8 }}>{active}</div>
+          <div style={{ fontSize: 14, color: "#555" }}>এই অক্ষরটি চেনো!</div>
+          <motion.button whileTap={{ scale: .95 }} style={{ marginTop: 12, padding: "10px 28px", borderRadius: 50, border: "none", background: "#18b368", color: "white", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>
             🔊 শুনো
           </motion.button>
         </motion.div>
@@ -712,82 +717,82 @@ function PhonemeView({onBack}) {
   );
 }
 
-function GameView({onBack}) {
-  const words = [{q:"🏡",ans:"বাড়ি",opts:["বাড়ি","পাখি","মাছি"]},{q:"📚",ans:"বই",opts:["গাছ","বই","ফুল"]},{q:"🌸",ans:"ফুল",opts:["ফুল","চাঁদ","তারা"]}];
-  const [qi,setQi]=useState(0); const [score,setScore]=useState(0); const [chosen,setChosen]=useState(null); const [done,setDone]=useState(false);
-  const choose=(opt)=>{if(chosen)return;setChosen(opt);if(opt===words[qi].ans)setScore(s=>s+1);setTimeout(()=>{if(qi+1<words.length){setQi(q=>q+1);setChosen(null);}else setDone(true);},900);};
-  if(done) return (
-    <div style={{padding:30,textAlign:"center"}}>
-      <motion.button whileTap={{scale:.9}} onClick={onBack} style={{width:44,height:44,borderRadius:14,border:"none",background:"white",cursor:"pointer",fontSize:18,display:"block",marginBottom:20,boxShadow:"0 2px 10px rgba(0,0,0,.08)"}}>←</motion.button>
-      <div style={{fontSize:60,marginBottom:16}}>🎉</div>
-      <h2 style={{fontSize:24,fontWeight:800,marginBottom:8,color:"#1d2b2a"}}>শাবাশ!</h2>
-      <div style={{fontSize:18,color:"#555"}}>স্কোর: {score}/{words.length}</div>
-      <div style={{margin:"20px 0",fontSize:24}}>{"⭐".repeat(score)}</div>
-      <motion.button whileTap={{scale:.95}} onClick={()=>{setQi(0);setScore(0);setChosen(null);setDone(false);}}
-        style={{padding:"14px 36px",borderRadius:50,border:"none",background:"#18b368",color:"white",fontWeight:700,fontSize:16,cursor:"pointer"}}>আবার খেলো</motion.button>
+function GameView({ onBack }) {
+  const words = [{ q: "🏡", ans: "বাড়ি", opts: ["বাড়ি", "পাখি", "মাছি"] }, { q: "📚", ans: "বই", opts: ["গাছ", "বই", "ফুল"] }, { q: "🌸", ans: "ফুল", opts: ["ফুল", "চাঁদ", "তারা"] }];
+  const [qi, setQi] = useState(0); const [score, setScore] = useState(0); const [chosen, setChosen] = useState(null); const [done, setDone] = useState(false);
+  const choose = (opt) => { if (chosen) return; setChosen(opt); if (opt === words[qi].ans) setScore(s => s + 1); setTimeout(() => { if (qi + 1 < words.length) { setQi(q => q + 1); setChosen(null); } else setDone(true); }, 900); };
+  if (done) return (
+    <div style={{ padding: 30, textAlign: "center" }}>
+      <motion.button whileTap={{ scale: .9 }} onClick={onBack} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, display: "block", marginBottom: 20, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
+      <div style={{ fontSize: 60, marginBottom: 16 }}>🎉</div>
+      <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: "#1d2b2a" }}>শাবাশ!</h2>
+      <div style={{ fontSize: 18, color: "#555" }}>স্কোর: {score}/{words.length}</div>
+      <div style={{ margin: "20px 0", fontSize: 24 }}>{"⭐".repeat(score)}</div>
+      <motion.button whileTap={{ scale: .95 }} onClick={() => { setQi(0); setScore(0); setChosen(null); setDone(false); }}
+        style={{ padding: "14px 36px", borderRadius: 50, border: "none", background: "#18b368", color: "white", fontWeight: 700, fontSize: 16, cursor: "pointer" }}>আবার খেলো</motion.button>
     </div>
   );
-  const w=words[qi];
+  const w = words[qi];
   return (
-    <div style={{padding:"20px"}}>
-      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
-        <motion.button whileTap={{scale:.9}} onClick={onBack} style={{width:44,height:44,borderRadius:14,border:"none",background:"white",cursor:"pointer",fontSize:18,boxShadow:"0 2px 10px rgba(0,0,0,.08)"}}>←</motion.button>
-        <h2 style={{fontSize:18,fontWeight:700,color:"#1d2b2a"}}>শব্দ খেলা — লেভেল ৪</h2>
+    <div style={{ padding: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <motion.button whileTap={{ scale: .9 }} onClick={onBack} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1d2b2a" }}>শব্দ খেলা — লেভেল ৪</h2>
       </div>
-      <div style={{textAlign:"center",marginBottom:30}}>
-        <div style={{fontSize:80}}>{w.q}</div>
-        <div style={{fontSize:15,color:"#888",marginTop:8}}>এই ছবির শব্দটি কী?</div>
+      <div style={{ textAlign: "center", marginBottom: 30 }}>
+        <div style={{ fontSize: 80 }}>{w.q}</div>
+        <div style={{ fontSize: 15, color: "#888", marginTop: 8 }}>এই ছবির শব্দটি কী?</div>
       </div>
-      <div style={{display:"flex",flexDirection:"column",gap:14}}>
-        {w.opts.map(opt=>(
-          <motion.button key={opt} whileTap={{scale:.96}} onClick={()=>choose(opt)}
-            animate={{background:chosen?(opt===w.ans?"#d4f3e3":opt===chosen?"#ffe0e0":"white"):"white",scale:chosen===opt?1.04:1}}
-            style={{padding:"16px",borderRadius:20,border:"2px solid",borderColor:chosen?(opt===w.ans?"#18b368":opt===chosen?"#ff6b6b":"#eee"):"#eee",fontSize:20,fontWeight:700,cursor:"pointer",fontFamily:"'Hind Siliguri',sans-serif",color:"#333"}}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {w.opts.map(opt => (
+          <motion.button key={opt} whileTap={{ scale: .96 }} onClick={() => choose(opt)}
+            animate={{ background: chosen ? (opt === w.ans ? "#d4f3e3" : opt === chosen ? "#ffe0e0" : "white") : "white", scale: chosen === opt ? 1.04 : 1 }}
+            style={{ padding: "16px", borderRadius: 20, border: "2px solid", borderColor: chosen ? (opt === w.ans ? "#18b368" : opt === chosen ? "#ff6b6b" : "#eee") : "#eee", fontSize: 20, fontWeight: 700, cursor: "pointer", fontFamily: "'Hind Siliguri',sans-serif", color: "#333" }}>
             {opt}
           </motion.button>
         ))}
       </div>
-      <div style={{textAlign:"center",marginTop:20,fontSize:13,color:"#aaa"}}>প্রশ্ন {qi+1}/{words.length}</div>
+      <div style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#aaa" }}>প্রশ্ন {qi + 1}/{words.length}</div>
     </div>
   );
 }
 
-function TraceView({onBack}) {
-  const canvasRef=useRef(null); const drawing=useRef(false); const ctx=useRef(null); const [letter,setLetter]=useState("অ");
-  const letters=["অ","আ","ক","খ","গ","ঘ"];
-  useEffect(()=>{
-    const c=canvasRef.current; ctx.current=c.getContext("2d");
-    ctx.current.lineWidth=6;ctx.current.lineCap="round";ctx.current.strokeStyle="#18b368";
-    ctx.current.font="140px 'Hind Siliguri'";ctx.current.fillStyle="rgba(24,179,104,.1)";ctx.current.textAlign="center";
-    ctx.current.fillText(letter,c.width/2,c.height*0.7);
-  },[letter]);
-  const getPos=(e,c)=>{const r=c.getBoundingClientRect();const src=e.touches?e.touches[0]:e;return[src.clientX-r.left,src.clientY-r.top];};
-  const start=e=>{drawing.current=true;const[x,y]=getPos(e,canvasRef.current);ctx.current.beginPath();ctx.current.moveTo(x,y);};
-  const move=e=>{if(!drawing.current)return;e.preventDefault();const[x,y]=getPos(e,canvasRef.current);ctx.current.lineTo(x,y);ctx.current.stroke();};
-  const end=()=>{drawing.current=false;};
-  const clear=()=>{const c=canvasRef.current;ctx.current.clearRect(0,0,c.width,c.height);ctx.current.font="140px 'Hind Siliguri'";ctx.current.fillStyle="rgba(24,179,104,.1)";ctx.current.textAlign="center";ctx.current.fillText(letter,c.width/2,c.height*0.7);};
+function TraceView({ onBack }) {
+  const canvasRef = useRef(null); const drawing = useRef(false); const ctx = useRef(null); const [letter, setLetter] = useState("অ");
+  const letters = ["অ", "আ", "ক", "খ", "গ", "ঘ"];
+  useEffect(() => {
+    const c = canvasRef.current; ctx.current = c.getContext("2d");
+    ctx.current.lineWidth = 6; ctx.current.lineCap = "round"; ctx.current.strokeStyle = "#18b368";
+    ctx.current.font = "140px 'Hind Siliguri'"; ctx.current.fillStyle = "rgba(24,179,104,.1)"; ctx.current.textAlign = "center";
+    ctx.current.fillText(letter, c.width / 2, c.height * 0.7);
+  }, [letter]);
+  const getPos = (e, c) => { const r = c.getBoundingClientRect(); const src = e.touches ? e.touches[0] : e; return [src.clientX - r.left, src.clientY - r.top]; };
+  const start = e => { drawing.current = true; const [x, y] = getPos(e, canvasRef.current); ctx.current.beginPath(); ctx.current.moveTo(x, y); };
+  const move = e => { if (!drawing.current) return; e.preventDefault(); const [x, y] = getPos(e, canvasRef.current); ctx.current.lineTo(x, y); ctx.current.stroke(); };
+  const end = () => { drawing.current = false; };
+  const clear = () => { const c = canvasRef.current; ctx.current.clearRect(0, 0, c.width, c.height); ctx.current.font = "140px 'Hind Siliguri'"; ctx.current.fillStyle = "rgba(24,179,104,.1)"; ctx.current.textAlign = "center"; ctx.current.fillText(letter, c.width / 2, c.height * 0.7); };
   return (
-    <div style={{padding:"20px"}}>
-      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-        <motion.button whileTap={{scale:.9}} onClick={onBack} style={{width:44,height:44,borderRadius:14,border:"none",background:"white",cursor:"pointer",fontSize:18,boxShadow:"0 2px 10px rgba(0,0,0,.08)"}}>←</motion.button>
-        <h2 style={{fontSize:18,fontWeight:700,color:"#1d2b2a"}}>ট্রেসিং — অক্ষর চর্চা</h2>
+    <div style={{ padding: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+        <motion.button whileTap={{ scale: .9 }} onClick={onBack} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1d2b2a" }}>ট্রেসিং — অক্ষর চর্চা</h2>
       </div>
-      <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
-        {letters.map(l=>(
-          <motion.button key={l} whileTap={{scale:.9}} onClick={()=>{setLetter(l);clear();}}
-            style={{padding:"8px 18px",borderRadius:50,border:"2px solid",borderColor:letter===l?"#18b368":"#ddd",background:letter===l?"#d4f3e3":"white",fontWeight:700,fontSize:18,cursor:"pointer",fontFamily:"'Hind Siliguri',sans-serif",color:"#333"}}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+        {letters.map(l => (
+          <motion.button key={l} whileTap={{ scale: .9 }} onClick={() => { setLetter(l); clear(); }}
+            style={{ padding: "8px 18px", borderRadius: 50, border: "2px solid", borderColor: letter === l ? "#18b368" : "#ddd", background: letter === l ? "#d4f3e3" : "white", fontWeight: 700, fontSize: 18, cursor: "pointer", fontFamily: "'Hind Siliguri',sans-serif", color: "#333" }}>
             {l}
           </motion.button>
         ))}
       </div>
-      <div style={{borderRadius:24,overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.1)",background:"#FFF8E7",border:"2px solid #e8d9bf"}}>
-        <canvas ref={canvasRef} width={390} height={300} style={{display:"block",touchAction:"none",width:"100%"}}
+      <div style={{ borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,.1)", background: "#FFF8E7", border: "2px solid #e8d9bf" }}>
+        <canvas ref={canvasRef} width={390} height={300} style={{ display: "block", touchAction: "none", width: "100%" }}
           onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
-          onTouchStart={start} onTouchMove={move} onTouchEnd={end}/>
+          onTouchStart={start} onTouchMove={move} onTouchEnd={end} />
       </div>
-      <div style={{display:"flex",gap:12,marginTop:16}}>
-        <motion.button whileTap={{scale:.95}} onClick={clear} style={{flex:1,padding:"14px",borderRadius:50,border:"none",background:"white",fontWeight:700,fontSize:15,cursor:"pointer",boxShadow:"0 4px 14px rgba(0,0,0,.08)",color:"#555"}}>🗑️ মুছো</motion.button>
-        <motion.button whileTap={{scale:.95}} style={{flex:1,padding:"14px",borderRadius:50,border:"none",background:"#18b368",color:"white",fontWeight:700,fontSize:15,cursor:"pointer"}}>✅ সম্পন্ন</motion.button>
+      <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+        <motion.button whileTap={{ scale: .95 }} onClick={clear} style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: "white", fontWeight: 700, fontSize: 15, cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,.08)", color: "#555" }}>🗑️ মুছো</motion.button>
+        <motion.button whileTap={{ scale: .95 }} style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: "#18b368", color: "white", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>✅ সম্পন্ন</motion.button>
       </div>
     </div>
   );
@@ -805,10 +810,10 @@ function HomePage({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  if (view === "read")    return <ReadingView  onBack={() => setView("home")} />;
+  if (view === "read") return <ReadingView onBack={() => setView("home")} />;
   if (view === "phoneme") return <PhonemeHighlighter onBack={() => setView("home")} />;
-  if (view === "game")    return <GameView     onBack={() => setView("home")} />;
-  if (view === "trace")   return <TraceView    onBack={() => setView("home")} />;
+  if (view === "game") return <BornoBazar onBack={() => setView("home")} />;
+  if (view === "trace") return <TraceView onBack={() => setView("home")} />;
 
   return (
     <div className="app-root">
@@ -893,12 +898,12 @@ function HomePage({
           animate={{ opacity: 1, y: 0 }}
         >
           {/* decorative clouds */}
-          <CloudSVG w={52} style={{ position:"absolute", top:18, right:280, opacity:.7 }} />
-          <CloudSVG w={38} style={{ position:"absolute", top:10, right:220, opacity:.5 }} />
-          <CloudSVG w={44} style={{ position:"absolute", top:24, left:320, opacity:.45 }} />
+          <CloudSVG w={52} style={{ position: "absolute", top: 18, right: 280, opacity: .7 }} />
+          <CloudSVG w={38} style={{ position: "absolute", top: 10, right: 220, opacity: .5 }} />
+          <CloudSVG w={44} style={{ position: "absolute", top: 24, left: 320, opacity: .45 }} />
 
           {/* Sun top-right */}
-          <div style={{ position:"absolute", top:14, right:14, zIndex:1 }}>
+          <div style={{ position: "absolute", top: 14, right: 14, zIndex: 1 }}>
             <SunSVG />
           </div>
 
@@ -923,10 +928,10 @@ function HomePage({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: .1 }}
         >
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-            <span style={{ fontSize:18, fontWeight:800, color:"#1d2b2a" }}>আজকের লক্ষ্য</span>
-            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-              <span style={{ fontSize:16, color:"#18b368", fontWeight:700 }}>{userProgress}% সম্পন্ন</span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 18, fontWeight: 800, color: "#1d2b2a" }}>আজকের লক্ষ্য</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 16, color: "#18b368", fontWeight: 700 }}>{userProgress}% সম্পন্ন</span>
               <StarSVG size={20} />
             </div>
           </div>
@@ -1012,9 +1017,9 @@ export default function App() {
   const [tab, setTab] = useState("home");
 
   const pages = {
-    home:     <HomePage onNav={setTab} />,
+    home: <HomePage onNav={setTab} />,
     progress: <ProgressPage />,
-    rewards:  <RewardsPage />,
+    rewards: <RewardsPage />,
     activity: <ActivityPage />,
     settings: <SettingsPage />,
   };
