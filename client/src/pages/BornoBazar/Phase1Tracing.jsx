@@ -35,13 +35,16 @@ export default function Phase1Tracing({ onComplete, onBack }) {
   // Handle canvas sizing
   useEffect(() => {
     const updateSize = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setCanvasSize({ width, height });
+      if (canvasRef.current) {
+        const { clientWidth, clientHeight } = canvasRef.current;
+        if (clientWidth > 0 && clientHeight > 0) {
+          setCanvasSize({ width: clientWidth, height: clientHeight });
+        }
       }
     };
     
-    updateSize();
+    // Initial size after mount
+    setTimeout(updateSize, 0);
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
   }, []);
@@ -111,10 +114,29 @@ export default function Phase1Tracing({ onComplete, onBack }) {
   }, [drawnStrokes, currentPath, canvasSize, letterData, currentStrokeIdx, state.hintActive, state.selectedLetterColor]);
 
   const getPos = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return [clientX - rect.left, clientY - rect.top];
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    
+    // Map screen coordinates strictly to canvas internal dimensions
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return [
+      (clientX - rect.left) * scaleX,
+      (clientY - rect.top) * scaleY
+    ];
   };
 
   const startDrawing = (e) => {

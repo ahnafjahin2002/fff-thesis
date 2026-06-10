@@ -91,8 +91,11 @@ export function validateStroke(drawnPoints, referencePath, canvasWidth, canvasHe
   const endCoverage = distance(drawnEnd, refEnd) < tolerance * 2;
   const hasCoverage = startCoverage || endCoverage;
   
-  // Stroke is valid if average deviation is within tolerance AND has reasonable coverage
-  const valid = averageDeviation <= tolerance && accuracy >= 0.5 && hasCoverage;
+  // Check direction
+  const isCorrectDirection = checkDirection(drawnPoints, referencePath, canvasWidth, canvasHeight);
+  
+  // Stroke is valid if average deviation is within tolerance AND has reasonable coverage AND direction is mostly correct
+  const valid = averageDeviation <= tolerance && accuracy >= 0.5 && hasCoverage && isCorrectDirection;
   
   return { valid, accuracy, averageDeviation };
 }
