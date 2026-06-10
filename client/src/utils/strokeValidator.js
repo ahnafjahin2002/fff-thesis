@@ -1,7 +1,7 @@
 // ─── Stroke Validator ──────────────────────────────────────────────────────────
 // Compares child's drawn stroke against a reference stroke path.
-// Uses point-to-path distance with 15% tolerance as specified in the design doc.
-// Dyslexia-friendly: does NOT require pixel-perfect tracing.
+// Dyslexia-friendly: uses generous tolerance — children just need to draw
+// roughly in the right area and direction. NOT pixel-perfect.
 
 /**
  * Calculate distance between two points
@@ -36,61 +36,97 @@ function pointToPathDistance(point, path) {
     const d = pointToSegmentDistance(point, path[i], path[i + 1]);
     if (d < minDist) minDist = d;
   }
+  // Also check distance to individual points (handles single-point paths)
+  for (let i = 0; i < path.length; i++) {
+    const d = distance(point, path[i]);
+    if (d < minDist) minDist = d;
+  }
   return minDist;
 }
 
 /**
  * Validate a child's drawn stroke against a reference stroke.
  * 
- * @param {Array<[number, number]>} drawnPoints - Points the child drew (in canvas pixels)
- * @param {Array<[number, number]>} referencePath - Reference path points (normalized 0-1)
+ * This is intentionally very forgiving — children with dyslexia
+ * should be able to pass by drawing roughly in the correct area
+ * and general direction. We check:
+ *   1. Did they draw long enough? (not just a tap)
+ *   2. Are most of their drawn points near the reference path?
+ *   3. Did they roughly cover the length of the reference path?
+ * 
+ * @param {Array<[number, number]>} drawnPoints - Points drawn (in canvas pixels)
+ * @param {Array<[number, number]>} referencePath - Reference path (normalized 0-1)
  * @param {number} canvasWidth - Canvas width in pixels
  * @param {number} canvasHeight - Canvas height in pixels  
- * @param {number} tolerancePercent - Tolerance as percentage of letter height (default 15%)
  * @returns {{ valid: boolean, accuracy: number, averageDeviation: number }}
  */
-export function validateStroke(drawnPoints, referencePath, canvasWidth, canvasHeight, tolerancePercent = 25) {
-  if (!drawnPoints || drawnPoints.length < 3) {
+export function validateStroke(drawnPoints, referencePath, canvasWidth, canvasHeight) {
+  if (!drawnPoints || drawnPoints.length < 3 || !referencePath || referencePath.length < 2) {
     return { valid: false, accuracy: 0, averageDeviation: 1 };
   }
   
   // Normalize drawn points to 0-1 space
-  const normalizedDrawn = drawnPoints.map(p => [
+  const drawn = drawnPoints.map(p => [
     p[0] / canvasWidth,
     p[1] / canvasHeight,
   ]);
+
+  // ── Check 1: Minimum drawn length ───────────────────────────────────────────
+  // The child must have drawn at least a meaningful distance
+  let drawnLength = 0;
+  for (let i = 0; i < drawn.length - 1; i++) {
+    drawnLength += distance(drawn[i], drawn[i + 1]);
+  }
+
+  // Reference path length
+  let refLength = 0;
+  for (let i = 0; i < referencePath.length - 1; i++) {
+    refLength += distance(referencePath[i], referencePath[i + 1]);
+  }
+
+  // Must draw at least 30% of reference length
+  if (drawnLength < refLength * 0.3) {
+    return { valid: false, accuracy: 0, averageDeviation: 1 };
+  }
+
+  // ── Check 2: Proximity — are drawn points near the reference? ───────────────
+  // Sample up to 15 evenly-spaced points from the drawn path
+  const sampleCount = Math.min(drawn.length, 15);
+  const step = Math.max(1, Math.floor(drawn.length / sampleCount));
   
-  // Calculate tolerance in normalized space
-  const tolerance = tolerancePercent / 100;
-  
-  // Sample points along the drawn path and check deviation from reference
-  const sampleCount = Math.min(normalizedDrawn.length, 20);
-  const step = Math.max(1, Math.floor(normalizedDrawn.length / sampleCount));
+  // Generous tolerance: 30% of canvas in normalized space
+  const tolerance = 0.30;
   
   let totalDeviation = 0;
   let sampledCount = 0;
   let withinTolerance = 0;
   
-  for (let i = 0; i < normalizedDrawn.length; i += step) {
-    const deviation = pointToPathDistance(normalizedDrawn[i], referencePath);
-    totalDeviation += deviation;
+  for (let i = 0; i < drawn.length; i += step) {
+    const dev = pointToPathDistance(drawn[i], referencePath);
+    totalDeviation += dev;
     sampledCount++;
-    if (deviation <= tolerance) withinTolerance++;
+    if (dev <= tolerance) withinTolerance++;
   }
-  
+
   const averageDeviation = totalDeviation / sampledCount;
   const accuracy = withinTolerance / sampledCount;
+
+  // ── Check 3: Coverage — did they trace most of the reference? ──────────────
+  // Check that drawn path starts near ref start and ends near ref end
+  const startDist = distance(drawn[0], referencePath[0]);
+  const endDist = distance(drawn[drawn.length - 1], referencePath[referencePath.length - 1]);
   
-  // Calculate drawn path length to ensure they didn't just tap
-  let drawnLength = 0;
-  for (let i = 0; i < normalizedDrawn.length - 1; i++) {
-    drawnLength += distance(normalizedDrawn[i], normalizedDrawn[i + 1]);
-  }
-  const hasReasonableLength = drawnLength > 0.1; // at least 10% of canvas dimension
+  // Also allow reverse direction (start near end, end near start)
+  const startDistRev = distance(drawn[0], referencePath[referencePath.length - 1]);
+  const endDistRev = distance(drawn[drawn.length - 1], referencePath[0]);
   
-  // Stroke is valid if accuracy is reasonable AND they drew enough
-  const valid = accuracy >= 0.4 && hasReasonableLength;
+  const forwardCoverage = Math.max(startDist, endDist);
+  const reverseCoverage = Math.max(startDistRev, endDistRev);
+  const bestCoverage = Math.min(forwardCoverage, reverseCoverage);
   
+  // Pass if: 30%+ of points are within tolerance AND reasonable coverage
+  const valid = accuracy >= 0.3 && bestCoverage < 0.5;
+
   return { valid, accuracy, averageDeviation };
 }
 
@@ -106,13 +142,11 @@ export function checkDirection(drawnPoints, referencePath, canvasWidth, canvasHe
   const refStart = referencePath[0];
   const refEnd = referencePath[referencePath.length - 1];
   
-  // Check if drawn direction roughly matches reference direction
   const drawnDx = drawnEnd[0] - drawnStart[0];
   const drawnDy = drawnEnd[1] - drawnStart[1];
   const refDx = refEnd[0] - refStart[0];
   const refDy = refEnd[1] - refStart[1];
   
-  // Dot product for direction similarity (positive = same direction)
   const dot = drawnDx * refDx + drawnDy * refDy;
-  return dot >= 0; // Allow reverse direction for accessibility
+  return dot >= 0;
 }

@@ -259,13 +259,7 @@
 }
 
 .tracing-ghost-letter {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 200px; font-weight: 700;
-  color: rgba(24,179,104,0.12);
-  pointer-events: none;
-  font-family: 'Hind Siliguri', sans-serif;
-  line-height: 1;
+  display: none;
 }
 
 .tracing-stroke-indicator {
@@ -517,7 +511,7 @@
   .letter-card { width: 110px; height: 130px; }
   .letter-card-char { font-size: 56px; }
   .tracing-target-letter { font-size: 60px; }
-  .tracing-ghost-letter { font-size: 140px; }
+  .tracing-ghost-letter { font-size: 200px; }
   .btn-primary { min-width: 180px; font-size: 18px; }
   .celebration-title { font-size: 26px; }
 }
