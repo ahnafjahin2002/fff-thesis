@@ -49,7 +49,7 @@ function pointToPathDistance(point, path) {
  * @param {number} tolerancePercent - Tolerance as percentage of letter height (default 15%)
  * @returns {{ valid: boolean, accuracy: number, averageDeviation: number }}
  */
-export function validateStroke(drawnPoints, referencePath, canvasWidth, canvasHeight, tolerancePercent = 15) {
+export function validateStroke(drawnPoints, referencePath, canvasWidth, canvasHeight, tolerancePercent = 25) {
   if (!drawnPoints || drawnPoints.length < 3) {
     return { valid: false, accuracy: 0, averageDeviation: 1 };
   }
@@ -81,21 +81,15 @@ export function validateStroke(drawnPoints, referencePath, canvasWidth, canvasHe
   const averageDeviation = totalDeviation / sampledCount;
   const accuracy = withinTolerance / sampledCount;
   
-  // Also check coverage: did the child draw across the full stroke length?
-  const drawnStart = normalizedDrawn[0];
-  const drawnEnd = normalizedDrawn[normalizedDrawn.length - 1];
-  const refStart = referencePath[0];
-  const refEnd = referencePath[referencePath.length - 1];
+  // Calculate drawn path length to ensure they didn't just tap
+  let drawnLength = 0;
+  for (let i = 0; i < normalizedDrawn.length - 1; i++) {
+    drawnLength += distance(normalizedDrawn[i], normalizedDrawn[i + 1]);
+  }
+  const hasReasonableLength = drawnLength > 0.1; // at least 10% of canvas dimension
   
-  const startCoverage = distance(drawnStart, refStart) < tolerance * 2;
-  const endCoverage = distance(drawnEnd, refEnd) < tolerance * 2;
-  const hasCoverage = startCoverage || endCoverage;
-  
-  // Check direction
-  const isCorrectDirection = checkDirection(drawnPoints, referencePath, canvasWidth, canvasHeight);
-  
-  // Stroke is valid if average deviation is within tolerance AND has reasonable coverage AND direction is mostly correct
-  const valid = averageDeviation <= tolerance && accuracy >= 0.5 && hasCoverage && isCorrectDirection;
+  // Stroke is valid if accuracy is reasonable AND they drew enough
+  const valid = accuracy >= 0.4 && hasReasonableLength;
   
   return { valid, accuracy, averageDeviation };
 }
