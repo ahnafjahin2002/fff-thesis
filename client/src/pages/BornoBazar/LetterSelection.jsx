@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGameState } from '../../hooks/useGameState';
 import { getLetterChoices } from '../../data/letters';
+import { playAudio } from '../../utils/audio';
 
 export default function LetterSelection({ onSelect, onBack }) {
   const { state } = useGameState();
@@ -19,11 +20,7 @@ export default function LetterSelection({ onSelect, onBack }) {
     
     if (state.audioEnabled) {
       setPlayingAudioFor(letter);
-      // In a real app, play audio here using the speech synthesis or audio files
-      console.log(`Playing sound for ${letter}`);
-      
-      // Simulate audio duration
-      setTimeout(() => setPlayingAudioFor(null), 1000);
+      playAudio(letter, () => setPlayingAudioFor(null));
     }
   };
 

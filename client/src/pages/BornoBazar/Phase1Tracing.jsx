@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameState } from '../../hooks/useGameState';
 import { getLetterData } from '../../data/letters';
 import { validateStroke } from '../../utils/strokeValidator';
+import { playAudio } from '../../utils/audio';
 import mascotThink from '../../assets/mascot-wave.png'; // fallback
 import mascotCelebrate from '../../assets/mascot-wave.png'; // fallback
 import streetBgBlur from '../../assets/street-empty.png'; // fallback
@@ -217,7 +218,16 @@ export default function Phase1Tracing({ onComplete, onBack }) {
 
       <div className="tracing-letter-display">
         <div className="tracing-target-letter">{state.currentLetter}</div>
-        <button className="btn-audio" style={{ width: 44, height: 44 }}>🔊</button>
+        <button 
+          className="btn-audio" 
+          style={{ width: 44, height: 44 }}
+          onClick={() => {
+            if (state.audioEnabled && state.currentLetter) {
+              playAudio(state.currentLetter);
+            }
+          }}
+          aria-label={`Play sound for ${state.currentLetter}`}
+        >🔊</button>
       </div>
 
       <div className="tracing-canvas-area">
