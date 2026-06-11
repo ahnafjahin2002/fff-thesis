@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import heroKid from "../assets/fff-hero-child-rainbow.png";
 import "./LandingPage.css";
 
@@ -73,11 +74,11 @@ export default function LandingPage() {
         </a>
 
         <div className="fff-navlinks">
-          <a className="active" href="/">
+          <Link className="active" to="/">
             হোম
-          </a>
+          </Link>
           <a href="#how">কিভাবে কাজ করে</a>
-          <a href="#parents">অভিভাবকদের জন্য</a>
+          <Link to="/parents">অভিভাবকদের জন্য</Link>
           <a href="#resources">সম্পদ</a>
           <a href="#contact">যোগাযোগ</a>
         </div>
@@ -112,14 +113,14 @@ export default function LandingPage() {
           </motion.p>
 
           <motion.div className="hero-actions" variants={fadeUp}>
-            <a className="primary-cta" href="/dashboard">
+            <Link className="primary-cta" to="/dashboard">
               
 
               <span>
                 চল শুরু করি
                 <small>বিনামূল্যে শুরু করুন</small>
               </span>
-            </a>
+            </Link>
 
             <a className="secondary-cta" href="#how">
               <span className="play-icon">▶</span>
