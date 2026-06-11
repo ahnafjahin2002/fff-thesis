@@ -1,17 +1,3 @@
-/**
- * ReadingPage.jsx
- * ----------------
- * Full page for Feature 1 — Adaptive Text Visualization.
- * Child-friendly interface with:
- *   - Top toolbar (back, audio, word-by-word)
- *   - Progressive difficulty levels (শুরু → সহজ → মাঝারি → উন্নত)
- *   - Main reading area with illustration
- *   - Conjunct word breakdown on tap
- *   - Navigation (prev/next with counter)
- *   - Bottom showcase cards (juktoborno, kar-chihno, reph, levels)
- *   - Custom text input section
- */
-
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,510 +6,83 @@ import PreferencesPanel from '../components/reader/PreferencesPanel';
 import usePreferences from '../hooks/usePreferences';
 import { decomposeWord } from '../utils/banglaUtils';
 import { DIFFICULTY_LEVELS, READING_CONTENT, getLevelInfo } from '../utils/readingContent';
+import heroKid from '../assets/hero-kid.png';
 
-
-// ── Live Word Info Panel (replaces static image) ──
+// ── Live Word Info Panel ──
 function LiveWordInfoPanel({ word, wordData, onClose }) {
   const decomp = decomposeWord(word);
-  const hasConjunct = decomp.some(d => d.type === 'conjunct');
+  const colors = [
+    { bg: '#FFF3CD', border: '#FDE68A' }, // Yellow
+    { bg: '#FDE2E4', border: '#FAD1D4' }, // Pink/Orange
+    { bg: '#EAE6F8', border: '#D1C4E9' }, // Purple
+    { bg: '#D1F2EB', border: '#A3E4D7' }, // Blue
+  ];
 
   return (
-    <div style={{ height: '100%' }}>
-      {/* Header */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid #F0E8D8',
-      }}>
-        <span style={{
-          fontFamily: '"Noto Sans Bengali", sans-serif',
-          fontSize: '12px', fontWeight: 600, color: '#E06B2E',
-        }}>🔍 শব্দ বিশ্লেষণ</span>
-        <button onClick={onClose} style={{
-          width: '24px', height: '24px', borderRadius: '50%',
-          border: 'none', background: '#F5EDE0', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '11px', color: '#666',
-        }}>✕</button>
+    <div style={{
+      background: 'white', borderRadius: '16px', padding: '24px', 
+      boxShadow: '0 4px 12px rgba(0,0,0,0.04)', height: '100%', position: 'relative',
+      border: '1px solid #F0E8D8'
+    }}>
+      {/* Title */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="#4A5568" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span style={{ fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '15px', fontWeight: 700, color: '#4A5568' }}>শব্দ বিশ্লেষণ</span>
       </div>
 
       {/* Big word display */}
       <div style={{
-        fontFamily: '"Noto Sans Bengali", sans-serif',
-        fontSize: '32px', fontWeight: 700, color: '#2D1B00',
-        textAlign: 'center', lineHeight: 1.3, marginBottom: '12px',
+        fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '48px', fontWeight: 800, color: '#2D3748',
+        textAlign: 'center', marginBottom: '16px', letterSpacing: '0.5px'
       }}>{word}</div>
 
       {/* Syllable decomposition */}
       {decomp.length > 0 && (
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: '5px', flexWrap: 'wrap', marginBottom: '12px',
-        }}>
-          {decomp.map((d, i) => (
-            <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {i > 0 && <span style={{ fontSize: '14px', color: '#999', fontWeight: 700 }}>+</span>}
-              <div style={{
-                background: d.type === 'conjunct' ? '#FFF0E0' : '#E8F4FD',
-                border: `1.5px solid ${d.type === 'conjunct' ? '#E06B2E' : '#B3D9F2'}`,
-                borderRadius: '8px', padding: '4px 10px', textAlign: 'center',
-              }}>
-                <span style={{
-                  fontFamily: '"Noto Sans Bengali", sans-serif',
-                  fontSize: '18px', fontWeight: 600, display: 'block', color: '#2D1B00',
-                }}>{d.display}</span>
-                <span style={{
-                  fontFamily: '"Noto Sans Bengali", sans-serif',
-                  fontSize: '9px', color: '#888', display: 'block',
-                }}>{d.label}</span>
-              </div>
-            </span>
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '24px' }}>
+          {decomp.map((d, i) => {
+            const style = colors[i % colors.length];
+            return (
+              <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {i > 0 && <span style={{ fontSize: '18px', color: '#4A5568', fontWeight: 600 }}>+</span>}
+                <div style={{
+                  background: style.bg,
+                  border: `1.5px solid ${style.border}`,
+                  borderRadius: '12px', padding: '10px 18px', textAlign: 'center'
+                }}>
+                  <span style={{ fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '28px', fontWeight: 700, color: '#2D3748' }}>
+                    {d.display}
+                  </span>
+                </div>
+              </span>
+            );
+          })}
         </div>
       )}
-
-      {/* Conjunct formulas */}
-      {decomp.filter(d => d.formula).map((d, i) => (
-        <div key={i} style={{
-          background: '#FFF8E7', borderRadius: '8px', padding: '6px 10px',
-          textAlign: 'center', marginBottom: '6px',
-          fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '13px',
-        }}>
-          <span style={{ color: '#E06B2E', fontWeight: 600 }}>{d.formula}</span>
-          {d.vowelSign && (
-            <span style={{ color: '#666', marginLeft: '6px', fontSize: '11px' }}>
-              + {d.vowelSign} ({d.vowelSignName})
-            </span>
-          )}
-        </div>
-      ))}
 
       {/* Vowel signs list */}
-      {decomp.filter(d => d.vowelSign && d.type !== 'conjunct').length > 0 && (
-        <div style={{
-          marginTop: '6px', padding: '6px 10px', borderRadius: '8px',
-          background: '#F0FFF4', fontSize: '11px', textAlign: 'center',
-          fontFamily: '"Noto Sans Bengali", sans-serif', color: '#2E8B57',
-        }}>
-          কার: {decomp.filter(d => d.vowelSign && d.type !== 'conjunct').map(d => `${d.vowelSign} (${d.vowelSignName})`).join(', ')}
-        </div>
-      )}
-
-      {/* Word meaning if available */}
-      {wordData?.meaning && (
-        <div style={{
-          marginTop: '8px', padding: '6px 10px', borderRadius: '8px',
-          background: '#E8F4FD', fontFamily: '"Noto Sans Bengali", sans-serif',
-          fontSize: '12px', color: '#1A2B4A', textAlign: 'center',
-        }}>
-          অর্থ: {wordData.meaning}
-        </div>
-      )}
-
-      {/* Type badges */}
-      <div style={{
-        display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '10px',
-      }}>
-        {hasConjunct && (
-          <span style={{
-            background: '#FFF0E0', color: '#E06B2E', padding: '2px 8px',
-            borderRadius: '10px', fontSize: '10px', fontFamily: '"Noto Sans Bengali"', fontWeight: 600,
-          }}>যুক্তবর্ণ</span>
-        )}
-        {decomp.some(d => d.vowelSign) && (
-          <span style={{
-            background: '#F0FFF4', color: '#2E8B57', padding: '2px 8px',
-            borderRadius: '10px', fontSize: '10px', fontFamily: '"Noto Sans Bengali"', fontWeight: 600,
-          }}>কার-চিহ্ন</span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ── Showcase: Juktoborno Breakdown Demo ──
-function JuktobornoShowcase() {
-  const word = 'রান্না';
-  const decomp = decomposeWord(word);
-  return (
-    <div className="showcase-card">
-      <div className="showcase-card-title">যুক্তবর্ণ ভাঙার উদাহরণ</div>
-      <div className="showcase-word-big" style={{ fontSize: '36px' }}>{word}</div>
-      {/* Syllable-level breakdown */}
-      <div className="showcase-decomp-row">
-        <span style={{ fontSize: '24px', fontWeight: 700, fontFamily: '"Noto Sans Bengali"' }}>{word}</span>
-        <span className="conjunct-equals">=</span>
-        {decomp.map((d, i) => (
-          <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {i > 0 && <span className="conjunct-plus">+</span>}
-            <div className={`showcase-decomp-box ${d.type === 'conjunct' ? 'conjunct' : ''}`}>
-              <span className="showcase-decomp-char">{d.display}</span>
-            </div>
-          </span>
-        ))}
-      </div>
-      {/* Detailed table */}
-      <table className="showcase-table">
-        <tbody>
-          <tr>{decomp.map((d, i) => <td key={i}>{d.display}</td>)}</tr>
-          <tr>{decomp.map((d, i) => <td key={i} style={{ fontSize: '11px', color: '#888' }}>{d.label}{d.vowelSign ? ` + ${d.vowelSignName}` : ''}</td>)}</tr>
-          {decomp.some(d => d.formula) && (
-            <tr>{decomp.map((d, i) => <td key={i} style={{ fontSize: '11px', color: '#E06B2E' }}>{d.formula || '—'}</td>)}</tr>
-          )}
-        </tbody>
-      </table>
-      <div className="showcase-pron">
-        <span>🔊</span>
-        <span>উচ্চারণ: <strong>{word}</strong></span>
-      </div>
-    </div>
-  );
-}
-
-// ── Showcase: Kar-Chihno Highlight ──
-function KarChihnoShowcase() {
-  return (
-    <div className="showcase-card">
-      <div className="showcase-card-title">কার-চিহ্ন হাইলাইট</div>
-      <div className="vowel-highlight-demo">
-        ক<span className="vowel-highlighted">ি</span>না
-      </div>
-      <div className="vowel-arrow">↑ কার-চিহ্ন (ই-কার)</div>
-      <p style={{
-        fontFamily: '"Noto Sans Bengali"', fontSize: '12px', color: '#666',
-        marginTop: '10px', lineHeight: 1.6, textAlign: 'center',
-      }}>
-        কার-চিহ্নগুলো আলাদা রঙে দেখানো হয়েছে যাতে অবস্থান সহজে বোঝা যায়।
-      </p>
-    </div>
-  );
-}
-
-// ── Showcase: Reph / R-fola Indicator ──
-function RephShowcase() {
-  return (
-    <div className="showcase-card">
-      <div className="showcase-card-title">রেফ / র-ফলা নির্দেশক</div>
-      <div className="reph-demo-word">
-        <span className="reph-marker">◌</span>প্রেম
-      </div>
-      <div className="reph-info">
-        এই শব্দে র-ফলা আছে।<br />পড়ার সময় খেয়াল করুন।
-      </div>
-    </div>
-  );
-}
-
-// ── Showcase: Level Selector ──
-function LevelShowcase({ currentLevel, onLevelChange }) {
-  return (
-    <div className="showcase-card">
-      <div className="showcase-card-title">শুরু থেকে উন্নত পর্যায়</div>
-      <div className="level-grid">
-        {DIFFICULTY_LEVELS.map(level => (
-          <div
-            key={level.id}
-            className={`level-card ${currentLevel === level.id ? 'active' : ''}`}
-            onClick={() => onLevelChange(level.id)}
-          >
-            <span className="level-card-label">{level.label}</span>
-            <span className="level-card-sample">{level.desc}</span>
-            <span className="level-stars">{'⭐'.repeat(level.stars)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Main Page Component ──
-export default function ReadingPage() {
-  const { isPanelOpen, togglePanel } = usePreferences();
-  const navigate = useNavigate();
-  const [tappedWord, setTappedWord] = useState(null);
-  const [activeIdx, setActiveIdx] = useState(-1);
-  const [currentLevel, setCurrentLevel] = useState('sohoj');
-  const [currentItemIdx, setCurrentItemIdx] = useState(0);
-  const [customText, setCustomText] = useState('');
-  const [showCustomResult, setShowCustomResult] = useState(false);
-
-  const levelContent = READING_CONTENT[currentLevel] || [];
-  const currentItem = levelContent[currentItemIdx] || { text: '', title: '' };
-  const levelInfo = getLevelInfo(currentLevel);
-  const isSingleWord = currentLevel === 'shuru';
-
-  const handleWordTap = useCallback((word, wordData, wordIdx) => {
-    setTappedWord({ word, wordData, wordIdx });
-    setActiveIdx(wordIdx);
-  }, []);
-
-  const handlePrev = () => { if (currentItemIdx > 0) { setCurrentItemIdx(currentItemIdx - 1); setTappedWord(null); setActiveIdx(-1); } };
-  const handleNext = () => { if (currentItemIdx < levelContent.length - 1) { setCurrentItemIdx(currentItemIdx + 1); setTappedWord(null); setActiveIdx(-1); } };
-  const handleLevelChange = (levelId) => { setCurrentLevel(levelId); setCurrentItemIdx(0); setTappedWord(null); setActiveIdx(-1); };
-  const handleAnalyze = () => { if (customText.trim()) setShowCustomResult(true); };
-
-  return (
-    <div style={{ minHeight: '100vh', background: 'var(--pref-bg-color)', transition: 'background 0.2s ease' }}>
-
-      {/* ── Top Toolbar ── */}
-      <header className="app-header">
-        <div className="app-header-left">
-          <button className="back-btn" aria-label="পেছনে যান" onClick={() => navigate('/')}>←</button>
-          <div className="app-brand">
-            <div className="app-brand-avatar">📖</div>
-            <span className="app-brand-name">চলো পড়ি</span>
-            <span className="app-brand-star">⭐</span>
-          </div>
-        </div>
-        <div className="app-header-actions">
-          <button className="header-btn" aria-label="শোনো">
-            <span>🔊</span> <span>শোনো</span> <span>▶</span>
-          </button>
-          <button className="header-btn" aria-label="শব্দ ধরে ধরে">
-            <span>➡</span> <span>শব্দ ধরে ধরে</span>
-          </button>
-          <motion.button
-            whileTap={{ scale: 0.94 }}
-            onClick={togglePanel}
-            className={`header-btn ${isPanelOpen ? 'active' : ''}`}
-            aria-label="সেটিংস"
-            aria-expanded={isPanelOpen}
-          >
-            <span>⚙️</span> <span>সেটিংস</span>
-          </motion.button>
-        </div>
-      </header>
-
-      {/* ── Level Tabs ── */}
-      <div style={{
-        display: 'flex', gap: '6px', padding: '10px 20px', maxWidth: '900px', margin: '0 auto',
-        overflowX: 'auto', flexWrap: 'nowrap',
-      }}>
-        {DIFFICULTY_LEVELS.map(level => (
-          <button
-            key={level.id}
-            onClick={() => handleLevelChange(level.id)}
-            style={{
-              padding: '6px 14px', borderRadius: '20px', whiteSpace: 'nowrap',
-              border: currentLevel === level.id ? '2px solid #E06B2E' : '1.5px solid #E2D5C3',
-              background: currentLevel === level.id ? '#FFF0E0' : '#fff',
-              fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '13px',
-              fontWeight: currentLevel === level.id ? 600 : 400,
-              color: currentLevel === level.id ? '#E06B2E' : '#2D1B00',
-              cursor: 'pointer', transition: 'all 0.15s',
-            }}
-          >
-            {'⭐'.repeat(level.stars)} {level.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Main Reading Area ── */}
-      <main style={{ padding: '0 16px' }}>
-        <div className="reading-main-area">
-          {/* Level & item title */}
+      {decomp.some(d => d.vowelSign && d.type !== 'conjunct') && (
+        <div style={{ width: '100%', marginBottom: '12px' }}>
           <div style={{
-            display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px',
+            background: '#E8F5E9', padding: '8px', borderRadius: '12px',
+            fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '14px', color: '#1B5E20',
+            fontWeight: 600, textAlign: 'center'
           }}>
-            <span style={{
-              background: '#FFF0E0', color: '#E06B2E', padding: '3px 10px',
-              borderRadius: '12px', fontSize: '12px', fontWeight: 600,
-              fontFamily: '"Noto Sans Bengali", sans-serif',
-            }}>
-              {levelInfo.label}
-            </span>
-            {currentItem.title && (
-              <span style={{
-                fontFamily: '"Noto Sans Bengali", sans-serif',
-                fontSize: '13px', color: 'rgba(45,27,0,0.5)',
-              }}>
-                — {currentItem.title}
-              </span>
-            )}
-          </div>
-
-          {/* Text + Live Word Info Panel */}
-          <div className="reading-text-section">
-            <div className="reading-text-col">
-              {/* Audio icon for the text */}
-              <div style={{ marginBottom: '8px' }}>
-                <button style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  fontSize: '24px', opacity: 0.6, transition: 'opacity 0.15s',
-                }} aria-label="এই লেখাটি শুনুন">🔊</button>
-              </div>
-
-              <TextRenderer
-                content={currentItem.text}
-                activeWordIdx={activeIdx}
-                onWordTap={handleWordTap}
-                isSingleWord={isSingleWord}
-              />
-            </div>
-
-            {/* Live Word Info Panel — shows decomposition when a word is tapped */}
-            <AnimatePresence>
-              {tappedWord ? (
-                <motion.div
-                  className="live-word-panel"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <LiveWordInfoPanel
-                    word={tappedWord.word}
-                    wordData={tappedWord.wordData}
-                    onClose={() => { setTappedWord(null); setActiveIdx(-1); }}
-                  />
-                </motion.div>
-              ) : (
-                <motion.div
-                  className="live-word-panel"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <div style={{
-                    textAlign: 'center', padding: '20px',
-                    color: 'rgba(45,27,0,0.35)',
-                    fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '14px',
-                  }}>
-                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>👆</div>
-                    যেকোনো শব্দে ক্লিক করুন<br/>বিশ্লেষণ দেখতে
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            কার: {decomp.filter(d => d.vowelSign && d.type !== 'conjunct').map(d => `${d.vowelSign} (${d.vowelSignName})`).join(', ')}
           </div>
         </div>
+      )}
 
-        {/* ── Navigation Footer ── */}
-        <div className="nav-footer">
-          <button className="nav-btn" onClick={handlePrev} disabled={currentItemIdx === 0}>
-            ← পূর্ববর্তী
-          </button>
-          <div style={{ flex: 1, margin: '0 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              flex: 1, height: '16px', background: '#E5E5E5',
-              borderRadius: '8px', overflow: 'hidden', position: 'relative'
-            }}>
-              <motion.div
-                initial={false}
-                animate={{ width: `${((currentItemIdx + 1) / levelContent.length) * 100}%` }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                style={{
-                  position: 'absolute', top: 0, left: 0, bottom: 0,
-                  background: 'var(--duo-green)', borderRadius: '8px',
-                }}
-              >
-                {/* Glossy shine effect */}
-                <div style={{
-                  position: 'absolute', top: '2px', left: '8px', right: '8px',
-                  height: '4px', background: 'rgba(255,255,255,0.3)', borderRadius: '4px'
-                }} />
-              </motion.div>
-            </div>
-            <span className="nav-counter" style={{ flexShrink: 0, minWidth: '50px', textAlign: 'center' }}>
-              {currentItemIdx + 1} / {levelContent.length}
-            </span>
-          </div>
-          <button className="nav-btn" onClick={handleNext} disabled={currentItemIdx >= levelContent.length - 1}>
-            পরবর্তী →
-          </button>
-        </div>
-
-        {/* ── Single Word Decomposition (for shuru level) ── */}
-        {isSingleWord && currentItem.text && (
-          <div style={{ maxWidth: '900px', margin: '0 auto 16px', padding: '0 4px' }}>
-            <WordDecompositionCard word={currentItem.text} />
-          </div>
-        )}
-
-        {/* ── Custom Text Input ── */}
-        <div className="custom-input-section">
-          <div className="custom-input-card">
-            <div className="custom-input-title">
-              <span>✏️</span> নিজের লেখা বিশ্লেষণ করুন
-            </div>
-            <textarea
-              className="custom-textarea"
-              value={customText}
-              onChange={(e) => { setCustomText(e.target.value); setShowCustomResult(false); }}
-              placeholder="এখানে বাংলা শব্দ বা বাক্য লিখুন..."
-            />
-            <button className="custom-analyze-btn" onClick={handleAnalyze}>
-              🔍 বিশ্লেষণ করুন
-            </button>
-            {showCustomResult && customText.trim() && (
-              <div className="custom-result-area">
-                <TextRenderer
-                  content={customText}
-                  activeWordIdx={-1}
-                  onWordTap={handleWordTap}
-                />
-                {/* Word-level breakdown */}
-                <div style={{ marginTop: '14px', borderTop: '1px solid #E2D5C3', paddingTop: '14px' }}>
-                  <p style={{
-                    fontFamily: '"Noto Sans Bengali", sans-serif',
-                    fontSize: '13px', fontWeight: 600, color: '#E06B2E', marginBottom: '8px',
-                  }}>শব্দ বিশ্লেষণ:</p>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {customText.trim().split(/\s+/).filter(w => w.length > 0).map((w, i) => (
-                      <WordDecompositionMini key={i} word={w.replace(/[।,!?]/g, '')} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div style={{ height: '40px' }} />
-      </main>
-
-      {/* ── Preferences Panel ── */}
-      <PreferencesPanel />
-    </div>
-  );
-}
-
-// ── Word Decomposition Card (for single words at shuru level) ──
-function WordDecompositionCard({ word }) {
-  const decomp = decomposeWord(word);
-  if (decomp.length <= 1 && !decomp[0]?.formula) return null;
-
-  return (
-    <div className="showcase-card" style={{ marginTop: '0' }}>
-      <div className="showcase-card-title">শব্দ ভাঙন: {word}</div>
-      <div className="showcase-decomp-row">
-        <span style={{ fontSize: '28px', fontWeight: 700, fontFamily: '"Noto Sans Bengali"' }}>{word}</span>
-        <span className="conjunct-equals">=</span>
-        {decomp.map((d, i) => (
-          <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {i > 0 && <span className="conjunct-plus">+</span>}
-            <div className={`showcase-decomp-box ${d.type === 'conjunct' ? 'conjunct' : ''}`}>
-              <span className="showcase-decomp-char">{d.display}</span>
-              <span className="showcase-decomp-label">{d.label}</span>
-            </div>
-          </span>
-        ))}
-      </div>
-      {/* Conjunct details */}
-      {decomp.filter(d => d.formula).map((d, i) => (
-        <div key={i} style={{
-          textAlign: 'center', marginTop: '8px', padding: '8px',
-          background: '#FFF8E7', borderRadius: '8px',
-          fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '14px',
+      {/* Word badge */}
+      <div style={{ textAlign: 'center' }}>
+        <span style={{
+          background: '#E8F5E9', padding: '6px 20px', borderRadius: '20px',
+          fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '14px', color: '#1B5E20',
+          fontWeight: 600, display: 'inline-block'
         }}>
-          <span style={{ color: '#E06B2E', fontWeight: 600 }}>{d.formula}</span>
-          {d.vowelSign && (
-            <span style={{ color: '#666', marginLeft: '8px' }}>+ {d.vowelSign} ({d.vowelSignName})</span>
-          )}
-        </div>
-      ))}
-      <div className="showcase-pron" style={{ marginTop: '10px' }}>
-        <span>🔊</span>
-        <span>উচ্চারণ: <strong>{word}</strong></span>
+          শব্দ: {word}
+        </span>
       </div>
     </div>
   );
@@ -564,6 +123,274 @@ function WordDecompositionMini({ word }) {
           fontSize: '10px', color: '#E06B2E', marginTop: '2px',
         }}>({d.formula})</div>
       ))}
+    </div>
+  );
+}
+
+const FloatingStar = () => (
+  <svg width="80" height="80" viewBox="0 0 100 100" style={{ position: 'absolute', bottom: '60px', right: '40px', zIndex: 0, opacity: 0.9 }}>
+    <polygon points="50,10 61,39 92,39 67,58 76,88 50,70 24,88 33,58 8,39 39,39" fill="#FFD700" />
+    <circle cx="35" cy="45" r="5" fill="#333" />
+    <circle cx="65" cy="45" r="5" fill="#333" />
+    <path d="M40 65 Q50 75 60 65" fill="none" stroke="#333" strokeWidth="4" strokeLinecap="round" />
+    <circle cx="28" cy="58" r="6" fill="#FF9999" opacity="0.7" />
+    <circle cx="72" cy="58" r="6" fill="#FF9999" opacity="0.7" />
+  </svg>
+);
+
+const GrassBackground = () => (
+  <svg width="100%" height="120" viewBox="0 0 1000 100" preserveAspectRatio="none" style={{ position: 'absolute', bottom: 0, left: 0, zIndex: 1, pointerEvents: 'none', opacity: 0.9 }}>
+    <path d="M0,100 L0,40 Q50,30 100,50 T200,40 T300,60 T400,30 T500,50 T600,30 T700,60 T800,40 T900,50 T1000,40 L1000,100 Z" fill="#E8F5E9"/>
+    <path d="M0,100 L0,60 Q50,50 100,70 T200,60 T300,80 T400,50 T500,70 T600,50 T700,80 T800,60 T900,70 T1000,60 L1000,100 Z" fill="#C8E6C9"/>
+  </svg>
+);
+
+// ── Main Page Component ──
+export default function ReadingPage() {
+  const { isPanelOpen, togglePanel } = usePreferences();
+  const navigate = useNavigate();
+  const [tappedWord, setTappedWord] = useState(null);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const [currentLevel, setCurrentLevel] = useState('sohoj');
+  const [currentItemIdx, setCurrentItemIdx] = useState(0);
+  const [customText, setCustomText] = useState('');
+  const [showCustomResult, setShowCustomResult] = useState(false);
+
+  const levelContent = READING_CONTENT[currentLevel] || [];
+  const currentItem = levelContent[currentItemIdx] || { text: '', title: '' };
+  const isSingleWord = currentLevel === 'shuru';
+
+  const handleWordTap = useCallback((word, wordData, wordIdx) => {
+    setTappedWord({ word, wordData, wordIdx });
+    setActiveIdx(wordIdx);
+  }, []);
+
+  const handlePrev = () => { if (currentItemIdx > 0) { setCurrentItemIdx(currentItemIdx - 1); setTappedWord(null); setActiveIdx(-1); } };
+  const handleNext = () => { if (currentItemIdx < levelContent.length - 1) { setCurrentItemIdx(currentItemIdx + 1); setTappedWord(null); setActiveIdx(-1); } };
+  const handleLevelChange = (levelId) => { setCurrentLevel(levelId); setCurrentItemIdx(0); setTappedWord(null); setActiveIdx(-1); };
+  const handleAnalyze = () => { if (customText.trim()) setShowCustomResult(true); };
+
+  const levelStyles = {
+    shuru: { bg: '#F0FAEE', border: '#D5EDD0', activeColor: '#2E7D32' },
+    sohoj: { bg: '#FFF3E0', border: '#FFB74D', activeColor: '#E65100' },
+    majhari: { bg: '#E3F2FD', border: '#BBDEFB', activeColor: '#1565C0' },
+    unnoto: { bg: '#F3E5F5', border: '#E1BEE7', activeColor: '#6A1B9A' }
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#FFF9F0', fontFamily: '"Noto Sans Bengali", sans-serif', position: 'relative', overflowX: 'hidden' }}>
+      
+      {/* ── Top Toolbar ── */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px', background: '#FFF9F0', borderBottom: '1.5px solid #F0E8D8' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button onClick={() => navigate('/')} style={{ width: '48px', height: '48px', borderRadius: '16px', border: 'none', background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#4CAF50" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '32px' }}>📖</span>
+            <span style={{ fontSize: '24px', fontWeight: 800, color: '#2D3748' }}>চলো পড়ি</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button style={{ padding: '10px 20px', borderRadius: '24px', border: '1px solid #F0E8D8', background: 'white', boxShadow: '0 2px 6px rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '15px', color: '#2D3748' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="#4CAF50"/>
+              <path d="M15.54 8.46A5 5 0 0 1 15.54 15.54M19.07 4.93a10 10 0 0 1 0 14.14" stroke="#4CAF50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            শোনো
+          </button>
+          <button style={{ padding: '10px 20px', borderRadius: '24px', border: '1px solid #F0E8D8', background: 'white', boxShadow: '0 2px 6px rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '15px', color: '#6A1B9A' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 6H21M8 12H21M8 18H21M3 6H3.01M3 12H3.01M3 18H3.01" stroke="#6A1B9A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            শব্দ ধরে ধরে
+          </button>
+          <motion.button whileTap={{ scale: 0.95 }} onClick={togglePanel} style={{ padding: '10px 20px', borderRadius: '24px', border: 'none', background: '#FBE9E7', boxShadow: '0 2px 6px rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '15px', color: '#5D4037' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="#5D4037"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.8 1 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" fill="#5D4037"/>
+            </svg>
+            সেটিংস
+          </motion.button>
+        </div>
+      </header>
+
+      {/* ── Level Tabs ── */}
+      <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
+        {DIFFICULTY_LEVELS.map(level => {
+          const isActive = currentLevel === level.id;
+          const style = levelStyles[level.id] || levelStyles.shuru;
+          return (
+            <button
+              key={level.id}
+              onClick={() => handleLevelChange(level.id)}
+              style={{
+                padding: '8px 24px', borderRadius: '30px', whiteSpace: 'nowrap',
+                border: isActive ? `1.5px solid ${style.activeColor}` : `1px solid ${style.border}`,
+                background: style.bg,
+                fontFamily: '"Noto Sans Bengali", sans-serif', fontSize: '15px',
+                fontWeight: isActive ? 700 : 600,
+                color: isActive ? style.activeColor : '#2D3748',
+                cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
+              }}
+            >
+              <span style={{ color: '#FFD700', fontSize: '14px' }}>{'⭐'.repeat(level.stars)}</span> {level.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Main Reading Area ── */}
+      <div style={{ display: 'flex', gap: '24px', maxWidth: '1000px', margin: '0 auto', marginBottom: '24px', padding: '0 20px', zIndex: 10, position: 'relative' }}>
+        {/* Left Column: Text Renderer */}
+        <div style={{ flex: '2.5', background: 'white', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', position: 'relative', minHeight: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #F0E8D8' }}>
+          <button style={{ position: 'absolute', top: '20px', left: '20px', width: '40px', height: '40px', borderRadius: '50%', border: '1px solid #E2E8F0', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.03)' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="#4CAF50"/>
+              <path d="M15.54 8.46A5 5 0 0 1 15.54 15.54M19.07 4.93a10 10 0 0 1 0 14.14" stroke="#4CAF50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          
+          <div style={{ width: '100%' }}>
+            <TextRenderer
+              content={currentItem.text}
+              activeWordIdx={activeIdx}
+              onWordTap={handleWordTap}
+              isSingleWord={isSingleWord}
+            />
+          </div>
+        </div>
+
+        {/* Right Column: Analysis */}
+        <div style={{ flex: '1.5', minWidth: '320px' }}>
+          <AnimatePresence mode="wait">
+            {tappedWord ? (
+              <motion.div
+                key={tappedWord.word}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                style={{ height: '100%' }}
+              >
+                <LiveWordInfoPanel
+                  word={tappedWord.word}
+                  wordData={tappedWord.wordData}
+                  onClose={() => { setTappedWord(null); setActiveIdx(-1); }}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{ height: '100%', background: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #F0E8D8' }}
+              >
+                <div style={{ textAlign: 'center', color: '#A0AEC0', fontSize: '16px', fontWeight: 600 }}>
+                  <div style={{ fontSize: '40px', marginBottom: '12px' }}>👆</div>
+                  শব্দ বিশ্লেষণ দেখতে<br/>যেকোনো শব্দে চাপুন
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* ── Navigation Row ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', maxWidth: '1000px', margin: '0 auto', marginBottom: '32px', padding: '0 20px', zIndex: 10, position: 'relative' }}>
+        <button onClick={handlePrev} disabled={currentItemIdx === 0} style={{ padding: '10px 24px', borderRadius: '30px', border: '1px solid #E2E8F0', background: 'white', fontWeight: 700, color: currentItemIdx === 0 ? '#CBD5E0' : '#2E7D32', cursor: currentItemIdx === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke={currentItemIdx === 0 ? '#CBD5E0' : '#2E7D32'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          পূর্ববর্তী
+        </button>
+        
+        {/* Progress Bar */}
+        <div style={{ flex: 1, height: '16px', background: '#E2E8F0', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
+          <motion.div 
+             initial={false}
+             animate={{ width: `${((currentItemIdx + 1) / levelContent.length) * 100}%` }}
+             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+             style={{ 
+               height: '100%', 
+               borderRadius: '8px',
+               background: 'repeating-linear-gradient(-45deg, #4CAF50, #4CAF50 10px, #81C784 10px, #81C784 20px)'
+             }} 
+          />
+        </div>
+
+        {/* Counter */}
+        <div style={{ padding: '8px 20px', background: '#FFF3E0', borderRadius: '20px', fontWeight: 700, color: '#E65100', fontSize: '15px' }}>
+          {currentItemIdx + 1} / {levelContent.length}
+        </div>
+
+        <button onClick={handleNext} disabled={currentItemIdx >= levelContent.length - 1} style={{ padding: '10px 24px', borderRadius: '30px', border: 'none', background: currentItemIdx >= levelContent.length - 1 ? '#A5D6A7' : '#4CAF50', color: 'white', fontWeight: 700, cursor: currentItemIdx >= levelContent.length - 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
+          পরবর্তী
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 19M19 12L12 5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* ── Custom Text Input ── */}
+      <div style={{ maxWidth: '1000px', margin: '0 auto', background: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', position: 'relative', zIndex: 10, width: 'calc(100% - 40px)', border: '1px solid #F0E8D8' }}>
+        <div style={{ fontWeight: 700, fontSize: '16px', color: '#1A202C', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>✏️</span> নিজের লেখা বিশ্লেষণ করুন
+        </div>
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <input 
+             type="text"
+             value={customText}
+             onChange={(e) => { setCustomText(e.target.value); setShowCustomResult(false); }}
+             placeholder="এখানে বাংলা শব্দ বা বাক্য লিখুন..."
+             style={{ flex: 1, padding: '16px 20px', borderRadius: '12px', border: '1px solid #E2E8F0', fontSize: '16px', fontFamily: '"Noto Sans Bengali", sans-serif', outline: 'none' }}
+          />
+          <button onClick={handleAnalyze} style={{ padding: '0 24px', borderRadius: '12px', border: 'none', background: '#388E3C', color: 'white', fontWeight: 700, fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 20L18.5 5.5C19.3284 4.67157 20.6716 4.67157 21.5 5.5V5.5C22.3284 6.32843 22.3284 7.67157 21.5 8.5L7 23" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+              <path d="M15 3L16 1L17 3L19 4L17 5L16 7L15 5L13 4L15 3Z" fill="white"/>
+              <path d="M5 9L6 6L9 5L6 4L5 1L4 4L1 5L4 6L5 9Z" fill="white"/>
+            </svg>
+            বিশ্লেষণ করুন
+          </button>
+        </div>
+        
+        {showCustomResult && customText.trim() && (
+          <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #E2E8F0' }}>
+            <div style={{ background: '#FFF9F0', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
+              <TextRenderer
+                content={customText}
+                activeWordIdx={-1}
+                onWordTap={handleWordTap}
+              />
+            </div>
+            {/* Word-level breakdown */}
+            <div>
+              <p style={{
+                fontFamily: '"Noto Sans Bengali", sans-serif',
+                fontSize: '14px', fontWeight: 700, color: '#E65100', marginBottom: '10px',
+              }}>শব্দ বিশ্লেষণ:</p>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                {customText.trim().split(/\s+/).filter(w => w.length > 0).map((w, i) => (
+                  <WordDecompositionMini key={i} word={w.replace(/[।,!?]/g, '')} />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ height: '80px' }} />
+
+      {/* Decorative Assets */}
+      <GrassBackground />
+      <img src={heroKid} alt="" style={{ position: 'absolute', bottom: '0', left: '20px', width: '160px', zIndex: 5 }} />
+      <FloatingStar />
+
+      {/* ── Preferences Panel ── */}
+      <PreferencesPanel />
     </div>
   );
 }

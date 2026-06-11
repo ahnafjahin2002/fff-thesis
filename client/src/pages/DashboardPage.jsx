@@ -759,18 +759,22 @@ function GameView({ onBack }) {
 
 function TraceView({ onBack }) {
   const canvasRef = useRef(null); const drawing = useRef(false); const ctx = useRef(null); const [letter, setLetter] = useState("অ");
-  const letters = ["অ", "আ", "ক", "খ", "গ", "ঘ"];
+  const letters = [
+    "অ", "আ", "ই", "ঈ", "উ", "ঊ", "ঋ", "এ", "ঐ", "ও", "ঔ",
+    "ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন", "প", "ফ", "ব", "ভ", "ম", "য", "র", "ল", "শ", "ষ", "স", "হ", "ড়", "ঢ়", "য়", "ৎ", "ং", "ঃ", "ঁ"
+  ];
   useEffect(() => {
     const c = canvasRef.current; ctx.current = c.getContext("2d");
-    ctx.current.lineWidth = 6; ctx.current.lineCap = "round"; ctx.current.strokeStyle = "#18b368";
-    ctx.current.font = "140px 'Hind Siliguri'"; ctx.current.fillStyle = "rgba(24,179,104,.1)"; ctx.current.textAlign = "center";
+    ctx.current.clearRect(0, 0, c.width, c.height);
+    ctx.current.lineWidth = 18; ctx.current.lineCap = "round"; ctx.current.strokeStyle = "#18b368";
+    ctx.current.font = "420px 'Hind Siliguri'"; ctx.current.fillStyle = "rgba(24,179,104,.1)"; ctx.current.textAlign = "center";
     ctx.current.fillText(letter, c.width / 2, c.height * 0.7);
   }, [letter]);
-  const getPos = (e, c) => { const r = c.getBoundingClientRect(); const src = e.touches ? e.touches[0] : e; return [src.clientX - r.left, src.clientY - r.top]; };
+  const getPos = (e, c) => { const r = c.getBoundingClientRect(); const src = e.touches ? e.touches[0] : e; const scaleX = c.width / r.width; const scaleY = c.height / r.height; return [(src.clientX - r.left) * scaleX, (src.clientY - r.top) * scaleY]; };
   const start = e => { drawing.current = true; const [x, y] = getPos(e, canvasRef.current); ctx.current.beginPath(); ctx.current.moveTo(x, y); };
   const move = e => { if (!drawing.current) return; e.preventDefault(); const [x, y] = getPos(e, canvasRef.current); ctx.current.lineTo(x, y); ctx.current.stroke(); };
   const end = () => { drawing.current = false; };
-  const clear = () => { const c = canvasRef.current; ctx.current.clearRect(0, 0, c.width, c.height); ctx.current.font = "140px 'Hind Siliguri'"; ctx.current.fillStyle = "rgba(24,179,104,.1)"; ctx.current.textAlign = "center"; ctx.current.fillText(letter, c.width / 2, c.height * 0.7); };
+  const clear = () => { const c = canvasRef.current; ctx.current.clearRect(0, 0, c.width, c.height); ctx.current.font = "420px 'Hind Siliguri'"; ctx.current.fillStyle = "rgba(24,179,104,.1)"; ctx.current.textAlign = "center"; ctx.current.fillText(letter, c.width / 2, c.height * 0.7); };
   return (
     <div style={{ padding: "20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -786,13 +790,13 @@ function TraceView({ onBack }) {
         ))}
       </div>
       <div style={{ borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,.1)", background: "#FFF8E7", border: "2px solid #e8d9bf" }}>
-        <canvas ref={canvasRef} width={390} height={300} style={{ display: "block", touchAction: "none", width: "100%" }}
+        <canvas ref={canvasRef} width={1170} height={900} style={{ display: "block", touchAction: "none", width: "100%" }}
           onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
           onTouchStart={start} onTouchMove={move} onTouchEnd={end} />
       </div>
       <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
         <motion.button whileTap={{ scale: .95 }} onClick={clear} style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: "white", fontWeight: 700, fontSize: 15, cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,.08)", color: "#555" }}>🗑️ মুছো</motion.button>
-        <motion.button whileTap={{ scale: .95 }} style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: "#18b368", color: "white", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>✅ সম্পন্ন</motion.button>
+        <motion.button whileTap={{ scale: .95 }} onClick={() => { const next = (letters.indexOf(letter) + 1) % letters.length; setLetter(letters[next]); }} style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: "#18b368", color: "white", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>✅ সম্পন্ন</motion.button>
       </div>
     </div>
   );
