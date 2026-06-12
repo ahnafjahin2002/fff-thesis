@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
-import PhonemeHighlighter from "../components/reader/PhonemeHighlighter";
 import BornoBazar from "./BornoBazar";
 
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
@@ -429,8 +428,7 @@ const DEFAULT_USER = {
 };
 
 const DEFAULT_ACTIVITIES = [
-  { id: "read", title: "পড়া", sub: "সহজ গল্প পড়ি\nআর নতুন শব্দ শিখি", bg: "#eef9f1", accent: "#18b368", icon: <BookSVG /> },
-  { id: "phoneme", title: "ফোনেমস", sub: "অক্ষর চিনি\nশব্দ গঠন শিখি", bg: "#fffbee", accent: "#f5a623", icon: <BoardSVG /> },
+  { id: "read", title: "পড়া", sub: "লাইন ধরে পড়ি\nআর অক্ষর চিনি", bg: "#eef9f1", accent: "#18b368", icon: <BookSVG /> },
   { id: "game", title: "বর্ণের দোকান", sub: "খেলার মাধ্যমে\nশিখি আর মজা করি", bg: "#f0efff", accent: "#7c75dd", icon: <GamepadSVG /> },
   { id: "trace", title: "ট্রেনিং", sub: "লেখা ও বানান চর্চা\nকরি প্রতিদিন", bg: "#fff0f5", accent: "#f06292", icon: <PencilSVG /> },
 ];
@@ -447,7 +445,6 @@ const DEFAULT_ACHIEVEMENTS = [
 const NAV_ITEMS = [
   { id: "home", label: "হোম", icon: <HomeSVG /> },
   { id: "read", label: "পড়া", icon: <BookSVG /> },
-  { id: "phoneme", label: "ফোনেমস", icon: <BoardSVG /> },
   { id: "game", label: "বর্ণের দোকান", icon: <GamepadSVG /> },
   { id: "trace", label: "ট্রেনিং", icon: <PencilSVG /> },
   { id: "rewards", label: "অর্জন", icon: <TrophySVG /> },
@@ -814,8 +811,6 @@ function HomePage({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  if (view === "read") return <ReadingView onBack={() => setView("home")} />;
-  if (view === "phoneme") return <PhonemeHighlighter onBack={() => setView("home")} />;
   if (view === "game") return <BornoBazar onBack={() => setView("home")} />;
   if (view === "trace") return <TraceView onBack={() => setView("home")} />;
 
@@ -847,6 +842,7 @@ function HomePage({
               onClick={() => {
                 setSidebarOpen(false);
                 if (item.id === "home") { onNav("home"); }
+                else if (item.id === "read") { navigate("/reading"); }
                 else if (["rewards", "settings"].includes(item.id)) { onNav(item.id); }
                 else { setView(item.id); }
               }}

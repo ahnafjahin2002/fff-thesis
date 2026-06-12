@@ -6,9 +6,11 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import TextRenderer from '../components/reader/TextRenderer';
 import PreferencesPanel from '../components/reader/PreferencesPanel';
+import PhonemeHighlighter from '../components/reader/PhonemeHighlighter';
 import usePreferences from '../hooks/usePreferences';
 import { decomposeWord } from '../utils/banglaUtils';
 import { DIFFICULTY_LEVELS, READING_CONTENT, getLevelInfo } from '../utils/readingContent';
@@ -280,8 +282,138 @@ function LiveWordInfoPanel({ word, wordData, onClose }) {
 }
 
 
+// ── Hub Selection Screen ──
+function ReadingHub({ onSelect }) {
+  const navigate = useNavigate();
+  const cards = [
+    {
+      id: 'line',
+      title: 'লাইন ধরে পড়া',
+      sub: 'বাক্য ধরে ধরে পড়ি\nশব্দ বিশ্লেষণ শিখি',
+      emoji: '📖',
+      bg: '#eef9f1',
+      accent: '#18b368',
+      desc: 'সহজ গল্প পড়ি, শব্দে ক্লিক করে বিশ্লেষণ দেখো',
+    },
+    {
+      id: 'phoneme',
+      title: 'অক্ষর অভ্যাস',
+      sub: 'অক্ষর চিনি\nফোনেম প্র্যাক্টিস করো',
+      emoji: '🔤',
+      bg: '#fffbee',
+      accent: '#f5a623',
+      desc: 'প্রতিটি অক্ষর চিনো ও ফোনেম ভানো শেখো',
+    },
+  ];
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#f0faf4',
+      fontFamily: "'Hind Siliguri', sans-serif",
+      padding: '28px 24px',
+    }}>
+      {/* Top bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => navigate('/dashboard')}
+          style={{
+            width: 48, height: 48, borderRadius: 16, border: 'none',
+            background: 'white', cursor: 'pointer', fontSize: 20,
+            boxShadow: '0 3px 14px rgba(0,0,0,.12)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          ←
+        </motion.button>
+        <div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: '#1a2e1a', lineHeight: 1.2 }}>
+            📚 পড়া
+          </div>
+          <div style={{ fontSize: 14, color: '#3a6b4a', fontWeight: 500, marginTop: 2 }}>
+            পড়ার সুবিধা ও অক্ষর চর্চা একসাথে
+          </div>
+        </div>
+      </div>
+
+      {/* Sub-feature cards */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 20,
+        maxWidth: 700,
+        margin: '0 auto',
+      }}>
+        {cards.map((card, i) => (
+          <motion.div
+            key={card.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            whileHover={{ translateY: -5, boxShadow: '0 10px 32px rgba(0,0,0,.12)' }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onSelect(card.id)}
+            style={{
+              background: card.bg,
+              borderRadius: 22,
+              padding: '30px 22px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 12px rgba(0,0,0,.07)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: 12,
+              minHeight: 200,
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 2.8, delay: i * 0.5, ease: 'easeInOut' }}
+              style={{ fontSize: 52 }}
+            >
+              {card.emoji}
+            </motion.div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#1a1a2e', lineHeight: 1.3 }}>
+              {card.title}
+            </div>
+            <div style={{ fontSize: 14, color: '#687076', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+              {card.sub}
+            </div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.93 }}
+              style={{
+                marginTop: 'auto',
+                width: 44, height: 44,
+                borderRadius: '50%',
+                background: card.accent,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', fontSize: 20,
+              }}
+            >
+              →
+            </motion.div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Responsive */}
+      <style>{`
+        @media (max-width: 500px) {
+          .reading-hub-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+
 // ── Main Page Component ──
 export default function ReadingPage() {
+  const [subView, setSubView] = useState(null); // null | 'line' | 'phoneme'
   const { isPanelOpen, togglePanel } = usePreferences();
   const [tappedWord, setTappedWord] = useState(null);
   const [activeIdx, setActiveIdx] = useState(-1);
@@ -327,6 +459,10 @@ export default function ReadingPage() {
     if (customText.trim()) setShowCustomResult(true);
   };
 
+  if (subView === null) return <ReadingHub onSelect={setSubView} />;
+  if (subView === 'phoneme') return <PhonemeHighlighter onBack={() => setSubView(null)} />;
+
+  // subView === 'line' — existing reading UI
   return (
     <div className="reading-page-shell">
       {/* Premium clean bottom decorations only */}
@@ -344,7 +480,7 @@ export default function ReadingPage() {
       {/* ── Top Toolbar ── */}
       <header className="app-header">
         <div className="app-header-left">
-          <button className="back-btn" aria-label="পেছনে যান">
+          <button className="back-btn" aria-label="পেছনে যান" onClick={() => setSubView(null)}>
             ←
           </button>
 
