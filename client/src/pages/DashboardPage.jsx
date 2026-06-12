@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
 import BornoBazar from "./BornoBazar";
@@ -714,64 +714,305 @@ function PhonemeView({ onBack }) {
   );
 }
 
-function GameView({ onBack }) {
-  const words = [{ q: "🏡", ans: "বাড়ি", opts: ["বাড়ি", "পাখি", "মাছি"] }, { q: "📚", ans: "বই", opts: ["গাছ", "বই", "ফুল"] }, { q: "🌸", ans: "ফুল", opts: ["ফুল", "চাঁদ", "তারা"] }];
-  const [qi, setQi] = useState(0); const [score, setScore] = useState(0); const [chosen, setChosen] = useState(null); const [done, setDone] = useState(false);
-  const choose = (opt) => { if (chosen) return; setChosen(opt); if (opt === words[qi].ans) setScore(s => s + 1); setTimeout(() => { if (qi + 1 < words.length) { setQi(q => q + 1); setChosen(null); } else setDone(true); }, 900); };
-  if (done) return (
-    <div style={{ padding: 30, textAlign: "center" }}>
-      <motion.button whileTap={{ scale: .9 }} onClick={onBack} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, display: "block", marginBottom: 20, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
-      <div style={{ fontSize: 60, marginBottom: 16 }}>🎉</div>
-      <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: "#1d2b2a" }}>শাবাশ!</h2>
-      <div style={{ fontSize: 18, color: "#555" }}>স্কোর: {score}/{words.length}</div>
-      <div style={{ margin: "20px 0", fontSize: 24 }}>{"⭐".repeat(score)}</div>
-      <motion.button whileTap={{ scale: .95 }} onClick={() => { setQi(0); setScore(0); setChosen(null); setDone(false); }}
-        style={{ padding: "14px 36px", borderRadius: 50, border: "none", background: "#18b368", color: "white", fontWeight: 700, fontSize: 16, cursor: "pointer" }}>আবার খেলো</motion.button>
-    </div>
-  );
-  const w = words[qi];
-  return (
-    <div style={{ padding: "20px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <motion.button whileTap={{ scale: .9 }} onClick={onBack} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1d2b2a" }}>শব্দ খেলা — লেভেল ৪</h2>
-      </div>
-      <div style={{ textAlign: "center", marginBottom: 30 }}>
-        <div style={{ fontSize: 80 }}>{w.q}</div>
-        <div style={{ fontSize: 15, color: "#888", marginTop: 8 }}>এই ছবির শব্দটি কী?</div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {w.opts.map(opt => (
-          <motion.button key={opt} whileTap={{ scale: .96 }} onClick={() => choose(opt)}
-            animate={{ background: chosen ? (opt === w.ans ? "#d4f3e3" : opt === chosen ? "#ffe0e0" : "white") : "white", scale: chosen === opt ? 1.04 : 1 }}
-            style={{ padding: "16px", borderRadius: 20, border: "2px solid", borderColor: chosen ? (opt === w.ans ? "#18b368" : opt === chosen ? "#ff6b6b" : "#eee") : "#eee", fontSize: 20, fontWeight: 700, cursor: "pointer", fontFamily: "'Hind Siliguri',sans-serif", color: "#333" }}>
-            {opt}
-          </motion.button>
-        ))}
-      </div>
-      <div style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#aaa" }}>প্রশ্ন {qi + 1}/{words.length}</div>
-    </div>
-  );
-}
-
 function TraceView({ onBack }) {
-  const canvasRef = useRef(null); const drawing = useRef(false); const ctx = useRef(null); const [letter, setLetter] = useState("অ");
+  const canvasRef = useRef(null);
+  const drawing = useRef(false);
+  const ctx = useRef(null);
+  const drawnPointsRef = useRef([]);
+  const ghostMaskRef = useRef(null);
+  const [letter, setLetter] = useState("অ");
+  const [feedback, setFeedback] = useState(null); // null | 'success' | 'error'
+  const [feedbackMsg, setFeedbackMsg] = useState("");
+  const [wiggle, setWiggle] = useState(false);
+
+  const CANVAS_W = 1170;
+  const CANVAS_H = 900;
+  const TOLERANCE_PX = 14;
+  const MAX_OUTSIDE_RATIO = 0.02;
+
   const letters = [
     "অ", "আ", "ই", "ঈ", "উ", "ঊ", "ঋ", "এ", "ঐ", "ও", "ঔ",
-    "ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন", "প", "ফ", "ব", "ভ", "ম", "য", "র", "ল", "শ", "ষ", "স", "হ", "ড়", "ঢ়", "য়", "ৎ", "ং", "ঃ", "ঁ"
+    "ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন", "প", "ফ", "ব", "ভ", "ম", "য", "র", "ল", "শ", "ষ", "স", "হ", "ড়", "ঢ়", "য়", "ৎ", "ং", "ঃ", "ঁ", "্য", "্"
   ];
+
+  const buildGhostMask = useCallback((letterChar) => {
+    const displayLetter = ["ং", "ঃ", "ঁ", "্য", "্"].includes(letterChar) ? "\u00A0" + letterChar : letterChar;
+    
+    const offscreen = document.createElement("canvas");
+    offscreen.width = CANVAS_W;
+    offscreen.height = CANVAS_H;
+    const offCtx = offscreen.getContext("2d");
+    offCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+    offCtx.font = "420px 'Hind Siliguri'";
+    offCtx.fillStyle = "rgba(0,0,0,1)";
+    offCtx.textAlign = "center";
+    offCtx.fillText(displayLetter, CANVAS_W / 2, CANVAS_H * 0.7);
+    const imageData = offCtx.getImageData(0, 0, CANVAS_W, CANVAS_H);
+    const data = imageData.data;
+
+    // Store raw mask — 1 = ghost letter pixel, 0 = empty
+    const rawMask = new Uint8Array(CANVAS_W * CANVAS_H);
+    let totalShadowPixels = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] > 10) {
+        rawMask[i / 4] = 1;
+        totalShadowPixels++;
+      }
+    }
+
+    // Find Connected Components (to distinguish main body from dots)
+    let componentCount = 0;
+    const componentMap = new Int32Array(CANVAS_W * CANVAS_H);
+    const components = [];
+
+    for (let y = 0; y < CANVAS_H; y++) {
+      for (let x = 0; x < CANVAS_W; x++) {
+        const idx = y * CANVAS_W + x;
+        if (rawMask[idx] === 1 && componentMap[idx] === 0) {
+          componentCount++;
+          let area = 0;
+          const stack = [idx];
+          componentMap[idx] = componentCount;
+
+          while (stack.length > 0) {
+            const curr = stack.pop();
+            area++;
+            const cy = Math.floor(curr / CANVAS_W);
+            const cx = curr % CANVAS_W;
+
+            if (cy > 0) {
+              const n = curr - CANVAS_W;
+              if (rawMask[n] === 1 && componentMap[n] === 0) {
+                componentMap[n] = componentCount; stack.push(n);
+              }
+            }
+            if (cy < CANVAS_H - 1) {
+              const n = curr + CANVAS_W;
+              if (rawMask[n] === 1 && componentMap[n] === 0) {
+                componentMap[n] = componentCount; stack.push(n);
+              }
+            }
+            if (cx > 0) {
+              const n = curr - 1;
+              if (rawMask[n] === 1 && componentMap[n] === 0) {
+                componentMap[n] = componentCount; stack.push(n);
+              }
+            }
+            if (cx < CANVAS_W - 1) {
+              const n = curr + 1;
+              if (rawMask[n] === 1 && componentMap[n] === 0) {
+                componentMap[n] = componentCount; stack.push(n);
+              }
+            }
+          }
+          if (area > 20) {
+            components.push({ id: componentCount, area });
+          }
+        }
+      }
+    }
+
+    ghostMaskRef.current = { rawMask, totalShadowPixels, componentMap, components };
+  }, []);
+
   useEffect(() => {
-    const c = canvasRef.current; ctx.current = c.getContext("2d");
+    const c = canvasRef.current;
+    ctx.current = c.getContext("2d");
     ctx.current.clearRect(0, 0, c.width, c.height);
-    ctx.current.lineWidth = 18; ctx.current.lineCap = "round"; ctx.current.strokeStyle = "#18b368";
-    ctx.current.font = "420px 'Hind Siliguri'"; ctx.current.fillStyle = "rgba(24,179,104,.1)"; ctx.current.textAlign = "center";
-    ctx.current.fillText(letter, c.width / 2, c.height * 0.7);
-  }, [letter]);
-  const getPos = (e, c) => { const r = c.getBoundingClientRect(); const src = e.touches ? e.touches[0] : e; const scaleX = c.width / r.width; const scaleY = c.height / r.height; return [(src.clientX - r.left) * scaleX, (src.clientY - r.top) * scaleY]; };
-  const start = e => { drawing.current = true; const [x, y] = getPos(e, canvasRef.current); ctx.current.beginPath(); ctx.current.moveTo(x, y); };
-  const move = e => { if (!drawing.current) return; e.preventDefault(); const [x, y] = getPos(e, canvasRef.current); ctx.current.lineTo(x, y); ctx.current.stroke(); };
+    ctx.current.lineWidth = 18;
+    ctx.current.lineCap = "round";
+    ctx.current.strokeStyle = "#18b368";
+    ctx.current.font = "420px 'Hind Siliguri'";
+    ctx.current.fillStyle = "rgba(24,179,104,.1)";
+    ctx.current.textAlign = "center";
+    const displayLetter = ["ং", "ঃ", "ঁ", "্য", "্"].includes(letter) ? "\u00A0" + letter : letter;
+    ctx.current.fillText(displayLetter, c.width / 2, c.height * 0.7);
+    drawnPointsRef.current = [];
+    setFeedback(null);
+    setFeedbackMsg("");
+    buildGhostMask(letter);
+  }, [letter, buildGhostMask]);
+
+  const getPos = (e, c) => {
+    const r = c.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    const scaleX = c.width / r.width;
+    const scaleY = c.height / r.height;
+    return [(src.clientX - r.left) * scaleX, (src.clientY - r.top) * scaleY];
+  };
+
+  const start = e => {
+    drawing.current = true;
+    const [x, y] = getPos(e, canvasRef.current);
+    ctx.current.beginPath();
+    ctx.current.moveTo(x, y);
+    drawnPointsRef.current.push([x, y]);
+  };
+
+  const move = e => {
+    if (!drawing.current) return;
+    e.preventDefault();
+    const [x, y] = getPos(e, canvasRef.current);
+    ctx.current.lineTo(x, y);
+    ctx.current.stroke();
+    drawnPointsRef.current.push([x, y]);
+  };
+
   const end = () => { drawing.current = false; };
-  const clear = () => { const c = canvasRef.current; ctx.current.clearRect(0, 0, c.width, c.height); ctx.current.font = "420px 'Hind Siliguri'"; ctx.current.fillStyle = "rgba(24,179,104,.1)"; ctx.current.textAlign = "center"; ctx.current.fillText(letter, c.width / 2, c.height * 0.7); };
+
+  const clear = () => {
+    const c = canvasRef.current;
+    ctx.current.clearRect(0, 0, c.width, c.height);
+    ctx.current.font = "420px 'Hind Siliguri'";
+    ctx.current.fillStyle = "rgba(24,179,104,.1)";
+    ctx.current.textAlign = "center";
+    const displayLetter = ["ং", "ঃ", "ঁ", "্য", "্"].includes(letter) ? "\u00A0" + letter : letter;
+    ctx.current.fillText(displayLetter, c.width / 2, c.height * 0.7);
+    drawnPointsRef.current = [];
+    setFeedback(null);
+    setFeedbackMsg("");
+  };
+
+  const validateAndProceed = () => {
+    const points = drawnPointsRef.current;
+    const maskInfo = ghostMaskRef.current;
+
+    if (points.length < 10) {
+      setFeedback("error");
+      setFeedbackMsg("অক্ষরটি আঁকো! ✏️");
+      setWiggle(true);
+      setTimeout(() => setWiggle(false), 500);
+      return;
+    }
+
+    if (!maskInfo) {
+      const next = (letters.indexOf(letter) + 1) % letters.length;
+      setLetter(letters[next]);
+      return;
+    }
+
+    const { rawMask, totalShadowPixels, componentMap, components } = maskInfo;
+
+    let outsideCount = 0;
+    let checkedCount = 0;
+    const tol = TOLERANCE_PX;
+    const tolSq = tol * tol;
+
+    for (let i = 0; i < points.length; i += 3) {
+      const px = Math.round(points[i][0]);
+      const py = Math.round(points[i][1]);
+      if (px < 0 || px >= CANVAS_W || py < 0 || py >= CANVAS_H) {
+        outsideCount++;
+        checkedCount++;
+        continue;
+      }
+      checkedCount++;
+
+      // Check if this point is directly on a ghost pixel
+      if (rawMask[py * CANVAS_W + px] === 1) {
+        continue; // on the shadow, pass
+      }
+
+      // Check tolerance radius — is any nearby pixel on the ghost?
+      let nearGhost = false;
+      const x0 = Math.max(0, px - tol);
+      const x1 = Math.min(CANVAS_W - 1, px + tol);
+      const y0 = Math.max(0, py - tol);
+      const y1 = Math.min(CANVAS_H - 1, py + tol);
+      for (let sy = y0; sy <= y1 && !nearGhost; sy += 4) {
+        for (let sx = x0; sx <= x1 && !nearGhost; sx += 4) {
+          const dx = sx - px;
+          const dy = sy - py;
+          if (dx * dx + dy * dy <= tolSq && rawMask[sy * CANVAS_W + sx] === 1) {
+            nearGhost = true;
+          }
+        }
+      }
+      if (!nearGhost) {
+        outsideCount++;
+      }
+    }
+
+    const outsideRatio = checkedCount > 0 ? outsideCount / checkedCount : 1;
+
+    if (outsideRatio > MAX_OUTSIDE_RATIO) {
+      setFeedback("error");
+      setFeedbackMsg("ছায়ার ভিতরে আঁকো! 🎯");
+      setWiggle(true);
+      setTimeout(() => {
+        setWiggle(false);
+        clear();
+      }, 800);
+      return;
+    }
+
+    // Check coverage
+    const imageData = ctx.current.getImageData(0, 0, CANVAS_W, CANVAS_H);
+    const data = imageData.data;
+    
+    let coveredShadowPixels = 0;
+    const componentCovered = {};
+    for (let c of components) {
+      componentCovered[c.id] = 0;
+    }
+
+    for (let i = 0; i < CANVAS_W * CANVAS_H; i++) {
+      if (rawMask[i] === 1) {
+        // User's stroke is drawn with high alpha
+        if (data[i * 4 + 3] > 100) {
+          coveredShadowPixels++;
+          const cid = componentMap[i];
+          if (componentCovered[cid] !== undefined) {
+            componentCovered[cid]++;
+          }
+        }
+      }
+    }
+
+    // Overall Coverage
+    const coverageRatio = totalShadowPixels > 0 ? coveredShadowPixels / totalShadowPixels : 1;
+    const MIN_COVERAGE = 0.40;
+
+    if (coverageRatio < MIN_COVERAGE) {
+      setFeedback("error");
+      setFeedbackMsg("পুরো অক্ষরটি আঁকো! 🖍️");
+      setWiggle(true);
+      setTimeout(() => {
+        setWiggle(false);
+        clear();
+      }, 800);
+      return;
+    }
+
+    // Component Coverage (Enforce all disconnected parts, e.g. dots, are drawn)
+    let missedComponent = false;
+    for (let c of components) {
+      const compCoverage = componentCovered[c.id] / c.area;
+      if (compCoverage < 0.15) { // At least 15% of each disjoint part must be touched
+        missedComponent = true;
+        break;
+      }
+    }
+
+    if (missedComponent) {
+      setFeedback("error");
+      setFeedbackMsg("অক্ষরের সব অংশ আঁকো! (যেমন: বিন্দু) 🖍️");
+      setWiggle(true);
+      setTimeout(() => {
+        setWiggle(false);
+        clear();
+      }, 800);
+      return;
+    }
+
+    setFeedback("success");
+    setFeedbackMsg("দারুণ! 🎉");
+    setTimeout(() => {
+      const next = (letters.indexOf(letter) + 1) % letters.length;
+      setLetter(letters[next]);
+    }, 600);
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -780,20 +1021,44 @@ function TraceView({ onBack }) {
       </div>
       <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
         {letters.map(l => (
-          <motion.button key={l} whileTap={{ scale: .9 }} onClick={() => { setLetter(l); clear(); }}
+          <motion.button key={l} whileTap={{ scale: .9 }} onClick={() => { setLetter(l); }}
             style={{ padding: "8px 18px", borderRadius: 50, border: "2px solid", borderColor: letter === l ? "#18b368" : "#ddd", background: letter === l ? "#d4f3e3" : "white", fontWeight: 700, fontSize: 18, cursor: "pointer", fontFamily: "'Hind Siliguri',sans-serif", color: "#333" }}>
             {l}
           </motion.button>
         ))}
       </div>
-      <div style={{ borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,.1)", background: "#FFF8E7", border: "2px solid #e8d9bf" }}>
-        <canvas ref={canvasRef} width={1170} height={900} style={{ display: "block", touchAction: "none", width: "100%" }}
-          onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
-          onTouchStart={start} onTouchMove={move} onTouchEnd={end} />
+      <div style={{ position: "relative" }}>
+        <motion.div
+          animate={wiggle ? { x: [0, -8, 8, -8, 8, 0] } : {}}
+          transition={{ duration: 0.4 }}
+          style={{ borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,.1)", background: "#FFF8E7", border: `2px solid ${feedback === "error" ? "#ff6b6b" : feedback === "success" ? "#18b368" : "#e8d9bf"}`, transition: "border-color 0.3s" }}
+        >
+          <canvas ref={canvasRef} width={CANVAS_W} height={CANVAS_H} style={{ display: "block", touchAction: "none", width: "100%" }}
+            onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
+            onTouchStart={start} onTouchMove={move} onTouchEnd={end} />
+        </motion.div>
+        <AnimatePresence>
+          {feedback && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.9 }}
+              style={{
+                position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)",
+                padding: "12px 28px", borderRadius: 50,
+                background: feedback === "error" ? "#ff6b6b" : "#18b368",
+                color: "white", fontWeight: 700, fontSize: 16, boxShadow: "0 4px 16px rgba(0,0,0,.2)",
+                pointerEvents: "none", zIndex: 10, whiteSpace: "nowrap"
+              }}
+            >
+              {feedbackMsg}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
         <motion.button whileTap={{ scale: .95 }} onClick={clear} style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: "white", fontWeight: 700, fontSize: 15, cursor: "pointer", boxShadow: "0 4px 14px rgba(0,0,0,.08)", color: "#555" }}>🗑️ মুছো</motion.button>
-        <motion.button whileTap={{ scale: .95 }} onClick={() => { const next = (letters.indexOf(letter) + 1) % letters.length; setLetter(letters[next]); }} style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: "#18b368", color: "white", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>✅ সম্পন্ন</motion.button>
+        <motion.button whileTap={{ scale: .95 }} onClick={validateAndProceed} style={{ flex: 1, padding: "14px", borderRadius: 50, border: "none", background: "#18b368", color: "white", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>✅ সম্পন্ন</motion.button>
       </div>
     </div>
   );
