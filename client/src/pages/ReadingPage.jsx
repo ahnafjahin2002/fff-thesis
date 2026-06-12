@@ -108,7 +108,7 @@ function LiveWordInfoPanel({ word, wordData, onClose }) {
               {i > 0 && (
                 <span
                   style={{
-                    fontSize: '28px',
+                    fontSize: '24px',
                     color: '#7891B5',
                     fontWeight: 900,
                   }}
@@ -131,17 +131,17 @@ function LiveWordInfoPanel({ word, wordData, onClose }) {
                       : i % 3 === 1
                       ? '2px solid #C9E1FF'
                       : '2px solid #FFD1E1',
-                  borderRadius: '18px',
-                  padding: '14px 20px',
+                  borderRadius: '16px',
+                  padding: '10px 14px',
                   textAlign: 'center',
-                  minWidth: 76,
+                  minWidth: 60,
                   boxShadow: '0 8px 16px rgba(40, 50, 70, 0.08)',
                 }}
               >
                 <span
                   style={{
                     fontFamily: '"Noto Sans Bengali", sans-serif',
-                    fontSize: '34px',
+                    fontSize: '28px',
                     fontWeight: 800,
                     display: 'block',
                     color: '#183A24',

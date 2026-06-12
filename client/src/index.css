@@ -1090,7 +1090,7 @@ input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
 .reading-text-section {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) 420px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 480px);
   gap: 28px;
   align-items: stretch;
 }
@@ -1100,11 +1100,11 @@ input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
   background: #ffffff;
   border: 2px solid #eadfca;
   border-radius: 30px;
-  padding: 100px 52px 54px;
+  padding: 40px 44px;
   box-shadow: 0 12px 30px rgba(60, 45, 20, 0.11);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   position: relative;
   overflow: hidden;
 }
@@ -1129,10 +1129,9 @@ input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
 }
 
 .sentence-listen-btn {
-  position: absolute;
-  top: 28px;
-  left: 28px;
-  min-height: 62px;
+  margin-bottom: 24px;
+  align-self: flex-start;
+  min-height: 54px;
   padding: 0 22px;
   border-radius: 22px;
   border: 2px solid #bfe5aa;
@@ -1176,6 +1175,7 @@ input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
 /* Word analysis panel */
 
 .live-word-panel {
+  width: 100%;
   min-height: 350px;
   background: linear-gradient(180deg, #eef7ff, #ffffff);
   border: 2px solid #c8def8;
@@ -1223,7 +1223,7 @@ input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
   align-items: center;
   justify-content: center;
   gap: 10px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   margin-bottom: 18px;
   width: 100%;
 }
