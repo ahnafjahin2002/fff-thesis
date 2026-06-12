@@ -5,7 +5,7 @@
  * Premium child-friendly / dyslexia-friendly interface.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import TextRenderer from '../components/reader/TextRenderer';
@@ -420,12 +420,15 @@ export default function ReadingPage() {
   const [currentLevel, setCurrentLevel] = useState('sohoj');
   const [currentItemIdx, setCurrentItemIdx] = useState(0);
   const [customText, setCustomText] = useState('');
-  const [showCustomResult, setShowCustomResult] = useState(false);
+  const [customAnalysisActive, setCustomAnalysisActive] = useState(false);
 
   const levelContent = READING_CONTENT[currentLevel] || [];
   const currentItem = levelContent[currentItemIdx] || { text: '', title: '' };
   const levelInfo = getLevelInfo(currentLevel);
-  const isSingleWord = currentLevel === 'shuru';
+  const isSingleWord = currentLevel === 'shuru' && !customAnalysisActive;
+
+  // The text displayed in the main reading area
+  const displayText = customAnalysisActive ? customText : currentItem.text;
 
   const handleWordTap = useCallback((word, wordData, wordIdx) => {
     setTappedWord({ word, wordData, wordIdx });
@@ -437,6 +440,7 @@ export default function ReadingPage() {
       setCurrentItemIdx(currentItemIdx - 1);
       setTappedWord(null);
       setActiveIdx(-1);
+      setCustomAnalysisActive(false);
     }
   };
 
@@ -445,6 +449,7 @@ export default function ReadingPage() {
       setCurrentItemIdx(currentItemIdx + 1);
       setTappedWord(null);
       setActiveIdx(-1);
+      setCustomAnalysisActive(false);
     }
   };
 
@@ -453,10 +458,21 @@ export default function ReadingPage() {
     setCurrentItemIdx(0);
     setTappedWord(null);
     setActiveIdx(-1);
+    setCustomAnalysisActive(false);
   };
 
+  const textSectionRef = useRef(null);
+
   const handleAnalyze = () => {
-    if (customText.trim()) setShowCustomResult(true);
+    if (customText.trim()) {
+      setCustomAnalysisActive(true);
+      setTappedWord(null);
+      setActiveIdx(-1);
+      // Scroll the text panel into view so user sees the result
+      setTimeout(() => {
+        textSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
   };
 
   if (subView === null) return <ReadingHub onSelect={setSubView} />;
@@ -540,19 +556,25 @@ export default function ReadingPage() {
       <main className="reading-premium-main">
         <div className="reading-main-area">
           <div className="reading-text-section">
-            <div className="reading-text-col">
+            <div className="reading-text-col" ref={textSectionRef}>
               <button className="sentence-listen-btn" aria-label="এই লেখাটি শুনুন">
                 <img src={speakerIcon} alt="" />
                 <span>শোনো</span>
               </button>
 
               <div className="reading-level-label">
-                <span>{levelInfo.label}</span>
-                {currentItem.title && <span>— {currentItem.title}</span>}
+                {customAnalysisActive ? (
+                  <span>✏️ নিজের লেখা</span>
+                ) : (
+                  <>
+                    <span>{levelInfo.label}</span>
+                    {currentItem.title && <span>— {currentItem.title}</span>}
+                  </>
+                )}
               </div>
 
               <TextRenderer
-                content={currentItem.text}
+                content={displayText}
                 activeWordIdx={activeIdx}
                 onWordTap={handleWordTap}
                 isSingleWord={isSingleWord}
@@ -661,7 +683,7 @@ export default function ReadingPage() {
               value={customText}
               onChange={e => {
                 setCustomText(e.target.value);
-                setShowCustomResult(false);
+                setCustomAnalysisActive(false);
               }}
               placeholder="এখানে বাংলা শব্দ বা বাক্য লিখুন..."
             />
@@ -671,41 +693,26 @@ export default function ReadingPage() {
               বিশ্লেষণ করুন
             </button>
 
-            {showCustomResult && customText.trim() && (
-              <div className="custom-result-area">
-                <TextRenderer
-                  content={customText}
-                  activeWordIdx={-1}
-                  onWordTap={handleWordTap}
-                />
-
-                <div style={{ marginTop: '14px', borderTop: '1px solid #E2D5C3', paddingTop: '14px' }}>
-                  <p
-                    style={{
-                      fontFamily: '"Noto Sans Bengali", sans-serif',
-                      fontSize: '15px',
-                      fontWeight: 800,
-                      color: '#E06B2E',
-                      marginBottom: '10px',
-                    }}
-                  >
-                    শব্দ বিশ্লেষণ:
-                  </p>
-
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {customText
-                      .trim()
-                      .split(/\s+/)
-                      .filter(w => w.length > 0)
-                      .map((w, i) => (
-                        <WordDecompositionMini
-                          key={i}
-                          word={w.replace(/[।,!?]/g, '')}
-                        />
-                      ))}
-                  </div>
-                </div>
-              </div>
+            {customAnalysisActive && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{
+                  marginTop: '10px',
+                  padding: '10px 14px',
+                  borderRadius: '12px',
+                  background: '#EAF8E6',
+                  fontSize: '13px',
+                  fontFamily: '"Noto Sans Bengali", sans-serif',
+                  color: '#2E8B57',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                ✅ লেখাটি উপরে দেখানো হচ্ছে — শব্দে ক্লিক করুন বিশ্লেষণ দেখতে
+              </motion.div>
             )}
           </div>
         </div>
