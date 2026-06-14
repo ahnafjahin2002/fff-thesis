@@ -5,13 +5,15 @@
  * Premium child-friendly / dyslexia-friendly interface.
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import TextRenderer from '../components/reader/TextRenderer';
 import PreferencesPanel from '../components/reader/PreferencesPanel';
 import PhonemeHighlighter from '../components/reader/PhonemeHighlighter';
+import PhonemeWord from '../components/reader/PhonemeWord';
 import usePreferences from '../hooks/usePreferences';
+import { usePhoneme } from '../hooks/usePhoneme';
+import { segmentText } from '../utils/phonemeUtils';
 import { decomposeWord } from '../utils/banglaUtils';
 import { DIFFICULTY_LEVELS, READING_CONTENT, getLevelInfo } from '../utils/readingContent';
 
@@ -28,138 +30,148 @@ import settingsIcon from '../assets/settings-icon.png';
 import progressStar from '../assets/progress-star.png';
 import rewardConfetti from '../assets/reward-confetti.png';
 
+const cleanDisplayWord = (word = '') =>
+  word.replace(/[।,!?;:\-–—"'()\[\]]/g, '').trim();
 
-// ── Live Word Info Panel ──
-function LiveWordInfoPanel({ word, wordData, onClose }) {
-  const decomp = decomposeWord(word);
-  const hasConjunct = decomp.some(d => d.type === 'conjunct');
+const HIGHLIGHT_COLORS = ['#FFD700', '#A7E46F', '#92D7FF', '#FF9AA2', '#C8A2FF', '#FFB86B'];
+
+function ReadingSpeedControl({ speed, setSpeed }) {
+  return (
+    <div className="reading-speed-panel">
+      <div className="reading-speed-title">
+        <span>🐢</span>
+        <strong>পড়ার গতি</strong>
+        <span>🐇</span>
+      </div>
+
+      <div className="reading-speed-row">
+        <input
+          type="range"
+          min="0.6"
+          max="1.25"
+          step="0.05"
+          value={speed}
+          onChange={(e) => setSpeed(Number(e.target.value))}
+          className="reading-speed-slider"
+          aria-label="পড়ার গতি"
+        />
+
+        <span className="reading-speed-value">{speed.toFixed(2)}x</span>
+      </div>
+    </div>
+  );
+}
+
+function HighlightColorControl({ highlightColor, setHighlightColor }) {
+  return (
+    <div className="highlight-chip-panel">
+      <div className="highlight-chip-title">🎨 হাইলাইট রং</div>
+
+      <div className="highlight-chip-row">
+        {HIGHLIGHT_COLORS.map((color) => (
+          <button
+            key={color}
+            type="button"
+            className={`highlight-chip ${highlightColor === color ? 'active' : ''}`}
+            style={{ backgroundColor: color }}
+            onClick={() => setHighlightColor(color)}
+            aria-label={`হাইলাইট রং ${color}`}
+          >
+            {highlightColor === color ? '✓' : ''}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NarratedTextRenderer({
+  words,
+  activeWordIndex,
+  activePhonemeIndex,
+  highlightColor,
+  onWordTap,
+  isPlaying,
+}) {
+  if (!words.length) {
+    return (
+      <div className="phoneme-reading-empty">
+        এখানে বাংলা লেখা দেখা যাবে
+      </div>
+    );
+  }
 
   return (
-    <div style={{ height: '100%' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '16px',
-          paddingBottom: '12px',
-          borderBottom: '1px solid #DDEBFF',
-        }}
-      >
-        <span
-          style={{
-            fontFamily: '"Noto Sans Bengali", sans-serif',
-            fontSize: '18px',
-            fontWeight: 800,
-            color: '#174A8B',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
+    <div className="phoneme-reading-text">
+      {words.map((entry, idx) => (
+        <span key={`${entry.word}-${idx}`} className="phoneme-reading-token">
+          <PhonemeWord
+            word={entry.word}
+            phonemes={entry.phonemes}
+            isActiveWord={idx === activeWordIndex}
+            activePhonemeIndex={activePhonemeIndex}
+            highlightColor={highlightColor}
+            dimmed={isPlaying && activeWordIndex !== -1 && idx !== activeWordIndex}
+            onClick={() => onWordTap(entry.word, entry, idx)}
+          />
+          {' '}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// ── Live Word Info Panel ──
+function LiveWordInfoPanel({
+  word,
+  wordData,
+  phonemes = [],
+  activePhonemeIndex = -1,
+  isPlaying = false,
+  onClose,
+}) {
+  const decomp = decomposeWord(word);
+  const hasConjunct = decomp.some((d) => d.type === 'conjunct');
+
+  const units = phonemes.length
+    ? phonemes.map((p, i) => ({
+        display: p,
+        label: decomp[i]?.label || 'ধ্বনি',
+        formula: decomp[i]?.formula,
+        vowelSign: decomp[i]?.vowelSign,
+        vowelSignName: decomp[i]?.vowelSignName,
+      }))
+    : decomp;
+
+  return (
+    <div className="live-word-info-inner">
+      <div className="live-word-panel-header">
+        <span>
           🧩 শব্দ বিশ্লেষণ
+          {isPlaying && <em>চলছে...</em>}
         </span>
 
-        <button
-          onClick={onClose}
-          style={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            border: 'none',
-            background: '#F5EDE0',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '14px',
-            color: '#666',
-          }}
-        >
+        <button onClick={onClose} aria-label="বন্ধ করুন">
           ✕
         </button>
       </div>
 
-      <div
-        style={{
-          fontFamily: '"Noto Sans Bengali", sans-serif',
-          fontSize: '52px',
-          fontWeight: 800,
-          color: '#183A24',
-          textAlign: 'center',
-          lineHeight: 1.3,
-          marginBottom: '20px',
-        }}
-      >
-        {word}
-      </div>
+      <div className="live-word-title">{word}</div>
 
-      {decomp.length > 0 && (
+      {units.length > 0 && (
         <div className="word-breakdown-row">
-          {decomp.map((d, i) => (
-            <span
-              key={i}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              {i > 0 && (
-                <span
-                  style={{
-                    fontSize: '24px',
-                    color: '#7891B5',
-                    fontWeight: 900,
-                  }}
-                >
-                  +
-                </span>
-              )}
+          {units.map((d, i) => (
+            <span key={`${d.display}-${i}`} className="breakdown-unit-wrap">
+              {i > 0 && <span className="breakdown-plus">+</span>}
 
               <div
-                style={{
-                  background:
-                    i % 3 === 0
-                      ? '#EFF9E8'
-                      : i % 3 === 1
-                      ? '#EAF4FF'
-                      : '#FFF0F5',
-                  border:
-                    i % 3 === 0
-                      ? '2px solid #CDEEBE'
-                      : i % 3 === 1
-                      ? '2px solid #C9E1FF'
-                      : '2px solid #FFD1E1',
-                  borderRadius: '16px',
-                  padding: '10px 14px',
-                  textAlign: 'center',
-                  minWidth: 60,
-                  boxShadow: '0 8px 16px rgba(40, 50, 70, 0.08)',
-                }}
+                className={`breakdown-unit-card ${
+                  i === activePhonemeIndex ? 'active' : ''
+                }`}
               >
-                <span
-                  style={{
-                    fontFamily: '"Noto Sans Bengali", sans-serif',
-                    fontSize: '28px',
-                    fontWeight: 800,
-                    display: 'block',
-                    color: '#183A24',
-                  }}
-                >
-                  {d.display}
-                </span>
-
-                <span
-                  style={{
-                    fontFamily: '"Noto Sans Bengali", sans-serif',
-                    fontSize: '13px',
-                    color: '#65758A',
-                    display: 'block',
-                    marginTop: 3,
-                  }}
-                >
-                  {d.label}
+                <span className="breakdown-unit-char">{d.display}</span>
+                <span className="breakdown-unit-label">
+                  {i === activePhonemeIndex ? 'এখন পড়ছে' : d.label}
                 </span>
               </div>
             </span>
@@ -167,124 +179,46 @@ function LiveWordInfoPanel({ word, wordData, onClose }) {
         </div>
       )}
 
-      {decomp.filter(d => d.formula).map((d, i) => (
-        <div
-          key={i}
-          style={{
-            background: '#FFF8E7',
-            borderRadius: '14px',
-            padding: '9px 12px',
-            textAlign: 'center',
-            marginBottom: '8px',
-            fontFamily: '"Noto Sans Bengali", sans-serif',
-            fontSize: '15px',
-          }}
-        >
-          <span style={{ color: '#E06B2E', fontWeight: 700 }}>{d.formula}</span>
+      {decomp.filter((d) => d.formula).map((d, i) => (
+        <div key={i} className="breakdown-formula">
+          <span>{d.formula}</span>
 
           {d.vowelSign && (
-            <span
-              style={{
-                color: '#666',
-                marginLeft: '8px',
-                fontSize: '13px',
-              }}
-            >
+            <small>
               + {d.vowelSign} ({d.vowelSignName})
-            </span>
+            </small>
           )}
         </div>
       ))}
 
-      {decomp.filter(d => d.vowelSign && d.type !== 'conjunct').length > 0 && (
-        <div
-          style={{
-            marginTop: '10px',
-            padding: '12px 14px',
-            borderRadius: '16px',
-            background: '#EAF8E6',
-            fontSize: '15px',
-            textAlign: 'center',
-            fontFamily: '"Noto Sans Bengali", sans-serif',
-            color: '#2E8B57',
-            fontWeight: 700,
-          }}
-        >
+      {decomp.filter((d) => d.vowelSign && d.type !== 'conjunct').length > 0 && (
+        <div className="breakdown-kar">
           কার:{' '}
           {decomp
-            .filter(d => d.vowelSign && d.type !== 'conjunct')
-            .map(d => `${d.vowelSign} (${d.vowelSignName})`)
+            .filter((d) => d.vowelSign && d.type !== 'conjunct')
+            .map((d) => `${d.vowelSign} (${d.vowelSignName})`)
             .join(', ')}
         </div>
       )}
 
       {wordData?.meaning && (
-        <div
-          style={{
-            marginTop: '12px',
-            padding: '10px 14px',
-            borderRadius: '16px',
-            background: '#E8F4FD',
-            fontFamily: '"Noto Sans Bengali", sans-serif',
-            fontSize: '15px',
-            color: '#1A2B4A',
-            textAlign: 'center',
-            fontWeight: 700,
-          }}
-        >
+        <div className="breakdown-meaning">
           অর্থ: {wordData.meaning}
         </div>
       )}
 
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          marginTop: '16px',
-        }}
-      >
-        {hasConjunct && (
-          <span
-            style={{
-              background: '#FFF0E0',
-              color: '#E06B2E',
-              padding: '5px 12px',
-              borderRadius: '14px',
-              fontSize: '12px',
-              fontFamily: '"Noto Sans Bengali"',
-              fontWeight: 800,
-            }}
-          >
-            যুক্তবর্ণ
-          </span>
-        )}
-
-        {decomp.some(d => d.vowelSign) && (
-          <span
-            style={{
-              background: '#F0FFF4',
-              color: '#2E8B57',
-              padding: '5px 12px',
-              borderRadius: '14px',
-              fontSize: '12px',
-              fontFamily: '"Noto Sans Bengali"',
-              fontWeight: 800,
-            }}
-          >
-            কার-চিহ্ন
-          </span>
-        )}
+      <div className="breakdown-tags">
+        {hasConjunct && <span>যুক্তবর্ণ</span>}
+        {decomp.some((d) => d.vowelSign) && <span>কার-চিহ্ন</span>}
       </div>
     </div>
   );
 }
 
-
 // ── Hub Selection Screen ──
 function ReadingHub({ onSelect }) {
   const navigate = useNavigate();
+
   const cards = [
     {
       id: 'line',
@@ -293,7 +227,6 @@ function ReadingHub({ onSelect }) {
       emoji: '📖',
       bg: '#eef9f1',
       accent: '#18b368',
-      desc: 'সহজ গল্প পড়ি, শব্দে ক্লিক করে বিশ্লেষণ দেখো',
     },
     {
       id: 'phoneme',
@@ -302,49 +235,60 @@ function ReadingHub({ onSelect }) {
       emoji: '🔤',
       bg: '#fffbee',
       accent: '#f5a623',
-      desc: 'প্রতিটি অক্ষর চিনো ও ফোনেম ভানো শেখো',
     },
   ];
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#f0faf4',
-      fontFamily: "'Hind Siliguri', sans-serif",
-      padding: '28px 24px',
-    }}>
-      {/* Top bar */}
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#f0faf4',
+        fontFamily: "'Hind Siliguri', sans-serif",
+        padding: '28px 24px',
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate('/dashboard')}
           style={{
-            width: 48, height: 48, borderRadius: 16, border: 'none',
-            background: 'white', cursor: 'pointer', fontSize: 20,
+            width: 48,
+            height: 48,
+            borderRadius: 16,
+            border: 'none',
+            background: 'white',
+            cursor: 'pointer',
+            fontSize: 20,
             boxShadow: '0 3px 14px rgba(0,0,0,.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           ←
         </motion.button>
+
         <div>
           <div style={{ fontSize: 26, fontWeight: 800, color: '#1a2e1a', lineHeight: 1.2 }}>
             📚 পড়া
           </div>
+
           <div style={{ fontSize: 14, color: '#3a6b4a', fontWeight: 500, marginTop: 2 }}>
             পড়ার সুবিধা ও অক্ষর চর্চা একসাথে
           </div>
         </div>
       </div>
 
-      {/* Sub-feature cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: 20,
-        maxWidth: 700,
-        margin: '0 auto',
-      }}>
+      <div
+        className="reading-hub-grid"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 20,
+          maxWidth: 700,
+          margin: '0 auto',
+        }}
+      >
         {cards.map((card, i) => (
           <motion.div
             key={card.id}
@@ -371,27 +315,46 @@ function ReadingHub({ onSelect }) {
           >
             <motion.div
               animate={{ y: [0, -5, 0] }}
-              transition={{ repeat: Infinity, duration: 2.8, delay: i * 0.5, ease: 'easeInOut' }}
+              transition={{
+                repeat: Infinity,
+                duration: 2.8,
+                delay: i * 0.5,
+                ease: 'easeInOut',
+              }}
               style={{ fontSize: 52 }}
             >
               {card.emoji}
             </motion.div>
+
             <div style={{ fontSize: 20, fontWeight: 800, color: '#1a1a2e', lineHeight: 1.3 }}>
               {card.title}
             </div>
-            <div style={{ fontSize: 14, color: '#687076', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+
+            <div
+              style={{
+                fontSize: 14,
+                color: '#687076',
+                lineHeight: 1.7,
+                whiteSpace: 'pre-line',
+              }}
+            >
               {card.sub}
             </div>
+
             <motion.div
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.93 }}
               style={{
                 marginTop: 'auto',
-                width: 44, height: 44,
+                width: 44,
+                height: 44,
                 borderRadius: '50%',
                 background: card.accent,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'white', fontSize: 20,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: 20,
               }}
             >
               →
@@ -399,22 +362,15 @@ function ReadingHub({ onSelect }) {
           </motion.div>
         ))}
       </div>
-
-      {/* Responsive */}
-      <style>{`
-        @media (max-width: 500px) {
-          .reading-hub-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }
 
-
 // ── Main Page Component ──
 export default function ReadingPage() {
-  const [subView, setSubView] = useState(null); // null | 'line' | 'phoneme'
+  const [subView, setSubView] = useState(null);
   const { isPanelOpen, togglePanel } = usePreferences();
+
   const [tappedWord, setTappedWord] = useState(null);
   const [activeIdx, setActiveIdx] = useState(-1);
   const [currentLevel, setCurrentLevel] = useState('sohoj');
@@ -422,21 +378,100 @@ export default function ReadingPage() {
   const [customText, setCustomText] = useState('');
   const [customAnalysisActive, setCustomAnalysisActive] = useState(false);
 
+  const textSectionRef = useRef(null);
+  const autoStartCustomRef = useRef(false);
+
   const levelContent = READING_CONTENT[currentLevel] || [];
   const currentItem = levelContent[currentItemIdx] || { text: '', title: '' };
   const levelInfo = getLevelInfo(currentLevel);
   const isSingleWord = currentLevel === 'shuru' && !customAnalysisActive;
 
-  // The text displayed in the main reading area
   const displayText = customAnalysisActive ? customText : currentItem.text;
 
-  const handleWordTap = useCallback((word, wordData, wordIdx) => {
-    setTappedWord({ word, wordData, wordIdx });
+  const readingWords = useMemo(() => segmentText(displayText), [displayText]);
+
+  const handleNarrationWordChange = useCallback((entry, wordIdx) => {
+    const cleanWord = cleanDisplayWord(entry.word) || entry.word;
+
+    setTappedWord({
+      word: cleanWord,
+      wordData: entry,
+      wordIdx,
+    });
+
     setActiveIdx(wordIdx);
   }, []);
 
+  const handleNarrationEnd = useCallback(() => {
+    setActiveIdx(-1);
+  }, []);
+
+  const {
+    activeWordIndex,
+    activePhonemeIndex,
+    isPlaying,
+    highlightColor,
+    speed,
+    startNarration,
+    stopNarration,
+    setHighlightColor,
+    setSpeed,
+  } = usePhoneme(readingWords, {
+    onWordChange: handleNarrationWordChange,
+    onEnd: handleNarrationEnd,
+  });
+
+  useEffect(() => {
+    stopNarration();
+    setTappedWord(null);
+    setActiveIdx(-1);
+  }, [displayText, stopNarration]);
+
+  useEffect(() => {
+    if (customAnalysisActive && autoStartCustomRef.current && displayText.trim()) {
+      autoStartCustomRef.current = false;
+
+      const timer = setTimeout(() => {
+        startNarration();
+      }, 180);
+
+      return () => clearTimeout(timer);
+    }
+  }, [customAnalysisActive, displayText, startNarration]);
+
+  const handlePlayToggle = useCallback(() => {
+    if (isPlaying) {
+      stopNarration();
+      return;
+    }
+
+    if (!displayText.trim()) return;
+
+    setTappedWord(null);
+    setActiveIdx(-1);
+    startNarration();
+  }, [isPlaying, displayText, startNarration, stopNarration]);
+
+  const handleWordTap = useCallback(
+    (word, wordData, wordIdx) => {
+      if (isPlaying) stopNarration();
+
+      const cleanWord = cleanDisplayWord(word) || word;
+
+      setTappedWord({
+        word: cleanWord,
+        wordData,
+        wordIdx,
+      });
+
+      setActiveIdx(wordIdx);
+    },
+    [isPlaying, stopNarration]
+  );
+
   const handlePrev = () => {
     if (currentItemIdx > 0) {
+      stopNarration();
       setCurrentItemIdx(currentItemIdx - 1);
       setTappedWord(null);
       setActiveIdx(-1);
@@ -446,6 +481,7 @@ export default function ReadingPage() {
 
   const handleNext = () => {
     if (currentItemIdx < levelContent.length - 1) {
+      stopNarration();
       setCurrentItemIdx(currentItemIdx + 1);
       setTappedWord(null);
       setActiveIdx(-1);
@@ -453,7 +489,8 @@ export default function ReadingPage() {
     }
   };
 
-  const handleLevelChange = levelId => {
+  const handleLevelChange = (levelId) => {
+    stopNarration();
     setCurrentLevel(levelId);
     setCurrentItemIdx(0);
     setTappedWord(null);
@@ -461,27 +498,33 @@ export default function ReadingPage() {
     setCustomAnalysisActive(false);
   };
 
-  const textSectionRef = useRef(null);
-
   const handleAnalyze = () => {
     if (customText.trim()) {
+      stopNarration();
+      autoStartCustomRef.current = true;
       setCustomAnalysisActive(true);
       setTappedWord(null);
       setActiveIdx(-1);
-      // Scroll the text panel into view so user sees the result
+
       setTimeout(() => {
-        textSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        textSectionRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
       }, 80);
     }
   };
 
+  const selectedPhonemes =
+    tappedWord?.wordIdx !== undefined
+      ? readingWords[tappedWord.wordIdx]?.phonemes || []
+      : [];
+
   if (subView === null) return <ReadingHub onSelect={setSubView} />;
   if (subView === 'phoneme') return <PhonemeHighlighter onBack={() => setSubView(null)} />;
 
-  // subView === 'line' — existing reading UI
   return (
     <div className="reading-page-shell">
-      {/* Premium clean bottom decorations only */}
       <div className="reading-decor-layer" aria-hidden="true">
         <img src={cloudSoft} alt="" className="reading-bottom-cloud" />
         <img src={readingKid} alt="" className="reading-bottom-kid" />
@@ -493,7 +536,6 @@ export default function ReadingPage() {
         </div>
       </div>
 
-      {/* ── Top Toolbar ── */}
       <header className="app-header">
         <div className="app-header-left">
           <button className="back-btn" aria-label="পেছনে যান" onClick={() => setSubView(null)}>
@@ -511,9 +553,13 @@ export default function ReadingPage() {
         </div>
 
         <div className="app-header-actions">
-          <button className="header-btn" aria-label="শোনো">
+          <button
+            className={`header-btn ${isPlaying ? 'listen-button-active' : ''}`}
+            aria-label="শোনো"
+            onClick={handlePlayToggle}
+          >
             <img src={speakerIcon} alt="" className="btn-icon-img" />
-            <span>শোনো</span>
+            <span>{isPlaying ? 'থামাও' : 'শোনো'}</span>
           </button>
 
           <button className="header-btn save-btn" aria-label="সংরক্ষণ">
@@ -534,7 +580,6 @@ export default function ReadingPage() {
         </div>
       </header>
 
-      {/* ── Level Tabs / Stepper ── */}
       <div className="reading-level-stepper">
         {DIFFICULTY_LEVELS.map((level, index) => (
           <button
@@ -552,14 +597,17 @@ export default function ReadingPage() {
         ))}
       </div>
 
-      {/* ── Main Reading Area ── */}
       <main className="reading-premium-main">
         <div className="reading-main-area">
           <div className="reading-text-section">
             <div className="reading-text-col" ref={textSectionRef}>
-              <button className="sentence-listen-btn" aria-label="এই লেখাটি শুনুন">
+              <button
+                className={`sentence-listen-btn ${isPlaying ? 'listen-button-active' : ''}`}
+                aria-label="এই লেখাটি শুনুন"
+                onClick={handlePlayToggle}
+              >
                 <img src={speakerIcon} alt="" />
-                <span>শোনো</span>
+                <span>{isPlaying ? 'থামাও' : 'শোনো'}</span>
               </button>
 
               <div className="reading-level-label">
@@ -573,57 +621,71 @@ export default function ReadingPage() {
                 )}
               </div>
 
-              <TextRenderer
-                content={displayText}
-                activeWordIdx={activeIdx}
+              <NarratedTextRenderer
+                words={readingWords}
+                activeWordIndex={activeWordIndex}
+                activePhonemeIndex={activePhonemeIndex}
+                highlightColor={highlightColor}
+                isPlaying={isPlaying}
                 onWordTap={handleWordTap}
-                isSingleWord={isSingleWord}
               />
             </div>
 
             <AnimatePresence>
-              {tappedWord ? (
-                <motion.div
-                  className="live-word-panel"
-                  initial={{ opacity: 0, x: 20, scale: 0.98 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 20, scale: 0.98 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <LiveWordInfoPanel
-                    word={tappedWord.word}
-                    wordData={tappedWord.wordData}
-                    onClose={() => {
-                      setTappedWord(null);
-                      setActiveIdx(-1);
-                    }}
-                  />
-                </motion.div>
-              ) : (
-                <motion.div
-                  className="live-word-panel empty-panel"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <img src={starMascot} alt="" className="empty-panel-star" />
+              <motion.div
+                className={`live-word-panel ${tappedWord ? '' : 'empty-panel'}`}
+                initial={{ opacity: 0, x: 20, scale: 0.98 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 20, scale: 0.98 }}
+                transition={{ duration: 0.2 }}
+              >
+                {tappedWord ? (
+                  <>
+                    <LiveWordInfoPanel
+                      word={tappedWord.word}
+                      wordData={tappedWord.wordData}
+                      phonemes={selectedPhonemes}
+                      activePhonemeIndex={
+                        tappedWord.wordIdx === activeWordIndex ? activePhonemeIndex : -1
+                      }
+                      isPlaying={isPlaying}
+                      onClose={() => {
+                        setTappedWord(null);
+                        setActiveIdx(-1);
+                      }}
+                    />
 
-                  <div>
-                    <strong>শব্দে ক্লিক করো</strong>
-                    <span>বিশ্লেষণ এখানে দেখাবে</span>
-                  </div>
-                </motion.div>
-              )}
+                    <ReadingSpeedControl speed={speed} setSpeed={setSpeed} />
+                    <HighlightColorControl
+                      highlightColor={highlightColor}
+                      setHighlightColor={setHighlightColor}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <div className="empty-panel-content">
+                      <img src={starMascot} alt="" className="empty-panel-star" />
+
+                      <div>
+                        <strong>শব্দে ক্লিক করো</strong>
+                        <span>বিশ্লেষণ এখানে দেখাবে</span>
+                      </div>
+                    </div>
+
+                    <ReadingSpeedControl speed={speed} setSpeed={setSpeed} />
+                    <HighlightColorControl
+                      highlightColor={highlightColor}
+                      setHighlightColor={setHighlightColor}
+                    />
+                  </>
+                )}
+              </motion.div>
             </AnimatePresence>
           </div>
         </div>
 
-        {/* ── Navigation Footer ── */}
         <div className="nav-footer">
-          <button
-            className="nav-btn"
-            onClick={handlePrev}
-            disabled={currentItemIdx === 0}
-          >
+          <button className="nav-btn" onClick={handlePrev} disabled={currentItemIdx === 0}>
             ← পূর্ববর্তী
           </button>
 
@@ -657,14 +719,12 @@ export default function ReadingPage() {
           </button>
         </div>
 
-        {/* ── Single Word Decomposition ── */}
         {isSingleWord && currentItem.text && (
           <div style={{ maxWidth: '1180px', margin: '0 auto 24px', padding: '0 4px' }}>
             <WordDecompositionCard word={currentItem.text} />
           </div>
         )}
 
-        {/* ── Custom Text Input ── */}
         <div className="custom-input-section">
           <img src={rewardConfetti} alt="" className="custom-confetti" />
 
@@ -681,7 +741,7 @@ export default function ReadingPage() {
             <textarea
               className="custom-textarea"
               value={customText}
-              onChange={e => {
+              onChange={(e) => {
                 setCustomText(e.target.value);
                 setCustomAnalysisActive(false);
               }}
@@ -690,28 +750,16 @@ export default function ReadingPage() {
 
             <button className="custom-analyze-btn" onClick={handleAnalyze}>
               <img src={magicWand} alt="" className="analyze-wand-icon" />
-              বিশ্লেষণ করুন
+              বিশ্লেষণ করুন ও শোনো
             </button>
 
             {customAnalysisActive && (
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                style={{
-                  marginTop: '10px',
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  background: '#EAF8E6',
-                  fontSize: '13px',
-                  fontFamily: '"Noto Sans Bengali", sans-serif',
-                  color: '#2E8B57',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
+                className="custom-active-message"
               >
-                ✅ লেখাটি উপরে দেখানো হচ্ছে — শব্দে ক্লিক করুন বিশ্লেষণ দেখতে
+                ✅ লেখাটি উপরে দেখানো হচ্ছে — পড়া ও বিশ্লেষণ চলছে
               </motion.div>
             )}
           </div>
@@ -724,7 +772,6 @@ export default function ReadingPage() {
     </div>
   );
 }
-
 
 // ── Word Decomposition Card ──
 function WordDecompositionCard({ word }) {
@@ -767,7 +814,7 @@ function WordDecompositionCard({ word }) {
         ))}
       </div>
 
-      {decomp.filter(d => d.formula).map((d, i) => (
+      {decomp.filter((d) => d.formula).map((d, i) => (
         <div
           key={i}
           style={{
@@ -796,80 +843,6 @@ function WordDecompositionCard({ word }) {
           উচ্চারণ: <strong>{word}</strong>
         </span>
       </div>
-    </div>
-  );
-}
-
-
-// ── Mini Word Decomposition ──
-function WordDecompositionMini({ word }) {
-  const decomp = decomposeWord(word);
-  const hasConjunct = decomp.some(d => d.type === 'conjunct');
-
-  if (!word || word.length === 0) return null;
-
-  return (
-    <div
-      style={{
-        background: hasConjunct ? '#FFF0E0' : '#F8F4EE',
-        border: `1px solid ${hasConjunct ? '#E06B2E' : '#E2D5C3'}`,
-        borderRadius: '10px',
-        padding: '8px 12px',
-        textAlign: 'center',
-        minWidth: '60px',
-      }}
-    >
-      <div
-        style={{
-          fontFamily: '"Noto Sans Bengali", sans-serif',
-          fontSize: '18px',
-          fontWeight: 700,
-          color: '#2D1B00',
-          marginBottom: '4px',
-        }}
-      >
-        {word}
-      </div>
-
-      {decomp.length > 1 && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '3px',
-            flexWrap: 'wrap',
-          }}
-        >
-          {decomp.map((d, i) => (
-            <span
-              key={i}
-              style={{
-                fontFamily: '"Noto Sans Bengali", sans-serif',
-                fontSize: '12px',
-                color: d.type === 'conjunct' ? '#E06B2E' : '#666',
-              }}
-            >
-              {i > 0 && '+'}
-              {d.display}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {decomp.filter(d => d.formula).map((d, i) => (
-        <div
-          key={i}
-          style={{
-            fontFamily: '"Noto Sans Bengali", sans-serif',
-            fontSize: '10px',
-            color: '#E06B2E',
-            marginTop: '2px',
-          }}
-        >
-          ({d.formula})
-        </div>
-      ))}
     </div>
   );
 }

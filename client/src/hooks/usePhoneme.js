@@ -1,21 +1,18 @@
 /**
  * usePhoneme.js
  * ─────────────────────────────────────────────────
- * Custom hook that connects TTS (Speech Synthesis) events
- * to phoneme highlighting index.
- *
- * Features:
- *  - Manages which word and which phoneme within that word is active
- *  - Uses SpeechSynthesisUtterance boundary events for sync
- *  - Falls back to timer-based highlighting when boundary events unavailable
- *  - Supports play, pause, stop, and manual word tap
+ * Custom hook that connects TTS narration to
+ * word-by-word and phoneme-by-phoneme highlighting.
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { estimatePhonemeDuration } from '../utils/phonemeUtils';
 
-export function usePhoneme(words = []) {
-  // words: Array<{ word: string, phonemes: string[] }>
+const cleanSpeechText = (text = '') =>
+  text.replace(/[।,!?;:\-–—"'()\[\]]/g, '').trim();
+
+export function usePhoneme(words = [], options = {}) {
+  const { onWordChange, onPhonemeChange, onEnd } = options;
 
   const [activeWordIndex, setActiveWordIndex] = useState(-1);
   const [activePhonemeIndex, setActivePhonemeIndex] = useState(-1);
@@ -27,56 +24,72 @@ export function usePhoneme(words = []) {
   const timerRef = useRef(null);
   const utteranceRef = useRef(null);
   const synthRef = useRef(typeof window !== 'undefined' ? window.speechSynthesis : null);
-  const wordIndexRef = useRef(-1);
-  const phonemeIndexRef = useRef(-1);
   const playingRef = useRef(false);
 
-  // Cleanup on unmount
+  const stopNarration = useCallback(() => {
+    playingRef.current = false;
+
+    setIsPlaying(false);
+    setIsPaused(false);
+    setActiveWordIndex(-1);
+    setActivePhonemeIndex(-1);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (synthRef.current) {
+      synthRef.current.cancel();
+    }
+  }, []);
+
   useEffect(() => {
     return () => {
       stopNarration();
     };
-  }, []);
+  }, [stopNarration]);
 
-  /**
-   * Animate phonemes for a single word using timers
-   */
-  const animatePhonemes = useCallback((wordIdx, onComplete) => {
-    if (!words[wordIdx]) {
-      onComplete?.();
-      return;
-    }
+  const animatePhonemes = useCallback(
+    (wordIdx, onComplete) => {
+      const currentWord = words[wordIdx];
 
-    const phonemes = words[wordIdx].phonemes;
-    let pIdx = 0;
-
-    const nextPhoneme = () => {
-      if (!playingRef.current) return;
-
-      if (pIdx >= phonemes.length) {
+      if (!currentWord) {
         onComplete?.();
         return;
       }
 
-      setActivePhonemeIndex(pIdx);
-      phonemeIndexRef.current = pIdx;
+      const phonemes = currentWord.phonemes || [];
+      let pIdx = 0;
 
-      const duration = estimatePhonemeDuration(phonemes[pIdx], 300 / speed);
-      pIdx++;
+      const nextPhoneme = () => {
+        if (!playingRef.current) return;
 
-      timerRef.current = setTimeout(nextPhoneme, duration);
-    };
+        if (pIdx >= phonemes.length) {
+          onComplete?.();
+          return;
+        }
 
-    nextPhoneme();
-  }, [words, speed]);
+        setActivePhonemeIndex(pIdx);
+        onPhonemeChange?.(phonemes[pIdx], pIdx, wordIdx);
 
-  /**
-   * Start narration — highlights words one by one, phonemes within each
-   */
+        const duration = estimatePhonemeDuration(
+          phonemes[pIdx],
+          Math.max(170, 320 / speed)
+        );
+
+        pIdx += 1;
+        timerRef.current = setTimeout(nextPhoneme, duration);
+      };
+
+      nextPhoneme();
+    },
+    [words, speed, onPhonemeChange]
+  );
+
   const startNarration = useCallback(() => {
-    if (words.length === 0) return;
+    if (!words.length) return;
 
-    // Cancel any existing
     if (synthRef.current) synthRef.current.cancel();
     if (timerRef.current) clearTimeout(timerRef.current);
 
@@ -88,84 +101,48 @@ export function usePhoneme(words = []) {
 
     const processWord = () => {
       if (!playingRef.current || wIdx >= words.length) {
-        // Done
         setIsPlaying(false);
+        setIsPaused(false);
         setActiveWordIndex(-1);
         setActivePhonemeIndex(-1);
         playingRef.current = false;
-        wordIndexRef.current = -1;
-        phonemeIndexRef.current = -1;
+        onEnd?.();
         return;
       }
 
-      setActiveWordIndex(wIdx);
-      wordIndexRef.current = wIdx;
+      const currentWord = words[wIdx];
+      const wordText = cleanSpeechText(currentWord.word);
 
-      // Speak the word using TTS
-      const wordText = words[wIdx].word.replace(/[।,!?;:\-–—"'()\[\]]/g, '');
-      if (synthRef.current && wordText.trim()) {
+      setActiveWordIndex(wIdx);
+      setActivePhonemeIndex(-1);
+      onWordChange?.(currentWord, wIdx);
+
+      const finishCurrentWord = () => {
+        if (!playingRef.current) return;
+        wIdx += 1;
+        timerRef.current = setTimeout(processWord, Math.max(80, 160 / speed));
+      };
+
+      if (synthRef.current && wordText) {
         const utt = new SpeechSynthesisUtterance(wordText);
         utt.lang = 'bn-BD';
         utt.rate = speed;
         utteranceRef.current = utt;
 
-        // We use timer-based phoneme animation in parallel with TTS
-        // since boundary events are unreliable for Bangla
-        animatePhonemes(wIdx, () => {
-          // Phoneme animation done for this word
-        });
+        animatePhonemes(wIdx);
 
-        utt.onend = () => {
-          if (!playingRef.current) return;
-          wIdx++;
-          // Small gap between words
-          timerRef.current = setTimeout(processWord, 150);
-        };
-
-        utt.onerror = () => {
-          if (!playingRef.current) return;
-          wIdx++;
-          timerRef.current = setTimeout(processWord, 150);
-        };
+        utt.onend = finishCurrentWord;
+        utt.onerror = finishCurrentWord;
 
         synthRef.current.speak(utt);
       } else {
-        // No TTS available — just use timer
-        animatePhonemes(wIdx, () => {
-          if (!playingRef.current) return;
-          wIdx++;
-          timerRef.current = setTimeout(processWord, 150);
-        });
+        animatePhonemes(wIdx, finishCurrentWord);
       }
     };
 
     processWord();
-  }, [words, speed, animatePhonemes]);
+  }, [words, speed, animatePhonemes, onWordChange, onEnd]);
 
-  /**
-   * Stop narration completely
-   */
-  const stopNarration = useCallback(() => {
-    playingRef.current = false;
-    setIsPlaying(false);
-    setIsPaused(false);
-    setActiveWordIndex(-1);
-    setActivePhonemeIndex(-1);
-    wordIndexRef.current = -1;
-    phonemeIndexRef.current = -1;
-
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    if (synthRef.current) {
-      synthRef.current.cancel();
-    }
-  }, []);
-
-  /**
-   * Pause / Resume
-   */
   const togglePause = useCallback(() => {
     if (!isPlaying) return;
 
@@ -178,54 +155,56 @@ export function usePhoneme(words = []) {
     }
   }, [isPlaying, isPaused]);
 
-  /**
-   * Manual tap on a word — highlight phonemes without audio
-   * (or with audio if desired)
-   */
-  const tapWord = useCallback((wordIdx, withAudio = false) => {
-    if (isPlaying) return; // Don't interrupt narration
+  const tapWord = useCallback(
+    (wordIdx, withAudio = false) => {
+      if (isPlaying) return;
 
-    // Clear any previous tap animation
-    if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
 
-    setActiveWordIndex(wordIdx);
-    wordIndexRef.current = wordIdx;
-    playingRef.current = true;
+      const currentWord = words[wordIdx];
+      if (!currentWord) return;
 
-    const phonemes = words[wordIdx]?.phonemes || [];
+      setActiveWordIndex(wordIdx);
+      setActivePhonemeIndex(-1);
+      onWordChange?.(currentWord, wordIdx);
 
-    if (withAudio && synthRef.current) {
-      const wordText = words[wordIdx].word.replace(/[।,!?;:\-–—"'()\[\]]/g, '');
-      const utt = new SpeechSynthesisUtterance(wordText);
-      utt.lang = 'bn-BD';
-      utt.rate = speed;
-      synthRef.current.speak(utt);
-    }
+      playingRef.current = true;
 
-    // Animate phonemes
-    let pIdx = 0;
-    const nextPhoneme = () => {
-      if (pIdx >= phonemes.length) {
-        // Keep last phoneme highlighted briefly, then reset
-        timerRef.current = setTimeout(() => {
-          setActiveWordIndex(-1);
-          setActivePhonemeIndex(-1);
-          playingRef.current = false;
-        }, 500);
-        return;
+      const wordText = cleanSpeechText(currentWord.word);
+
+      if (withAudio && synthRef.current && wordText) {
+        const utt = new SpeechSynthesisUtterance(wordText);
+        utt.lang = 'bn-BD';
+        utt.rate = speed;
+        synthRef.current.speak(utt);
       }
 
-      setActivePhonemeIndex(pIdx);
-      const duration = estimatePhonemeDuration(phonemes[pIdx], 400);
-      pIdx++;
-      timerRef.current = setTimeout(nextPhoneme, duration);
-    };
+      const phonemes = currentWord.phonemes || [];
+      let pIdx = 0;
 
-    nextPhoneme();
-  }, [words, isPlaying, speed]);
+      const nextPhoneme = () => {
+        if (pIdx >= phonemes.length) {
+          timerRef.current = setTimeout(() => {
+            setActivePhonemeIndex(-1);
+            playingRef.current = false;
+          }, 450);
+          return;
+        }
+
+        setActivePhonemeIndex(pIdx);
+        onPhonemeChange?.(phonemes[pIdx], pIdx, wordIdx);
+
+        const duration = estimatePhonemeDuration(phonemes[pIdx], 320 / speed);
+        pIdx += 1;
+        timerRef.current = setTimeout(nextPhoneme, duration);
+      };
+
+      nextPhoneme();
+    },
+    [words, isPlaying, speed, onWordChange, onPhonemeChange]
+  );
 
   return {
-    // State
     activeWordIndex,
     activePhonemeIndex,
     isPlaying,
@@ -233,7 +212,6 @@ export function usePhoneme(words = []) {
     highlightColor,
     speed,
 
-    // Actions
     startNarration,
     stopNarration,
     togglePause,

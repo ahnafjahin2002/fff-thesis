@@ -1504,3 +1504,498 @@ input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
     width: calc(100% - 24px);
   }
 }
+/* =========================================================
+   FINAL PATCH: Reading Page Narration + Breakdown Fix
+   Paste this at the VERY BOTTOM of index.css
+   Do not delete your old CSS.
+   ========================================================= */
+
+/* ---------- Main two-box layout fix ---------- */
+.reading-page-shell .reading-main-area {
+  width: min(1280px, calc(100% - 180px));
+  max-width: none;
+  margin: 0 auto 28px;
+  padding: 28px;
+  background: rgba(255, 255, 255, 0.32);
+  border: 2px solid #eadfc9;
+  border-radius: 34px;
+  box-shadow: 0 10px 24px rgba(80, 60, 30, 0.08);
+  position: relative;
+  z-index: 5;
+}
+
+.reading-page-shell .reading-text-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 460px);
+  gap: 26px;
+  align-items: stretch;
+}
+
+.reading-page-shell .reading-text-col {
+  min-height: 390px;
+  background: #ffffff;
+  border: 2px solid #eadfca;
+  border-radius: 30px;
+  padding: 110px 56px 64px;
+  box-shadow: 0 12px 28px rgba(60, 45, 20, 0.09);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.reading-page-shell .reading-text-col::before {
+  content: "";
+  position: absolute;
+  left: -70px;
+  bottom: -72px;
+  width: 390px;
+  height: 140px;
+  background: #e8f7de;
+  border-radius: 50% 50% 0 0;
+  z-index: 0;
+  opacity: 0.7;
+}
+
+.reading-page-shell .reading-text-col > div,
+.reading-page-shell .reading-text-col > button {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------- Listen button active state ---------- */
+.reading-page-shell .listen-button-active {
+  background: #ffd700 !important;
+  border-color: #ffbd00 !important;
+  color: #15351c !important;
+}
+
+/* ---------- Narrated reading text ---------- */
+.reading-page-shell .phoneme-reading-text {
+  width: 100%;
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1.9;
+  font-weight: 800;
+  color: #183a24;
+  letter-spacing: 0.02em;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.reading-page-shell .phoneme-reading-token {
+  display: inline-block;
+  margin: 0 4px;
+}
+
+.reading-page-shell .phoneme-reading-empty {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  font-size: 28px;
+  color: #8a8a8a;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* Scoped PhonemeWord style so old PhonemeHighlighter page does not break */
+.reading-page-shell .phoneme-word {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  border-radius: 16px;
+  padding: 3px 4px;
+  margin: 0 2px;
+  transition: opacity 0.18s ease, transform 0.18s ease, background 0.18s ease;
+  position: relative;
+}
+
+.reading-page-shell .phoneme-word:hover {
+  background: rgba(255, 215, 0, 0.16);
+}
+
+.reading-page-shell .phoneme-word--active {
+  background: rgba(255, 215, 0, 0.12);
+  transform: translateY(-1px);
+  opacity: 1;
+}
+
+.reading-page-shell .phoneme-word--dimmed {
+  opacity: 0.38;
+}
+
+.reading-page-shell .phoneme-span {
+  display: inline-block;
+  padding: 2px 5px;
+  border-radius: 12px;
+  transition: all 0.18s ease;
+}
+
+.reading-page-shell .phoneme-active {
+  background: var(--phoneme-highlight, #ffd700);
+  color: #122315;
+  box-shadow: 0 5px 14px rgba(255, 205, 45, 0.35);
+  transform: scale(1.04);
+  animation: none;
+}
+
+/* ---------- Right word analysis panel ---------- */
+.reading-page-shell .live-word-panel {
+  min-height: 390px;
+  background: linear-gradient(180deg, #f1f8ff, #ffffff);
+  border: 2px solid #c8def8;
+  border-radius: 30px;
+  padding: 24px 22px 20px;
+  box-shadow: 0 12px 28px rgba(60, 45, 20, 0.09);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.reading-page-shell .live-word-info-inner {
+  width: 100%;
+}
+
+.reading-page-shell .live-word-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ddebff;
+}
+
+.reading-page-shell .live-word-panel-header span {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: #174a8b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reading-page-shell .live-word-panel-header em {
+  font-style: normal;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #2e8b57;
+  background: #eaf8e6;
+}
+
+.reading-page-shell .live-word-panel-header button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #f5ede0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.reading-page-shell .live-word-title {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  font-size: clamp(42px, 4vw, 58px);
+  font-weight: 900;
+  color: #183a24;
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 18px;
+}
+
+/* ---------- Word breakdown cards ---------- */
+.reading-page-shell .word-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.reading-page-shell .breakdown-unit-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reading-page-shell .breakdown-plus {
+  font-size: 28px;
+  color: #7891b5;
+  font-weight: 900;
+}
+
+.reading-page-shell .breakdown-unit-card {
+  background: #eff9e8;
+  border: 2px solid #cdeebe;
+  border-radius: 18px;
+  padding: 12px 18px;
+  text-align: center;
+  min-width: 78px;
+  box-shadow: 0 8px 16px rgba(40, 50, 70, 0.08);
+  transition: all 0.18s ease;
+}
+
+.reading-page-shell .breakdown-unit-wrap:nth-child(2n) .breakdown-unit-card {
+  background: #eaf4ff;
+  border-color: #c9e1ff;
+}
+
+.reading-page-shell .breakdown-unit-wrap:nth-child(3n) .breakdown-unit-card {
+  background: #fff0f5;
+  border-color: #ffd1e1;
+}
+
+.reading-page-shell .breakdown-unit-card.active {
+  background: #ffd700 !important;
+  border-color: #ffbd00 !important;
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 10px 20px rgba(255, 196, 0, 0.35);
+}
+
+.reading-page-shell .breakdown-unit-char {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  font-size: 34px;
+  font-weight: 900;
+  display: block;
+  color: #183a24;
+}
+
+.reading-page-shell .breakdown-unit-label {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  font-size: 12px;
+  color: #65758a;
+  display: block;
+  margin-top: 3px;
+  font-weight: 700;
+}
+
+.reading-page-shell .breakdown-formula {
+  background: #fff8e7;
+  border-radius: 14px;
+  padding: 9px 12px;
+  text-align: center;
+  margin-bottom: 8px;
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  font-size: 15px;
+}
+
+.reading-page-shell .breakdown-formula span {
+  color: #e06b2e;
+  font-weight: 800;
+}
+
+.reading-page-shell .breakdown-formula small {
+  color: #666;
+  margin-left: 8px;
+  font-size: 13px;
+}
+
+.reading-page-shell .breakdown-kar,
+.reading-page-shell .breakdown-meaning {
+  margin-top: 10px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: #eaf8e6;
+  font-size: 15px;
+  text-align: center;
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  color: #2e8b57;
+  font-weight: 800;
+}
+
+.reading-page-shell .breakdown-meaning {
+  background: #e8f4fd;
+  color: #1a2b4a;
+}
+
+.reading-page-shell .breakdown-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.reading-page-shell .breakdown-tags span {
+  background: #fff0e0;
+  color: #e06b2e;
+  padding: 5px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  font-weight: 800;
+}
+
+/* ---------- Speed control under breakdown ---------- */
+.reading-page-shell .reading-speed-panel {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #fffaf0;
+  border: 1px solid #eadfca;
+}
+
+.reading-page-shell .reading-speed-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  color: #183a24;
+  font-size: 14px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.reading-page-shell .reading-speed-row {
+  display: grid;
+  grid-template-columns: 1fr 66px;
+  gap: 12px;
+  align-items: center;
+}
+
+.reading-page-shell .reading-speed-slider {
+  width: 100%;
+  accent-color: #49b51e;
+}
+
+.reading-page-shell .reading-speed-value {
+  background: #eaf8e6;
+  color: #2e8b57;
+  border-radius: 12px;
+  padding: 7px 8px;
+  font-size: 13px;
+  text-align: center;
+  font-weight: 900;
+}
+
+/* ---------- Highlight color chips ---------- */
+.reading-page-shell .highlight-chip-panel {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f8fbff;
+  border: 1px solid #ddebff;
+}
+
+.reading-page-shell .highlight-chip-title {
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  color: #174a8b;
+  font-size: 14px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.reading-page-shell .highlight-chip-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.reading-page-shell .highlight-chip {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 3px 8px rgba(40, 50, 70, 0.18);
+  cursor: pointer;
+  color: #173a1d;
+  font-weight: 900;
+}
+
+.reading-page-shell .highlight-chip.active {
+  outline: 3px solid #2e8b57;
+}
+
+/* ---------- Empty right panel ---------- */
+.reading-page-shell .empty-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.reading-page-shell .empty-panel-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  gap: 12px;
+  color: #64748b;
+  font-family: inherit;
+  min-height: 150px;
+}
+
+/* ---------- Custom input active message ---------- */
+.reading-page-shell .custom-active-message {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #eaf8e6;
+  font-size: 13px;
+  font-family: "Noto Sans Bengali", "Hind Siliguri", sans-serif;
+  color: #2e8b57;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- Responsive safety ---------- */
+@media (max-width: 1180px) {
+  .reading-page-shell .reading-main-area,
+  .reading-page-shell .nav-footer,
+  .reading-page-shell .custom-input-section {
+    width: calc(100% - 48px);
+  }
+
+  .reading-page-shell .reading-text-section {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+  }
+}
+
+@media (max-width: 1050px) {
+  .reading-page-shell .reading-text-section {
+    grid-template-columns: 1fr;
+  }
+
+  .reading-page-shell .live-word-panel {
+    min-height: auto;
+  }
+
+  .reading-page-shell .reading-text-col {
+    padding: 110px 28px 42px;
+  }
+
+  .reading-page-shell .phoneme-reading-text {
+    font-size: clamp(30px, 7vw, 46px);
+    line-height: 1.8;
+  }
+
+  .reading-page-shell .reading-speed-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .reading-page-shell .reading-main-area,
+  .reading-page-shell .nav-footer,
+  .reading-page-shell .custom-input-section {
+    width: calc(100% - 24px);
+  }
+
+  .reading-page-shell .reading-bottom-kid,
+  .reading-page-shell .reading-bottom-cloud,
+  .reading-page-shell .reading-bottom-right-decor {
+    display: none;
+  }
+}
