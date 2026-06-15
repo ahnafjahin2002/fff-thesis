@@ -231,7 +231,7 @@ function ReadingHub({ onSelect }) {
     {
       id: 'phoneme',
       title: 'অক্ষর অভ্যাস',
-      sub: 'অক্ষর চিনি\nফোনেম প্র্যাক্টিস করো',
+      sub: 'অক্ষর চিনি',
       emoji: '🔤',
       bg: '#fffbee',
       accent: '#f5a623',

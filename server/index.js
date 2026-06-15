@@ -125,3 +125,5 @@ app.listen(PORT, () => {
   console.log(`   HF Model: ${process.env.HF_MODEL || 'EMTIAZZ/bangladeshi-bangla-tts-vits'}`);
   console.log(`   HF Token: ${process.env.HF_TOKEN ? '✅ Set' : '❌ Not set (browser fallback only)'}\n`);
 });
+
+
