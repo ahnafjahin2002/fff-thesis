@@ -698,7 +698,6 @@ body {
 }
 
 /* Color picker section */
-.phoneme-color-section { }
 .phoneme-color-toggle {
   display: flex; align-items: center; gap: 8px;
   padding: 10px 14px; border-radius: 12px;
