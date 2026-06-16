@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
 import BornoBazar from "./BornoBazar";
+import QuizModule from "../components/quiz/QuizModule";
 
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
@@ -411,6 +412,19 @@ const TrophySVG = () => (
   </svg>
 );
 
+const PuzzleSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="4" width="20" height="20" rx="4" fill="#e04e81" />
+    <rect x="28" y="4" width="20" height="20" rx="4" fill="#f5a623" />
+    <rect x="4" y="28" width="20" height="20" rx="4" fill="#18b368" />
+    <rect x="28" y="28" width="20" height="20" rx="4" fill="#4a90d9" />
+    <circle cx="24" cy="14" r="6" fill="#e04e81" />
+    <circle cx="24" cy="38" r="6" fill="#18b368" />
+    <circle cx="14" cy="24" r="6" fill="#e04e81" />
+    <circle cx="38" cy="24" r="6" fill="#4a90d9" />
+  </svg>
+);
+
 const HomeSVG = () => <svg width="22" height="22" viewBox="0 0 28 28"><path d="M3 14 L14 4 L25 14 V26 H18 V19 H10 V26 H3 Z" fill="#18b368" /></svg>;
 const SettingsSVG = () => (
   <svg width="22" height="22" viewBox="0 0 28 28">
@@ -431,6 +445,7 @@ const DEFAULT_ACTIVITIES = [
   { id: "read", title: "পড়া", sub: "লাইন ধরে পড়ি\nআর অক্ষর চিনি", bg: "#eef9f1", accent: "#18b368", icon: <BookSVG /> },
   { id: "game", title: "বর্ণের দোকান", sub: "খেলার মাধ্যমে\nশিখি আর মজা করি", bg: "#f0efff", accent: "#7c75dd", icon: <GamepadSVG /> },
   { id: "trace", title: "ট্রেনিং", sub: "লেখা ও বানান চর্চা\nকরি প্রতিদিন", bg: "#fff0f5", accent: "#f06292", icon: <PencilSVG /> },
+  { id: "quiz", title: "কুইজ", sub: "শব্দ ও ছবি মেলাও", bg: "#fffbee", accent: "#e04e81", icon: <PuzzleSVG /> },
 ];
 
 const DEFAULT_PROGRESS = 70;
@@ -447,6 +462,7 @@ const NAV_ITEMS = [
   { id: "read", label: "পড়া", icon: <BookSVG /> },
   { id: "game", label: "বর্ণের দোকান", icon: <GamepadSVG /> },
   { id: "trace", label: "ট্রেনিং", icon: <PencilSVG /> },
+  { id: "quiz", label: "কুইজ", icon: <PuzzleSVG /> },
   { id: "rewards", label: "অর্জন", icon: <TrophySVG /> },
   { id: "settings", label: "সেটিংস", icon: <SettingsSVG /> },
 ];
@@ -1078,6 +1094,14 @@ function HomePage({
 
   if (view === "game") return <BornoBazar onBack={() => setView("home")} />;
   if (view === "trace") return <TraceView onBack={() => setView("home")} />;
+  if (view === "quiz") return (
+    <div style={{ padding: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+        <motion.button whileTap={{ scale: .9 }} onClick={() => setView("home")} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
+      </div>
+      <QuizModule />
+    </div>
+  );
 
   return (
     <div className="app-root">

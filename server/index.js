@@ -13,6 +13,7 @@ const path = require('path');
 const { synthesize, getAudioDuration, getCachedAudio } = require('./services/ttsService');
 const { estimateWordTimings, estimateFullTimings } = require('./services/phonemeTimingService');
 const { normalizeForTTS } = require('./services/banglaTextNormalizer');
+const { generateQuiz } = require('./services/quizService');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -115,6 +116,22 @@ app.post('/api/tts/normalize', (req, res) => {
   } catch (err) {
     console.error('[API] Normalize error:', err.message);
     res.status(500).json({ error: 'Normalization failed', details: err.message });
+  }
+});
+
+// ── Quiz Module ──
+// GET /api/quiz/generate?difficulty=1&count=6&category=all
+app.get('/api/quiz/generate', (req, res) => {
+  try {
+    const difficulty = parseInt(req.query.difficulty) || 1;
+    const count = parseInt(req.query.count) || 6;
+    const category = req.query.category || 'all';
+
+    const words = generateQuiz(difficulty, count, category);
+    res.json({ success: true, words });
+  } catch (err) {
+    console.error('[API] Quiz generate error:', err.message);
+    res.status(500).json({ error: 'Failed to generate quiz', details: err.message });
   }
 });
 
