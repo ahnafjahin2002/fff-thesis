@@ -216,7 +216,7 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
               ref={el => imageRefs.current[img.id] = el}
               animate={isWrong ? { x: [-14, 14, -14, 14, 0] } : {}}
               transition={{ duration: 0.4 }}
-              whileHover={!isMatched ? { scale: 1.04, boxShadow: '0 10px 36px rgba(0,0,0,0.14)' } : {}}
+              whileHover={!isMatched ? { scale: 1.7, zIndex: 100, boxShadow: '0 25px 60px rgba(0,0,0,0.3)' } : {}}
               whileTap={!isMatched ? { scale: 0.96 } : {}}
               style={{
                 width: '100%',
@@ -229,6 +229,7 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
                 opacity: isMatched ? 0.6 : 1,
                 overflow: 'hidden',
                 position: 'relative',
+                zIndex: isSelected ? 30 : 1,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
