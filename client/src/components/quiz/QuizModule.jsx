@@ -137,46 +137,68 @@ export default function QuizModule() {
   }
 
   return (
-    <div style={{ width: '100%', padding: '20px 0' }}>
-      {!roundComplete && pairs.length > 0 && (
-        <ScoreBoard 
-          score={score} 
-          total={pairs.length} 
-          streak={streak} 
-          timeElapsed={timeElapsed} 
-          difficulty={difficulty} 
-        />
-      )}
+    <div style={{ 
+      width: '100%', 
+      padding: '30px 40px', 
+      background: 'linear-gradient(180deg, #E8F4FD 0%, #F0FFF4 100%)',
+      borderRadius: 32,
+      boxShadow: 'inset 0 4px 20px rgba(255,255,255,0.8), 0 8px 32px rgba(0,0,0,0.06)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Playful background decorative shapes */}
+      <div style={{ position: 'absolute', top: -30, left: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(28,176,246,0.08)' }} />
+      <div style={{ position: 'absolute', bottom: 50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(88,204,2,0.08)' }} />
+      <div style={{ position: 'absolute', top: '40%', left: '50%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,200,0,0.05)', transform: 'translate(-50%, -50%)' }} />
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: 50, fontSize: 20 }}>লুড হচ্ছে...</div>
-      ) : roundComplete ? (
-        <RoundSummary 
-          score={score} 
-          total={pairs.length} 
-          onNextRound={handleNextRound}
-          onChangeDifficulty={() => setDifficulty(null)}
-        />
-      ) : pairs.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 50, background: 'white', borderRadius: 20, boxShadow: '0 4px 16px rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize: 40, marginBottom: 15 }}>⚠️</div>
-          <h3 style={{ fontSize: 20, color: '#ff6b6b', marginBottom: 10 }}>সার্ভারের সাথে সংযোগ করা যাচ্ছে না!</h3>
-          <p style={{ color: '#555', marginBottom: 20 }}>অনুগ্রহ করে নিশ্চিত করুন যে ব্যাকএন্ড সার্ভারটি (http://localhost:3001) চলছে।</p>
-          <button 
-            onClick={() => fetchPairs(difficulty)}
-            style={{ padding: '10px 24px', background: '#18b368', color: 'white', border: 'none', borderRadius: 10, fontSize: 16, cursor: 'pointer', fontWeight: 600 }}
-          >
-            পুনরায় চেষ্টা করুন
-          </button>
-        </div>
-      ) : (
-        <QuizCard 
-          pairs={pairs} 
-          onMatch={handleMatch} 
-          onWrongMatch={handleWrongMatch} 
-          onComplete={() => setRoundComplete(true)}
-        />
-      )}
+      <div style={{ position: 'relative', zIndex: 10 }}>
+        {!roundComplete && pairs.length > 0 && (
+          <ScoreBoard 
+            score={score} 
+            total={pairs.length} 
+            streak={streak} 
+            timeElapsed={timeElapsed} 
+            difficulty={difficulty} 
+          />
+        )}
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 80, fontSize: 24, fontWeight: 800, color: '#1cb0f6' }}>লুড হচ্ছে... ⏳</div>
+        ) : roundComplete ? (
+          <RoundSummary 
+            score={score} 
+            total={pairs.length} 
+            onNextRound={handleNextRound}
+            onChangeDifficulty={() => setDifficulty(null)}
+          />
+        ) : pairs.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 50, background: 'white', borderRadius: 24, border: '4px solid #e5e5e5', borderBottomWidth: '8px' }}>
+            <div style={{ fontSize: 60, marginBottom: 15 }}>⚠️</div>
+            <h3 style={{ fontSize: 24, fontWeight: 800, color: '#ff4b4b', marginBottom: 10 }}>সার্ভারের সাথে সংযোগ করা যাচ্ছে না!</h3>
+            <p style={{ color: '#555', marginBottom: 30, fontSize: 18 }}>অনুগ্রহ করে নিশ্চিত করুন যে ব্যাকএন্ড সার্ভারটি চলছে।</p>
+            <button 
+              onClick={() => fetchPairs(difficulty)}
+              style={{ 
+                padding: '16px 32px', background: '#1cb0f6', color: 'white', 
+                border: '4px solid #1899D6', borderBottomWidth: '8px', 
+                borderRadius: 20, fontSize: 20, cursor: 'pointer', fontWeight: 800,
+                boxShadow: '0 4px 12px rgba(28,176,246,0.3)'
+              }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = 'translateY(4px)'; e.currentTarget.style.borderBottomWidth = '4px'; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderBottomWidth = '8px'; }}
+            >
+              পুনরায় চেষ্টা করুন
+            </button>
+          </div>
+        ) : (
+          <QuizCard 
+            pairs={pairs} 
+            onMatch={handleMatch} 
+            onWrongMatch={handleWrongMatch} 
+            onComplete={() => setRoundComplete(true)}
+          />
+        )}
+      </div>
     </div>
   );
 }

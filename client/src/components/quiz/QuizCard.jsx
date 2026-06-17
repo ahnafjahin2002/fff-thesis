@@ -119,15 +119,15 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
     <div ref={containerRef} style={{ 
       position: 'relative', 
       display: 'flex', 
-      gap: 80, 
-      justifyContent: 'space-between', 
+      gap: 200, 
+      justifyContent: 'center', 
       alignItems: 'stretch', 
       width: '100%',
     }}>
       <MatchLine lines={lines} containerRef={containerRef} />
       
       {/* ─── Words Column ─── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, zIndex: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, zIndex: 20 }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: '#18b368', textAlign: 'center', marginBottom: 4, letterSpacing: '1px' }}>
           📝 শব্দ নির্বাচন করো
         </div>
@@ -145,15 +145,17 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
               whileHover={!isMatched ? { scale: 1.04, boxShadow: '0 10px 36px rgba(0,0,0,0.14)' } : {}}
               whileTap={!isMatched ? { scale: 0.96 } : {}}
               style={{
+                width: '100%',
+                maxWidth: 280,
                 height: 200,
                 background: isMatched 
                   ? 'linear-gradient(135deg, #d4f3e3, #b8e6cf)' 
                   : isSelected 
                     ? 'linear-gradient(135deg, #fff8e1, #ffe0b2)' 
                     : 'white',
-                border: `5px solid ${isMatched ? '#18b368' : isSelected ? '#f5a623' : isWrong ? '#ff6b6b' : '#d0d0d0'}`,
-                borderRadius: 24,
-                padding: '0 32px',
+                border: `6px solid ${isMatched ? '#18b368' : isSelected ? '#f5a623' : isWrong ? '#ff6b6b' : '#d0d0d0'}`,
+                borderRadius: 16,
+                padding: '0 24px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -161,6 +163,7 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
                 opacity: isMatched ? 0.5 : 1,
                 boxShadow: isSelected ? '0 10px 36px rgba(245,166,35,0.35)' : '0 5px 20px rgba(0,0,0,0.07)',
                 transition: 'border-color 0.2s, background 0.2s',
+                boxSizing: 'border-box',
               }}
               onClick={() => {
                 if (!isMatched && !wrongAnimation) {
@@ -201,7 +204,7 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
       </div>
 
       {/* ─── Images Column ─── */}
-      <div style={{ flex: 1.3, display: 'flex', flexDirection: 'column', gap: 18, zIndex: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, zIndex: 20 }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: '#f5a623', textAlign: 'center', marginBottom: 4, letterSpacing: '1px' }}>
           🖼️ ছবি মেলাও
         </div>

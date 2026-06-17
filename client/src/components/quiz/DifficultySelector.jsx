@@ -19,16 +19,23 @@ export default function DifficultySelector({ onSelect }) {
             onClick={() => onSelect(opt.id)}
             style={{
               background: opt.bg,
-              border: `2px solid ${opt.color}`,
-              borderRadius: 20,
+              border: `4px solid ${opt.color}`,
+              borderBottomWidth: '12px',
+              borderRadius: 28,
               padding: '30px 40px',
               cursor: 'pointer',
               boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-              minWidth: 200,
+              minWidth: 220,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              transition: 'border-bottom-width 0.1s, transform 0.1s'
             }}
+            onMouseDown={(e) => { e.currentTarget.style.borderBottomWidth = '4px'; e.currentTarget.style.transform = 'translateY(8px)'; }}
+            onMouseUp={(e) => { e.currentTarget.style.borderBottomWidth = '12px'; e.currentTarget.style.transform = 'translateY(0)'; }}
           >
-            <div style={{ fontSize: 32, fontWeight: 800, color: opt.color, marginBottom: 10 }}>{opt.title}</div>
-            <div style={{ fontSize: 16, color: '#555', fontWeight: 600 }}>{opt.desc}</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: opt.color, marginBottom: 12, letterSpacing: '2px' }}>{opt.title}</div>
+            <div style={{ fontSize: 18, color: '#444', fontWeight: 700 }}>{opt.desc}</div>
           </motion.div>
         ))}
       </div>

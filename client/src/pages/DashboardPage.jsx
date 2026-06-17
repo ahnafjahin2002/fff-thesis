@@ -1095,11 +1095,51 @@ function HomePage({
   if (view === "game") return <BornoBazar onBack={() => setView("home")} />;
   if (view === "trace") return <TraceView onBack={() => setView("home")} />;
   if (view === "quiz") return (
-    <div style={{ padding: "20px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <motion.button whileTap={{ scale: .9 }} onClick={() => setView("home")} style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}>←</motion.button>
+    <div style={{ padding: "20px", display: "flex", gap: 24, alignItems: "stretch", minHeight: "85vh" }}>
+      {/* Left Cartoon Mascot Panel */}
+      <div style={{ 
+        width: 160, background: 'linear-gradient(to bottom, #74ebd5, #ACB6E5)', 
+        borderRadius: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', 
+        justifyContent: 'flex-end', position: 'relative', overflow: 'hidden', 
+        border: '6px solid white', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' 
+      }}>
+        <motion.div animate={{ x: [0, 10, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }} style={{ position: 'absolute', top: 30, left: 10, fontSize: 40 }}>☁️</motion.div>
+        <motion.div animate={{ x: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }} style={{ position: 'absolute', top: 120, right: 10, fontSize: 30 }}>☁️</motion.div>
+        <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} style={{ fontSize: 80, zIndex: 2, marginBottom: 15 }}>
+          🦉
+        </motion.div>
+        <div style={{ width: '200%', height: 100, background: '#66bb6a', borderRadius: '50%', position: 'absolute', bottom: -40, zIndex: 1, boxShadow: 'inset 0 10px 0 rgba(0,0,0,0.1)' }} />
       </div>
-      <QuizModule />
+
+      {/* Main Quiz Area */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+          <motion.button 
+            whileTap={{ scale: .9 }} 
+            onClick={() => setView("home")} 
+            style={{ width: 44, height: 44, borderRadius: 14, border: "none", background: "white", cursor: "pointer", fontSize: 18, boxShadow: "0 2px 10px rgba(0,0,0,.08)" }}
+          >
+            ←
+          </motion.button>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1d2b2a' }}>মজার কুইজ</h2>
+        </div>
+        <QuizModule />
+      </div>
+
+      {/* Right Cartoon Mascot Panel */}
+      <div style={{ 
+        width: 160, background: 'linear-gradient(to bottom, #ff9a9e, #fecfef)', 
+        borderRadius: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', 
+        justifyContent: 'flex-end', position: 'relative', overflow: 'hidden', 
+        border: '6px solid white', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' 
+      }}>
+        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} style={{ position: 'absolute', top: 30, right: 20, fontSize: 50 }}>🎈</motion.div>
+        <motion.div animate={{ scale: [1, 1.3, 1], rotate: [0, 90, 180] }} transition={{ duration: 3, repeat: Infinity, ease: 'linear' }} style={{ position: 'absolute', top: 140, left: 20, fontSize: 25 }}>✨</motion.div>
+        <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }} style={{ fontSize: 80, zIndex: 2, marginBottom: 15 }}>
+          🐅
+        </motion.div>
+        <div style={{ width: '200%', height: 100, background: '#ffb74d', borderRadius: '50%', position: 'absolute', bottom: -40, zIndex: 1, boxShadow: 'inset 0 10px 0 rgba(0,0,0,0.1)' }} />
+      </div>
     </div>
   );
 
