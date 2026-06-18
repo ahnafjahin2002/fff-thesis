@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-
+import { playAudio } from '../utils/audio';
 // Import Generated Assets
 import loginBg from '../assets/login/login-bg.png';
 import loginMascot from '../assets/login/login-mascot.png';
@@ -59,11 +59,7 @@ export default function LoginPage() {
     { id: "child-4", name: "তিশা", img: avatarGirlHijab, bg: "#fff0f5", color: "#f06292" },
   ];
 
-  const playAudio = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'bn-BD';
-    window.speechSynthesis.speak(utterance);
-  };
+
 
   const handleAvatarSelect = (avatar) => {
     setSelectedAvatar(avatar);
