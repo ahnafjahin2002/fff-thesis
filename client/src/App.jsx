@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ReadingPage from './pages/ReadingPage';
 import DashboardPage from './pages/DashboardPage';
 import ParentsGuidePage from './pages/ParentsGuidePage';
-
+import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
 
 import './index.css';
@@ -14,6 +14,7 @@ export default function App() {
       <Routes>
 
         <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/parents" element={<ParentsGuidePage />} />
 

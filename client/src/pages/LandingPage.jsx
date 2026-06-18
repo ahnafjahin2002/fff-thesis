@@ -81,6 +81,7 @@ export default function LandingPage() {
           <Link to="/parents">অভিভাবকদের জন্য</Link>
           <a href="#resources">সম্পদ</a>
           <a href="#contact">যোগাযোগ</a>
+          <Link to="/login" style={{ fontWeight: 700, color: '#18b368', background: '#eef9f1', padding: '6px 14px', borderRadius: '12px' }}>লগইন</Link>
         </div>
 
         <button className="language-btn" type="button">
@@ -113,7 +114,7 @@ export default function LandingPage() {
           </motion.p>
 
           <motion.div className="hero-actions" variants={fadeUp}>
-            <Link className="primary-cta" to="/dashboard">
+            <Link className="primary-cta" to="/login">
               
 
               <span>
@@ -191,7 +192,7 @@ export default function LandingPage() {
             <p>{feature.text}</p>
 
             <a
-              href="/dashboard"
+              href="/login"
               className={`feature-arrow ${feature.arrow}`}
             >
               →

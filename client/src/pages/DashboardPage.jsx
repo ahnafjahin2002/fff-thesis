@@ -465,6 +465,7 @@ const NAV_ITEMS = [
   { id: "quiz", label: "কুইজ", icon: <PuzzleSVG /> },
   { id: "rewards", label: "অর্জন", icon: <TrophySVG /> },
   { id: "settings", label: "সেটিংস", icon: <SettingsSVG /> },
+  { id: "logout", label: "লগআউট", icon: <span style={{fontSize: 20}}>🚪</span> },
 ];
 
 // ─── Sub-pages ────────────────────────────────────────────────────────────────
@@ -1172,6 +1173,8 @@ function HomePage({
                 setSidebarOpen(false);
                 if (item.id === "home") { onNav("home"); }
                 else if (item.id === "read") { navigate("/reading"); }
+                else if (item.id === "quiz") { navigate("/quiz"); }
+                else if (item.id === "logout") { navigate("/login"); }
                 else if (["rewards", "settings"].includes(item.id)) { onNav(item.id); }
                 else { setView(item.id); }
               }}
