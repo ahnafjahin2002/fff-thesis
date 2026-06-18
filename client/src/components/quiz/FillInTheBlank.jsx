@@ -1,9 +1,79 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// ─── Word Bank: 55 questions covering 7 কার চিহ্ন ─────────────────────────────
-const FILL_BLANK_WORDS = [
+const WORD_IMAGES = {
   // ━━━ া (আ-কার) ━━━
+  "হাত":  { file: "hat.jpg",     prompt: "A real close-up photo of a human hand (palm facing up) on a plain white background" },
+  "মাছ":  { file: "mach.jpg",    prompt: "A real photo of a fresh fish on a white surface, clearly showing scales and fins" },
+  "গাছ":  { file: "gach.jpg",    prompt: "A real photo of a single green tree standing alone in a field, full tree visible" },
+  "নাক":  { file: "nak.jpg",     prompt: "A real close-up photo of a human nose from the front, neutral expression, plain background" },
+  "কান":  { file: "kan.jpg",     prompt: "A real close-up photo of a human ear, side profile, plain white background" },
+  "বাস":  { file: "bus.jpg",     prompt: "A real photo of a colorful Bangladeshi local bus on a road" },
+  "রাত":  { file: "raat.jpg",    prompt: "A real photo of a dark night sky with visible stars over a village or field" },
+  "ডাল":  { file: "dal.jpg",     prompt: "A real photo of a bowl of Bengali yellow lentil dal (soup) on a wooden table" },
+  "পাল":  { file: "pal.jpg",     prompt: "A real photo of a white sail on a traditional wooden boat on a river in Bangladesh" },
+  "তাল":  { file: "taal.jpg",    prompt: "A real photo of a palm tree (তাল গাছ) with fruit clusters, Bangladesh countryside" },
+
+  // ━━━ ি (ই-কার) ━━━
+  "বাড়ি": { file: "bari.jpg",   prompt: "A real photo of a simple rural house in Bangladesh with a tin roof and green surroundings" },
+  "দিন":  { file: "din.jpg",     prompt: "A real photo of bright sunny daytime sky over a green field, daylight scene" },
+  "মিল":  { file: "mil.jpg",     prompt: "A real photo of a textile or rice mill factory building in Bangladesh" },
+  "তিল":  { file: "til.jpg",     prompt: "A real close-up photo of sesame seeds (তিল) scattered on a white surface" },
+  "বিল":  { file: "bil.jpg",     prompt: "A real photo of a large open wetland (বিল) with still water and green vegetation in Bangladesh" },
+  "শিল":  { file: "shil.jpg",    prompt: "A real photo of a traditional Bangladeshi stone grinding slab (শিল) used in the kitchen" },
+  "পিঠ":  { file: "pith.jpg",    prompt: "A real photo of a person's bare upper back/shoulder area, plain background" },
+  "পাখি": { file: "pakhi.jpg",   prompt: "A real photo of a colorful small bird perched on a branch in Bangladesh — like a kingfisher or sparrow" },
+  "ছিল":  { file: "chhil.jpg",   prompt: "A real photo of an old sepia or faded photograph suggesting 'something that was/existed before'" },
+  "গিত":  { file: "git.jpg",     prompt: "A real photo of a person singing into a microphone on a stage with stage lighting" },
+
+  // ━━━ ী (ঈ-কার) ━━━
+  "নদী":  { file: "nodi.jpg",    prompt: "A real photo of a wide calm river (নদী) in rural Bangladesh with green banks" },
+  "বীর":  { file: "bir.jpg",     prompt: "A real photo of a statue or portrait of a brave soldier or freedom fighter (বীর) in Bangladesh" },
+  "গীত":  { file: "geet.jpg",    prompt: "A real photo of a classical music performance with a Bengali singer and harmonium" },
+  "শীল":  { file: "sheel.jpg",   prompt: "A real close-up photo of a smooth polished stone or a traditional শীল grinding stone" },
+  "তীর":  { file: "teer.jpg",    prompt: "A real photo of a riverbank (তীর) in Bangladesh — grassy shore meeting calm water" },
+
+  // ━━━ ু (উ-কার) ━━━
+  "বুক":  { file: "buk.jpg",     prompt: "A real photo of a person placing their hand on their chest/heart area, plain background" },
+  "চুল":  { file: "chul.jpg",    prompt: "A real close-up photo of long black hair (চুল) flowing or spread out on a white surface" },
+  "ফুল":  { file: "ful.jpg",     prompt: "A real photo of a bright colorful flower (ফুল) — like a marigold or rose — on a green background" },
+  "কুল":  { file: "kul.jpg",     prompt: "A real close-up photo of Indian jujube fruits (কুল/বরই) — small green-yellow round fruits on a branch" },
+  "ধুলো": { file: "dhulo.jpg",   prompt: "A real photo of dust (ধুলো) particles visible in a ray of sunlight in a room" },
+  "তুলা": { file: "tula.jpg",    prompt: "A real close-up photo of raw cotton (তুলা) bolls on a plant, fluffy white fibers visible" },
+  "মুখ":  { file: "mukh.jpg",    prompt: "A real close-up photo of a child's smiling face (মুখ) looking directly at camera, plain background" },
+  "গুণ":  { file: "gun.jpg",     prompt: "A real photo of a child receiving a certificate or award, symbolizing a good quality/virtue (গুণ)" },
+
+  // ━━━ ূ (ঊ-কার) ━━━
+  "মূল":  { file: "mul.jpg",     prompt: "A real close-up photo of a plant root (মূল) pulled from soil, showing root system" },
+  "ভুল":  { file: "bhul.jpg",    prompt: "A real photo of a student's exam paper with red cross marks showing mistakes (ভুল)" },
+  "ধূল":  { file: "dhul.jpg",    prompt: "A real photo of a dusty dirt road with visible dust cloud in dry weather" },
+
+  // ━━━ ে (এ-কার) ━━━
+  "মেলা": { file: "mela.jpg",    prompt: "A real photo of a colorful village fair (মেলা) in Bangladesh with stalls, lights, and crowd" },
+  "রেখা": { file: "rekha.jpg",   prompt: "A real photo of a pencil drawing a straight line (রেখা) on white paper" },
+  "ছেলে": { file: "chhele.jpg",  prompt: "A real photo of a young Bangladeshi boy (ছেলে) smiling, wearing school uniform" },
+  "বেলা": { file: "bela.jpg",    prompt: "A real photo of afternoon golden hour sunlight (বেলা) over a rice field in Bangladesh" },
+  "খেলা": { file: "khela.jpg",   prompt: "A real photo of children playing (খেলা) outdoors in a field in Bangladesh" },
+  "দেশ":  { file: "desh.jpg",    prompt: "A real photo of the Bangladesh flag waving in front of a clear blue sky" },
+  "নেশা": { file: "nesha.jpg",   prompt: "A real photo of a person deeply absorbed in playing a musical instrument or reading — showing passion/obsession (নেশা)" },
+  "ফেলা": { file: "fela.jpg",    prompt: "A real photo of a hand dropping or throwing a paper into a trash bin" },
+  "ঢেলা": { file: "dhela.jpg",   prompt: "A real close-up photo of a small clump or lump of mud/clay (ঢেলা) on a surface" },
+  "তেল":  { file: "tel.jpg",     prompt: "A real photo of a bottle of mustard oil (সরিষার তেল) next to yellow mustard flowers, Bangladesh kitchen context" },
+
+  // ━━━ ো (ও-কার) ━━━
+  "কোল":  { file: "kol.jpg",     prompt: "A real photo of a mother holding a small child on her lap (কোলে নেওয়া), warm family scene" },
+  "ঘোড়া": { file: "ghora.jpg",  prompt: "A real photo of a brown horse (ঘোড়া) standing in a field, full body visible" },
+  "ছোট":  { file: "chhot.jpg",   prompt: "A real photo of a very small kitten or puppy next to a larger adult animal to show size contrast (ছোট = small)" },
+  "ভোর":  { file: "bhor.jpg",    prompt: "A real photo of early dawn (ভোর) — pink and orange sunrise over a quiet village or river" },
+  "খোল":  { file: "khol.jpg",    prompt: "A real photo of a traditional Bengali drum called Khol (খোল) lying on a wooden surface" },
+  "বোন":  { file: "bon.jpg",     prompt: "A real photo of two sisters (বোন) smiling together, arms around each other, Bangladeshi family setting" },
+  "মোম":  { file: "mom.jpg",     prompt: "A real photo of a lit white candle (মোম) with wax dripping, dark background" },
+  "ঢোল":  { file: "dhol.jpg",    prompt: "A real photo of a dhol (ঢোল) drum being played at a Bengali celebration or festival" },
+  "মোড়":  { file: "mor.jpg",    prompt: "A real photo of a road intersection or street corner (মোড়) in a Bangladeshi town" },
+  "নোট":  { file: "note.jpg",    prompt: "A real photo of a Bangladeshi taka banknote (নোট) laid flat on a surface" },
+};
+
+const FILL_BLANK_WORDS = [
   { base: "হ_ত",  answer: "হাত",  choices: ["হাত",  "হিত",  "হুত",  "হেত"],  missingKar: "া" },
   { base: "ম_ছ",  answer: "মাছ",  choices: ["মাছ",  "মিছ",  "মুছ",  "মেছ"],  missingKar: "া" },
   { base: "গ_ছ",  answer: "গাছ",  choices: ["গাছ",  "গিছ",  "গুছ",  "গেছ"],  missingKar: "া" },
@@ -14,8 +84,6 @@ const FILL_BLANK_WORDS = [
   { base: "ড_ল",  answer: "ডাল",  choices: ["ডাল",  "ডিল",  "ডুল",  "ডেল"],  missingKar: "া" },
   { base: "প_ল",  answer: "পাল",  choices: ["পাল",  "পিল",  "পুল",  "পেল"],  missingKar: "া" },
   { base: "ত_ল",  answer: "তাল",  choices: ["তাল",  "তিল",  "তুল",  "তেল"],  missingKar: "া" },
-
-  // ━━━ ি (ই-কার) ━━━
   { base: "বাড়_", answer: "বাড়ি", choices: ["বাড়ী", "বাড়ি", "বারি", "বারী"], missingKar: "ি" },
   { base: "দ_ন",  answer: "দিন",  choices: ["দিন",  "দীন",  "দেন",  "দোন"],  missingKar: "ি" },
   { base: "ম_ল",  answer: "মিল",  choices: ["মিল",  "মীল",  "মেল",  "মোল"],  missingKar: "ি" },
@@ -26,15 +94,11 @@ const FILL_BLANK_WORDS = [
   { base: "পাখ_", answer: "পাখি", choices: ["পাখি", "পাখী", "পাখা", "পাখে"], missingKar: "ি" },
   { base: "ছ_ল",  answer: "ছিল",  choices: ["ছিল",  "ছীল",  "ছেল",  "ছোল"],  missingKar: "ি" },
   { base: "গ_ত",  answer: "গিত",  choices: ["গিত",  "গীত",  "গেত",  "গোত"],  missingKar: "ি" },
-
-  // ━━━ ী (ঈ-কার) ━━━
   { base: "নদ_",  answer: "নদী",  choices: ["নদি",  "নদী",  "নদা",  "নদে"],  missingKar: "ী" },
   { base: "ব_র",  answer: "বীর",  choices: ["বির",  "বীর",  "বের",  "বোর"],  missingKar: "ী" },
   { base: "গ_ত",  answer: "গীত",  choices: ["গিত",  "গীত",  "গেত",  "গোত"],  missingKar: "ী" },
   { base: "শ_ল",  answer: "শীল",  choices: ["শিল",  "শীল",  "শেল",  "শোল"],  missingKar: "ী" },
   { base: "ত_র",  answer: "তীর",  choices: ["তির",  "তীর",  "তের",  "তোর"],  missingKar: "ী" },
-
-  // ━━━ ু (উ-কার) ━━━
   { base: "ব_ক",  answer: "বুক",  choices: ["বুক",  "বূক",  "বোক",  "বেক"],  missingKar: "ু" },
   { base: "চ_ল",  answer: "চুল",  choices: ["চুল",  "চূল",  "চোল",  "চেল"],  missingKar: "ু" },
   { base: "ফ_ল",  answer: "ফুল",  choices: ["ফুল",  "ফূল",  "ফোল",  "ফেল"],  missingKar: "ু" },
@@ -43,13 +107,9 @@ const FILL_BLANK_WORDS = [
   { base: "ত_লা", answer: "তুলা", choices: ["তুলা", "তূলা", "তোলা", "তেলা"], missingKar: "ু" },
   { base: "ম_খ",  answer: "মুখ",  choices: ["মুখ",  "মূখ",  "মোখ",  "মেখ"],  missingKar: "ু" },
   { base: "গ_ণ",  answer: "গুণ",  choices: ["গুণ",  "গূণ",  "গোণ",  "গেণ"],  missingKar: "ু" },
-
-  // ━━━ ূ (ঊ-কার) ━━━
   { base: "ম_ল",  answer: "মূল",  choices: ["মুল",  "মূল",  "মেল",  "মোল"],  missingKar: "ূ" },
   { base: "ভ_ল",  answer: "ভুল",  choices: ["ভুল",  "ভূল",  "ভেল",  "ভোল"],  missingKar: "ু" },
   { base: "ধ_ল",  answer: "ধূল",  choices: ["ধুল",  "ধূল",  "ধেল",  "ধোল"],  missingKar: "ূ" },
-
-  // ━━━ ে (এ-কার) ━━━
   { base: "ম_লা", answer: "মেলা", choices: ["মিলা", "মীলা", "মেলা", "মোলা"], missingKar: "ে" },
   { base: "র_খা", answer: "রেখা", choices: ["রিখা", "রীখা", "রেখা", "রোখা"], missingKar: "ে" },
   { base: "ছ_লে", answer: "ছেলে", choices: ["ছিলে", "ছীলে", "ছেলে", "ছোলে"], missingKar: "ে" },
@@ -60,8 +120,6 @@ const FILL_BLANK_WORDS = [
   { base: "ফ_লা", answer: "ফেলা", choices: ["ফিলা", "ফুলা", "ফেলা", "ফোলা"], missingKar: "ে" },
   { base: "ঢ_লা", answer: "ঢেলা", choices: ["ঢিলা", "ঢুলা", "ঢেলা", "ঢোলা"], missingKar: "ে" },
   { base: "ত_ল",  answer: "তেল",  choices: ["তিল",  "তুল",  "তেল",  "তোল"],  missingKar: "ে" },
-
-  // ━━━ ো (ও-কার) ━━━
   { base: "ক_ল",  answer: "কোল",  choices: ["কুল",  "কূল",  "কোল",  "কেল"],  missingKar: "ো" },
   { base: "ঘ_ড়া", answer: "ঘোড়া", choices: ["ঘুড়া", "ঘূড়া", "ঘোড়া", "ঘেড়া"], missingKar: "ো" },
   { base: "ছ_ট",  answer: "ছোট",  choices: ["ছুট",  "ছিট",  "ছেট",  "ছোট"],  missingKar: "ো" },
@@ -152,6 +210,45 @@ const TIMER_SECONDS = 45;
 const FEEDBACK_DELAY = 1200;
 const TOTAL_QUESTIONS = FILL_BLANK_WORDS.length;
 
+const WordImage = ({ answer, size = 130, className = "" }) => {
+  const [imgError, setImgError] = useState(false);
+  const imgData = WORD_IMAGES[answer];
+
+  if (!imgData || imgError) {
+    return (
+      <div
+        style={{
+          width: size, height: size,
+          background: "#e8f5e9",
+          borderRadius: 12,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: size > 150 ? "2.5rem" : "1.6rem",
+          fontWeight: 800,
+          color: "#2e7d32",
+          fontFamily: "'Hind Siliguri', sans-serif",
+        }}
+        className={className}
+      >
+        {answer}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={`/images/quiz/hints/${imgData.file}`}
+      alt={answer}
+      width={size}
+      height={size}
+      style={{ borderRadius: 12, objectFit: "cover" }}
+      className={className}
+      onError={() => setImgError(true)}
+    />
+  );
+};
+
 // ═══════════════════════════════════════════════════════════════════════════════
 //  FillInTheBlank Component
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -166,6 +263,8 @@ export default function FillInTheBlank() {
   const [quizDone, setQuizDone] = useState(false);
   const [shuffledWords, setShuffledWords] = useState([]);
   const [shuffledChoices, setShuffledChoices] = useState([]);
+  const [showHint, setShowHint] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const timerRef = useRef(null);
   const feedbackTimerRef = useRef(null);
@@ -234,6 +333,8 @@ export default function FillInTheBlank() {
       setQuestionIndex(nextIdx);
       setSelected(null);
       setIsCorrect(null);
+      setShowHint(false);
+      setShowCelebration(false);
       setTimeLeft(TIMER_SECONDS);
     }
   }, [questionIndex, shuffledWords]);
@@ -246,20 +347,28 @@ export default function FillInTheBlank() {
     const correct = choice === currentQ.answer;
 
     setSelected(choice);
-    setIsCorrect(correct);
+    setShowHint(false);
 
     if (correct) {
+      setIsCorrect(true);
       setScore(prev => prev + 1);
       setStreak(prev => prev + 1);
       playAudioFeedback('correct');
+      setShowCelebration(true);
+
+      feedbackTimerRef.current = setTimeout(() => {
+        setShowCelebration(false);
+        advanceQuestion();
+      }, 1400);
     } else {
+      setIsCorrect(false);
       setStreak(0);
       playAudioFeedback('wrong');
-    }
 
-    feedbackTimerRef.current = setTimeout(() => {
-      advanceQuestion();
-    }, FEEDBACK_DELAY);
+      feedbackTimerRef.current = setTimeout(() => {
+        advanceQuestion();
+      }, 1200);
+    }
   };
 
   const handleReplay = () => {
@@ -285,6 +394,8 @@ export default function FillInTheBlank() {
     setTimeLeft(TIMER_SECONDS);
     setSelected(null);
     setIsCorrect(null);
+    setShowHint(false);
+    setShowCelebration(false);
     setQuizDone(false);
   };
 
@@ -540,6 +651,18 @@ export default function FillInTheBlank() {
       padding: '0 16px',
       fontFamily: "'Hind Siliguri', 'Noto Sans Bengali', sans-serif",
     }}>
+      <style>{`
+        @keyframes fadeScaleIn {
+          from { opacity: 0; transform: translateX(-50%) scale(0.85); }
+          to   { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+      `}</style>
+      
       {/* ── Top Stats Bar ── */}
       <div style={{
         display: 'flex',
@@ -713,6 +836,45 @@ export default function FillInTheBlank() {
         </div>
       </motion.div>
 
+      {/* ── Hint Button ── */}
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <div style={{ position: "relative", display: "inline-block" }}>
+          <button
+            onClick={() => setShowHint(h => !h)}
+            style={{
+              background: "#fff9c4",
+              border: "2px solid #f9a825",
+              borderRadius: 20,
+              padding: "6px 18px",
+              fontSize: "1rem",
+              cursor: "pointer",
+              color: "#f57f17",
+              fontFamily: "'Hind Siliguri', sans-serif",
+              fontWeight: 600,
+            }}
+          >
+            💡 হিন্ট
+          </button>
+
+          {showHint && (
+            <div style={{
+              position: "absolute",
+              bottom: "calc(100% + 8px)",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 50,
+              borderRadius: 16,
+              border: "3px solid #4CAF50",
+              overflow: "hidden",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+              animation: "fadeScaleIn 0.2s ease",
+            }}>
+              <WordImage answer={currentQ.answer} size={130} />
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* ── Choices Grid (2×2) ── */}
       <div style={{
         display: 'grid',
@@ -758,7 +920,7 @@ export default function FillInTheBlank() {
 
       {/* ── Feedback Banner ── */}
       <AnimatePresence>
-        {selected !== null && (
+        {selected !== null && !showCelebration && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -788,6 +950,54 @@ export default function FillInTheBlank() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* CELEBRATION MODAL — render at top level of component return */}
+      {showCelebration && (
+        <div style={{
+          position: "fixed", inset: 0,
+          background: "rgba(0,0,0,0.45)",
+          backdropFilter: "blur(6px)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 100,
+          animation: "fadeIn 0.25s ease",
+        }}>
+          <div style={{
+            background: "white",
+            borderRadius: 24,
+            padding: "28px 24px 24px",
+            display: "flex", flexDirection: "column",
+            alignItems: "center", gap: 12,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            maxWidth: 300, width: "90%",
+            position: "relative",
+          }}>
+            <div style={{ position: "relative" }}>
+              <WordImage answer={currentQ.answer} size={240} />
+              <div style={{
+                position: "absolute", top: -10, right: -10,
+                width: 40, height: 40,
+                background: "#4CAF50", borderRadius: "50%",
+                color: "white", fontSize: "1.4rem",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                border: "3px solid white",
+              }}>✓</div>
+            </div>
+            <div style={{
+              fontSize: "2.5rem", fontWeight: 800,
+              color: "#2e7d32",
+              fontFamily: "'Hind Siliguri', sans-serif",
+            }}>
+              {currentQ.answer}
+            </div>
+            <div style={{
+              fontSize: "1.2rem", color: "#388e3c", fontWeight: 600,
+              fontFamily: "'Hind Siliguri', sans-serif",
+            }}>
+              সাবাশ! সঠিক উত্তর! 🎉
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
