@@ -1,10 +1,106 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import DifficultySelector from './DifficultySelector';
 import ScoreBoard from './ScoreBoard';
 import QuizCard from './QuizCard';
 import RoundSummary from './RoundSummary';
+import FillInTheBlank from './FillInTheBlank';
 
+// ─── Quiz Mode Selector ────────────────────────────────────────────────────────
+function QuizModeSelector({ onSelect }) {
+  const modes = [
+    {
+      id: 'match',
+      icon: '🖼️',
+      title: 'শব্দ ও ছবি মেলাও',
+      desc: 'সঠিক ছবির সাথে শব্দ মেলাও',
+      color: '#1cb0f6',
+      bg: 'linear-gradient(135deg, #e3f2fd, #e8f4fd)',
+      borderColor: '#1cb0f6',
+    },
+    {
+      id: 'fill-blank',
+      icon: '✏️',
+      title: 'শূন্যস্থান পূরণ করো',
+      desc: 'কার চিহ্ন শেখো',
+      color: '#2e7d32',
+      bg: 'linear-gradient(135deg, #e8f5e9, #f1f8e9)',
+      borderColor: '#43a047',
+    },
+  ];
+
+  return (
+    <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+      <h2 style={{
+        fontSize: 28, fontWeight: 800, color: '#1d2b2a', marginBottom: 12,
+        fontFamily: "'Hind Siliguri', 'Noto Sans Bengali', sans-serif",
+      }}>
+        কুইজ বেছে নাও
+      </h2>
+      <p style={{
+        fontSize: 16, color: '#888', marginBottom: 32,
+        fontFamily: "'Hind Siliguri', 'Noto Sans Bengali', sans-serif",
+      }}>
+        কোন কুইজ খেলতে চাও?
+      </p>
+      <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
+        {modes.map((m, i) => (
+          <motion.div
+            key={m.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12 }}
+            whileHover={{ scale: 1.05, y: -6, boxShadow: '0 16px 40px rgba(0,0,0,0.12)' }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => onSelect(m.id)}
+            style={{
+              background: m.bg,
+              border: `5px solid ${m.borderColor}`,
+              borderBottomWidth: '12px',
+              borderRadius: 28,
+              padding: '32px 36px',
+              cursor: 'pointer',
+              boxShadow: '0 8px 28px rgba(0,0,0,0.06)',
+              minWidth: 240,
+              maxWidth: 300,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              transition: 'border-bottom-width 0.1s, transform 0.1s',
+            }}
+            onMouseDown={(e) => { e.currentTarget.style.borderBottomWidth = '5px'; e.currentTarget.style.transform = 'translateY(7px)'; }}
+            onMouseUp={(e) => { e.currentTarget.style.borderBottomWidth = '12px'; e.currentTarget.style.transform = 'translateY(0)'; }}
+          >
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: i * 0.4 }}
+              style={{ fontSize: 52 }}
+            >
+              {m.icon}
+            </motion.div>
+            <div style={{
+              fontSize: 24, fontWeight: 800, color: m.color, lineHeight: 1.3,
+              fontFamily: "'Hind Siliguri', 'Noto Sans Bengali', sans-serif",
+            }}>
+              {m.title}
+            </div>
+            <div style={{
+              fontSize: 15, color: '#666', fontWeight: 600,
+              fontFamily: "'Hind Siliguri', 'Noto Sans Bengali', sans-serif",
+            }}>
+              {m.desc}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main QuizModule ────────────────────────────────────────────────────────────
 export default function QuizModule() {
+  const [mode, setMode] = useState(null); // null | 'match' | 'fill-blank'
   const [difficulty, setDifficulty] = useState(null); // 1, 2, 3
   const [pairs, setPairs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -132,6 +228,36 @@ export default function QuizModule() {
     localStorage.setItem(key, JSON.stringify(mastery));
   };
 
+  // ── No mode selected: show quiz type selector ──
+  if (!mode) {
+    return <QuizModeSelector onSelect={setMode} />;
+  }
+
+  // ── Fill-in-the-blank mode ──
+  if (mode === 'fill-blank') {
+    return (
+      <div style={{ 
+        width: '100%', 
+        padding: '30px 20px', 
+        background: 'linear-gradient(180deg, #f1f8e9 0%, #e8f5e9 100%)',
+        borderRadius: 32,
+        boxShadow: 'inset 0 4px 20px rgba(255,255,255,0.8), 0 8px 32px rgba(0,0,0,0.06)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Decorative shapes */}
+        <div style={{ position: 'absolute', top: -30, left: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(46,125,50,0.06)' }} />
+        <div style={{ position: 'absolute', bottom: 50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(102,187,106,0.06)' }} />
+        <div style={{ position: 'absolute', top: '40%', left: '50%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,200,0,0.04)', transform: 'translate(-50%, -50%)' }} />
+
+        <div style={{ position: 'relative', zIndex: 10 }}>
+          <FillInTheBlank />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Match mode: existing word-image quiz flow ──
   if (!difficulty) {
     return <DifficultySelector onSelect={startGame} />;
   }
