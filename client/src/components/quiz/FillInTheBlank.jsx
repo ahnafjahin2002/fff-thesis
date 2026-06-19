@@ -190,7 +190,7 @@ const TIMER_SECONDS = 45;
 const FEEDBACK_DELAY = 1200;
 const TOTAL_QUESTIONS = FILL_BLANK_WORDS.length;
 
-const WordImage = ({ answer, size = 130, className = "" }) => {
+const WordImage = ({ answer, size = 130, className = "", objectFit = "contain" }) => {
   const [imgError, setImgError] = useState(false);
   const imgData = WORD_IMAGES[answer];
 
@@ -204,7 +204,7 @@ const WordImage = ({ answer, size = 130, className = "" }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: size > 150 ? "2.5rem" : "1.6rem",
+          fontSize: typeof size === 'number' && size > 150 ? "2.5rem" : "1.6rem",
           fontWeight: 800,
           color: "#2e7d32",
           fontFamily: "'Hind Siliguri', sans-serif",
@@ -220,9 +220,13 @@ const WordImage = ({ answer, size = 130, className = "" }) => {
     <img
       src={`/images/quiz/hints/${imgData.file}`}
       alt={answer}
-      width={size}
-      height={size}
-      style={{ borderRadius: 12, objectFit: "cover" }}
+      style={{ 
+        width: size, 
+        height: size, 
+        borderRadius: 12, 
+        objectFit: objectFit,
+        backgroundColor: '#f1f8e9'
+      }}
       className={className}
       onError={() => setImgError(true)}
     />
@@ -637,6 +641,11 @@ export default function FillInTheBlank() {
           to   { opacity: 1; transform: translateX(-50%) scale(1); }
         }
 
+        @keyframes zoomIn {
+          from { opacity: 0; transform: scale(0.85); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+
         @keyframes fadeIn {
           from { opacity: 0; }
           to   { opacity: 1; }
@@ -817,42 +826,44 @@ export default function FillInTheBlank() {
       </motion.div>
 
       {/* ── Hint Button ── */}
-      <div style={{ textAlign: 'center', marginBottom: 20 }}>
-        <div style={{ position: "relative", display: "inline-block" }}>
-          <button
-            onClick={() => setShowHint(h => !h)}
-            style={{
-              background: "#fff9c4",
-              border: "2px solid #f9a825",
-              borderRadius: 20,
-              padding: "6px 18px",
-              fontSize: "1rem",
-              cursor: "pointer",
-              color: "#f57f17",
-              fontFamily: "'Hind Siliguri', sans-serif",
-              fontWeight: 600,
-            }}
-          >
-            💡 হিন্ট
-          </button>
+      <div style={{ textAlign: 'center', marginBottom: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+        {showHint && (
+          <div style={{
+            width: 'clamp(110px, 25vw, 220px)',
+            height: 'clamp(110px, 25vw, 220px)',
+            borderRadius: 16,
+            border: "4px solid #a5d6a7",
+            background: "#f1f8e9",
+            overflow: "hidden",
+            boxShadow: "0 8px 24px rgba(46,125,50,0.15)",
+            animation: "zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+            padding: 8,
+          }}>
+            <WordImage answer={currentQ.answer} size="100%" objectFit="contain" />
+          </div>
+        )}
 
-          {showHint && (
-            <div style={{
-              position: "absolute",
-              bottom: "calc(100% + 8px)",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 50,
-              borderRadius: 16,
-              border: "3px solid #4CAF50",
-              overflow: "hidden",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
-              animation: "fadeScaleIn 0.2s ease",
-            }}>
-              <WordImage answer={currentQ.answer} size={130} />
-            </div>
-          )}
-        </div>
+        <button
+          onClick={() => setShowHint(h => !h)}
+          style={{
+            background: "#fff9c4",
+            border: "2px solid #f9a825",
+            borderRadius: 20,
+            padding: "8px 24px",
+            fontSize: "1.1rem",
+            cursor: "pointer",
+            color: "#f57f17",
+            fontFamily: "'Hind Siliguri', sans-serif",
+            fontWeight: 700,
+            boxShadow: "0 4px 12px rgba(245,127,23,0.15)",
+            transition: "all 0.2s",
+          }}
+          onMouseDown={(e) => e.currentTarget.style.transform = "scale(0.95)"}
+          onMouseUp={(e) => e.currentTarget.style.transform = "scale(1)"}
+          onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+        >
+          {showHint ? "💡 লুকান" : "💡 হিন্ট"}
+        </button>
       </div>
 
       {/* ── Choices Grid (2×2) ── */}
