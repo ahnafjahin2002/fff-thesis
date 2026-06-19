@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { playAudio } from '../utils/audio';
+import { playAudio as playBanglaAudio } from '../utils/audio';
 // Import Generated Assets
 import loginBg from '../assets/login/login-bg.png';
 import loginMascot from '../assets/login/login-mascot.png';
@@ -59,8 +59,9 @@ export default function LoginPage() {
     { id: "child-4", name: "তিশা", img: avatarGirlHijab, bg: "#fff0f5", color: "#f06292" },
   ];
 
-
-
+  const playAudio = (text) => {
+    playBanglaAudio(text, { playbackRate: 0.85 });
+  };
   const handleAvatarSelect = (avatar) => {
     setSelectedAvatar(avatar);
     playAudio(`${avatar.name} নির্বাচিত হয়েছে`);

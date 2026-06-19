@@ -15,6 +15,7 @@ import usePreferences from '../hooks/usePreferences';
 import { usePhoneme } from '../hooks/usePhoneme';
 import { segmentText } from '../utils/phonemeUtils';
 import { decomposeWord } from '../utils/banglaUtils';
+import { synthesizeBanglaTTS } from '../utils/ttsApi';
 import { DIFFICULTY_LEVELS, READING_CONTENT, getLevelInfo } from '../utils/readingContent';
 
 // Premium UI assets
@@ -377,9 +378,11 @@ export default function ReadingPage() {
   const [currentItemIdx, setCurrentItemIdx] = useState(0);
   const [customText, setCustomText] = useState('');
   const [customAnalysisActive, setCustomAnalysisActive] = useState(false);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 
   const textSectionRef = useRef(null);
   const autoStartCustomRef = useRef(false);
+  const audioRef = useRef(null);
 
   const levelContent = READING_CONTENT[currentLevel] || [];
   const currentItem = levelContent[currentItemIdx] || { text: '', title: '' };
@@ -413,6 +416,7 @@ export default function ReadingPage() {
     highlightColor,
     speed,
     startNarration,
+    startHighlightOnly,
     stopNarration,
     setHighlightColor,
     setSpeed,
@@ -421,40 +425,86 @@ export default function ReadingPage() {
     onEnd: handleNarrationEnd,
   });
 
-  useEffect(() => {
+  const stopAllAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+    setIsGeneratingAudio(false);
     stopNarration();
+  }, [stopNarration]);
+
+  const playAudioWithBackend = useCallback(async () => {
+    if (!displayText.trim()) return;
+
+    setIsGeneratingAudio(true);
     setTappedWord(null);
     setActiveIdx(-1);
-  }, [displayText, stopNarration]);
+
+    try {
+      const result = await synthesizeBanglaTTS(displayText, "female");
+
+      if (result && result.fullAudioUrl) {
+        const audio = new Audio(result.fullAudioUrl);
+        audio.playbackRate = speed;
+        audioRef.current = audio;
+
+        audio.onended = () => {
+          audioRef.current = null;
+        };
+
+        await audio.play();
+        
+        const effectiveDurationMs = result.durationMs / speed;
+        startHighlightOnly(effectiveDurationMs);
+      } else {
+        throw new Error("No audio URL returned");
+      }
+    } catch (err) {
+      console.warn("Backend TTS failed, falling back to browser SpeechSynthesis", err);
+      startNarration(); // Fallback
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  }, [displayText, speed, startHighlightOnly, startNarration]);
+
+  useEffect(() => {
+    stopAllAudio();
+    setTappedWord(null);
+    setActiveIdx(-1);
+  }, [displayText, stopAllAudio]);
+
+  useEffect(() => {
+    return () => {
+      stopAllAudio();
+    };
+  }, [stopAllAudio]);
 
   useEffect(() => {
     if (customAnalysisActive && autoStartCustomRef.current && displayText.trim()) {
       autoStartCustomRef.current = false;
 
       const timer = setTimeout(() => {
-        startNarration();
+        playAudioWithBackend();
       }, 180);
 
       return () => clearTimeout(timer);
     }
-  }, [customAnalysisActive, displayText, startNarration]);
+  }, [customAnalysisActive, displayText, playAudioWithBackend]);
 
   const handlePlayToggle = useCallback(() => {
-    if (isPlaying) {
-      stopNarration();
+    if (isPlaying || isGeneratingAudio) {
+      stopAllAudio();
       return;
     }
 
-    if (!displayText.trim()) return;
-
-    setTappedWord(null);
-    setActiveIdx(-1);
-    startNarration();
-  }, [isPlaying, displayText, startNarration, stopNarration]);
+    playAudioWithBackend();
+  }, [isPlaying, isGeneratingAudio, stopAllAudio, playAudioWithBackend]);
 
   const handleWordTap = useCallback(
     (word, wordData, wordIdx) => {
-      if (isPlaying) stopNarration();
+      if (isPlaying || isGeneratingAudio) stopAllAudio();
 
       const cleanWord = cleanDisplayWord(word) || word;
 
@@ -466,12 +516,12 @@ export default function ReadingPage() {
 
       setActiveIdx(wordIdx);
     },
-    [isPlaying, stopNarration]
+    [isPlaying, isGeneratingAudio, stopAllAudio]
   );
 
   const handlePrev = () => {
     if (currentItemIdx > 0) {
-      stopNarration();
+      stopAllAudio();
       setCurrentItemIdx(currentItemIdx - 1);
       setTappedWord(null);
       setActiveIdx(-1);
@@ -481,7 +531,7 @@ export default function ReadingPage() {
 
   const handleNext = () => {
     if (currentItemIdx < levelContent.length - 1) {
-      stopNarration();
+      stopAllAudio();
       setCurrentItemIdx(currentItemIdx + 1);
       setTappedWord(null);
       setActiveIdx(-1);
@@ -490,7 +540,7 @@ export default function ReadingPage() {
   };
 
   const handleLevelChange = (levelId) => {
-    stopNarration();
+    stopAllAudio();
     setCurrentLevel(levelId);
     setCurrentItemIdx(0);
     setTappedWord(null);
@@ -500,7 +550,7 @@ export default function ReadingPage() {
 
   const handleAnalyze = () => {
     if (customText.trim()) {
-      stopNarration();
+      stopAllAudio();
       autoStartCustomRef.current = true;
       setCustomAnalysisActive(true);
       setTappedWord(null);
@@ -522,6 +572,10 @@ export default function ReadingPage() {
 
   if (subView === null) return <ReadingHub onSelect={setSubView} />;
   if (subView === 'phoneme') return <PhonemeHighlighter onBack={() => setSubView(null)} />;
+
+  let btnLabel = 'শোনো';
+  if (isGeneratingAudio) btnLabel = 'অডিও তৈরি হচ্ছে...';
+  else if (isPlaying) btnLabel = 'থামাও';
 
   return (
     <div className="reading-page-shell">
@@ -554,12 +608,12 @@ export default function ReadingPage() {
 
         <div className="app-header-actions">
           <button
-            className={`header-btn ${isPlaying ? 'listen-button-active' : ''}`}
+            className={`header-btn ${(isPlaying || isGeneratingAudio) ? 'listen-button-active' : ''}`}
             aria-label="শোনো"
             onClick={handlePlayToggle}
           >
             <img src={speakerIcon} alt="" className="btn-icon-img" />
-            <span>{isPlaying ? 'থামাও' : 'শোনো'}</span>
+            <span>{btnLabel}</span>
           </button>
 
           <button className="header-btn save-btn" aria-label="সংরক্ষণ">
@@ -602,12 +656,12 @@ export default function ReadingPage() {
           <div className="reading-text-section">
             <div className="reading-text-col" ref={textSectionRef}>
               <button
-                className={`sentence-listen-btn ${isPlaying ? 'listen-button-active' : ''}`}
+                className={`sentence-listen-btn ${(isPlaying || isGeneratingAudio) ? 'listen-button-active' : ''}`}
                 aria-label="এই লেখাটি শুনুন"
                 onClick={handlePlayToggle}
               >
                 <img src={speakerIcon} alt="" />
-                <span>{isPlaying ? 'থামাও' : 'শোনো'}</span>
+                <span>{btnLabel}</span>
               </button>
 
               <div className="reading-level-label">

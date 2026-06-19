@@ -5,3 +5,14 @@ dist/
 .DS_Store
 *.log
 fff-thesis/
+
+server/venv/
+server/cache/
+server/generated-audio/
+server/scripts/banglatts_model/
+server/.env
+client/.env
+*.wav
+*.mp3
+__pycache__/
+

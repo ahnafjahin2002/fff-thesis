@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playAudio as playBanglaAudio } from '../../utils/audio';
 
 export default function PhonemeHighlighter({ onBack }) {
   return (
@@ -49,13 +50,7 @@ function LetterGrid() {
   const colors = ['#dbeeff','#fff3d4','#d9f5e5','#ede8ff','#ffe0e0'];
 
   const speakLetter = (letter) => {
-    if (typeof window === 'undefined') return;
-    const synth = window.speechSynthesis;
-    synth.cancel();
-    const utt = new SpeechSynthesisUtterance(letter);
-    utt.lang = 'bn-BD';
-    utt.rate = 0.7;
-    synth.speak(utt);
+    playBanglaAudio(letter, { playbackRate: 0.7 });
   };
 
   const renderLetter = (l, i) => (

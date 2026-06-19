@@ -22,6 +22,7 @@ export function usePhoneme(words = [], options = {}) {
   const [speed, setSpeed] = useState(0.85);
 
   const timerRef = useRef(null);
+  const highlightTimersRef = useRef([]);
   const utteranceRef = useRef(null);
   const synthRef = useRef(typeof window !== 'undefined' ? window.speechSynthesis : null);
   const playingRef = useRef(false);
@@ -38,6 +39,10 @@ export function usePhoneme(words = [], options = {}) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+
+    // Clear all highlight-only timers
+    highlightTimersRef.current.forEach((id) => clearTimeout(id));
+    highlightTimersRef.current = [];
 
     if (synthRef.current) {
       synthRef.current.cancel();
@@ -143,6 +148,100 @@ export function usePhoneme(words = [], options = {}) {
     processWord();
   }, [words, speed, animatePhonemes, onWordChange, onEnd]);
 
+  /**
+   * startHighlightOnly(totalDurationMs)
+   * ────────────────────────────────────
+   * Walk through words & phonemes on a pure timer.
+   * Does NOT use SpeechSynthesisUtterance.
+   * Designed to run alongside external audio (e.g. BanglaTTS).
+   *
+   * @param {number} totalDurationMs - total duration of the external audio
+   */
+  const startHighlightOnly = useCallback(
+    (totalDurationMs) => {
+      if (!words.length || !totalDurationMs || totalDurationMs <= 0) return;
+
+      // Cancel any running narration first
+      if (timerRef.current) clearTimeout(timerRef.current);
+      highlightTimersRef.current.forEach((id) => clearTimeout(id));
+      highlightTimersRef.current = [];
+      if (synthRef.current) synthRef.current.cancel();
+
+      setIsPlaying(true);
+      setIsPaused(false);
+      playingRef.current = true;
+
+      // --- Build a weighted schedule ---
+      // Each word gets time proportional to its phoneme count (min 1).
+      const phonemeCounts = words.map(
+        (w) => Math.max(1, (w.phonemes || []).length)
+      );
+      const totalWeight = phonemeCounts.reduce((a, b) => a + b, 0);
+
+      // Reserve 5 % of total time as inter-word gaps
+      const gapRatio = 0.05;
+      const totalGapMs = totalDurationMs * gapRatio;
+      const perWordGapMs = words.length > 1 ? totalGapMs / (words.length - 1) : 0;
+      const usableDurationMs = totalDurationMs - totalGapMs;
+
+      // Accumulate schedule: [{wordIdx, startMs, durationMs}]
+      let cursor = 0;
+      const schedule = words.map((w, idx) => {
+        const wordDurationMs = (phonemeCounts[idx] / totalWeight) * usableDurationMs;
+        const entry = { wordIdx: idx, startMs: cursor, durationMs: wordDurationMs };
+        cursor += wordDurationMs + (idx < words.length - 1 ? perWordGapMs : 0);
+        return entry;
+      });
+
+      // --- Set up all timers ---
+      schedule.forEach((entry) => {
+        const { wordIdx, startMs, durationMs } = entry;
+        const currentWord = words[wordIdx];
+        const phonemes = currentWord.phonemes || [];
+
+        // Timer to activate this word
+        const wordTimer = setTimeout(() => {
+          if (!playingRef.current) return;
+
+          setActiveWordIndex(wordIdx);
+          setActivePhonemeIndex(-1);
+          onWordChange?.(currentWord, wordIdx);
+
+          // Walk phonemes inside this word
+          if (phonemes.length > 0) {
+            const perPhonemeDuration = durationMs / phonemes.length;
+
+            phonemes.forEach((ph, pIdx) => {
+              const phonemeTimer = setTimeout(() => {
+                if (!playingRef.current) return;
+                setActivePhonemeIndex(pIdx);
+                onPhonemeChange?.(ph, pIdx, wordIdx);
+              }, pIdx * perPhonemeDuration);
+
+              highlightTimersRef.current.push(phonemeTimer);
+            });
+          }
+        }, startMs);
+
+        highlightTimersRef.current.push(wordTimer);
+      });
+
+      // Timer to finish at the end
+      const endTimer = setTimeout(() => {
+        if (!playingRef.current) return;
+        setIsPlaying(false);
+        setIsPaused(false);
+        setActiveWordIndex(-1);
+        setActivePhonemeIndex(-1);
+        playingRef.current = false;
+        onEnd?.();
+      }, totalDurationMs);
+
+      highlightTimersRef.current.push(endTimer);
+    },
+    [words, onWordChange, onPhonemeChange, onEnd]
+  );
+
   const togglePause = useCallback(() => {
     if (!isPlaying) return;
 
@@ -213,6 +312,7 @@ export function usePhoneme(words = [], options = {}) {
     speed,
 
     startNarration,
+    startHighlightOnly,
     stopNarration,
     togglePause,
     tapWord,

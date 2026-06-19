@@ -1,22 +1,32 @@
-/**
- * Utility for playing text-to-speech audio using the Web Speech API.
- * Defaults to Bengali language if available.
- */
+import { synthesizeBanglaTTS } from './ttsApi';
 
-export function playAudio(text, onEnd) {
+let currentAudio = null;
+
+/**
+ * Stops any currently playing audio (backend or browser fallback).
+ */
+export function stopAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+function fallbackToBrowserSpeech(text, onEnd, playbackRate = 1.0) {
   if (!('speechSynthesis' in window)) {
     console.warn('SpeechSynthesis is not supported in this browser.');
     if (onEnd) onEnd();
     return;
   }
 
-  // Cancel any ongoing speech
-  window.speechSynthesis.cancel();
-
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'bn-BD'; // Bengali (Bangladesh)
-  utterance.rate = 0.8; // Slightly slower for children
-  utterance.pitch = 1.1; // Slightly higher pitch
+  utterance.lang = 'bn-BD';
+  utterance.rate = 0.8 * playbackRate; // Slightly slower for children, adjusted by playbackRate
+  utterance.pitch = 1.1;
 
   if (onEnd) {
     utterance.onend = onEnd;
@@ -26,40 +36,66 @@ export function playAudio(text, onEnd) {
   window.speechSynthesis.speak(utterance);
 }
 
+async function playWithTTS(text, optionsOrOnEnd) {
+  let onEnd = null;
+  let playbackRate = 1.0;
+
+  if (typeof optionsOrOnEnd === 'function') {
+    onEnd = optionsOrOnEnd;
+  } else if (optionsOrOnEnd && typeof optionsOrOnEnd === 'object') {
+    onEnd = optionsOrOnEnd.onEnd;
+    if (optionsOrOnEnd.playbackRate !== undefined) {
+      playbackRate = optionsOrOnEnd.playbackRate;
+    }
+  }
+
+  stopAudio();
+
+  try {
+    const result = await synthesizeBanglaTTS(text, "female");
+    if (result && result.fullAudioUrl) {
+      const audio = new Audio(result.fullAudioUrl);
+      audio.playbackRate = playbackRate;
+      currentAudio = audio;
+
+      if (onEnd) {
+        audio.onended = () => {
+          if (currentAudio === audio) currentAudio = null;
+          onEnd();
+        };
+        audio.onerror = () => {
+          if (currentAudio === audio) currentAudio = null;
+          onEnd();
+        };
+      } else {
+        audio.onended = () => {
+          if (currentAudio === audio) currentAudio = null;
+        };
+      }
+
+      await audio.play();
+      return;
+    } else {
+      throw new Error("No audio URL returned");
+    }
+  } catch (err) {
+    console.warn("Backend TTS failed, falling back to browser SpeechSynthesis", err);
+    fallbackToBrowserSpeech(text, onEnd, playbackRate);
+  }
+}
+
+/**
+ * Utility for playing text-to-speech audio.
+ * Now defaults to local backend BanglaTTS with browser fallback.
+ */
+export function playAudio(text, optionsOrOnEnd) {
+  playWithTTS(text, optionsOrOnEnd);
+}
+
 /**
  * Attempts to play high-quality native Bangla TTS via the local server.
  * Falls back to browser Web Speech API if the server fails.
  */
-export async function playBanglaTTS(text, onEnd) {
-  try {
-    const response = await fetch('http://localhost:3001/api/tts/synthesize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, speed: 1.0 })
-    });
-
-    if (!response.ok) throw new Error('TTS server error');
-
-    const data = await response.json();
-
-    if (data.audioUrl) {
-      const audio = new Audio(`http://localhost:3001${data.audioUrl}`);
-      if (onEnd) {
-        audio.addEventListener('ended', onEnd);
-        audio.addEventListener('error', () => {
-          // If audio loading fails, fallback
-          playAudio(text, onEnd);
-        });
-      }
-      await audio.play();
-      return;
-    }
-
-    // No audio URL returned, fallback
-    playAudio(text, onEnd);
-
-  } catch (err) {
-    console.error('Failed to play native TTS, falling back:', err);
-    playAudio(text, onEnd);
-  }
+export async function playBanglaTTS(text, optionsOrOnEnd) {
+  await playWithTTS(text, optionsOrOnEnd);
 }

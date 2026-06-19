@@ -124,6 +124,67 @@ async function synthesizeWithHuggingFace(text, retries = 2) {
   return null;
 }
 
+const { spawn } = require('child_process');
+
+async function synthesizeWithLocalTTS(text, cacheKey) {
+  return new Promise((resolve) => {
+    const normalizedText = normalizeForTTS(text);
+    if (!normalizedText) return resolve(null);
+
+    console.log(`[TTS] Local Python request: "${normalizedText.substring(0, 50)}..."`);
+    
+    const pythonScript = path.join(__dirname, '../scripts/bangla_tts.py');
+    const outDir = CACHE_DIR;
+    const filename = `${cacheKey}.wav`;
+    const pythonExec = path.join(__dirname, '../venv/bin/python3');
+    const pythonCmd = fs.existsSync(pythonExec) ? pythonExec : 'python3';
+
+    const child = spawn(pythonCmd, [pythonScript]);
+    
+    let output = '';
+    let errorOutput = '';
+
+    child.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+
+    child.stderr.on('data', (data) => {
+      errorOutput += data.toString();
+    });
+
+    child.on('close', (code) => {
+      if (code !== 0) {
+        console.error(`[TTS] Local Python error (code ${code}):`, errorOutput);
+        return resolve(null);
+      }
+      
+      try {
+        const result = JSON.parse(output.trim());
+        if (result.success && result.audioPath) {
+          console.log(`[TTS] Local Python success`);
+          const audioBuffer = fs.readFileSync(result.audioPath);
+          return resolve(audioBuffer);
+        } else {
+          console.error(`[TTS] Local Python script failed:`, result.error, result.traceback);
+          return resolve(null);
+        }
+      } catch (err) {
+        console.error(`[TTS] Failed to parse local Python output:`, output, errorOutput);
+        return resolve(null);
+      }
+    });
+    
+    const payload = JSON.stringify({
+      text: normalizedText,
+      voice: 'female',
+      outDir: outDir,
+      filename: filename
+    });
+    child.stdin.write(payload);
+    child.stdin.end();
+  });
+}
+
 /**
  * synthesize(text, speed)
  * ────────────────────────
@@ -144,14 +205,22 @@ async function synthesize(text, speed = 1.0) {
     return { audioBuffer, cacheKey, source: 'cache', cached: true };
   }
 
-  // 2. Try HuggingFace VITS
+  // 2. Try Local Python BanglaTTS
+  if (process.env.TTS_PROVIDER === 'local') {
+    const localAudio = await synthesizeWithLocalTTS(text, cacheKey);
+    if (localAudio) {
+      return { audioBuffer: localAudio, cacheKey, source: 'local', cached: false };
+    }
+  }
+
+  // 3. Try HuggingFace VITS
   const hfAudio = await synthesizeWithHuggingFace(text);
   if (hfAudio) {
     saveToCache(cacheKey, hfAudio);
     return { audioBuffer: hfAudio, cacheKey, source: 'huggingface', cached: false };
   }
 
-  // 3. No TTS available — return null (client will use browser SpeechSynthesis)
+  // 4. No TTS available — return null (client will use browser SpeechSynthesis)
   console.warn('[TTS] All TTS engines failed — client must use browser fallback');
   return { audioBuffer: null, cacheKey, source: 'none', cached: false };
 }

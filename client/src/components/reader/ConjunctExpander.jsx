@@ -14,6 +14,7 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { decomposeWord } from '../../utils/banglaUtils';
+import { playAudio as playBanglaAudio } from '../../utils/audio';
 
 export default function ConjunctExpander({ word, parts, isOpen, onClose }) {
   const popupRef = useRef(null);
@@ -124,7 +125,7 @@ export default function ConjunctExpander({ word, parts, isOpen, onClose }) {
           {/* Pronunciation */}
           <div className="conjunct-pronunciation">
             <span className="conjunct-pron-text">উচ্চারণ: {word}</span>
-            <button className="conjunct-pron-btn" aria-label="উচ্চারণ শুনুন">🔊</button>
+            <button className="conjunct-pron-btn" aria-label="উচ্চারণ শুনুন" onClick={() => playBanglaAudio(word, { playbackRate: 0.7 })}>🔊</button>
           </div>
         </motion.div>
       )}

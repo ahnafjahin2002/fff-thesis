@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playAudio as playBanglaAudio } from '../../utils/audio';
 
 const WORD_IMAGES = {
   // ━━━ া (আ-কার) ━━━
@@ -181,28 +182,7 @@ function playAudioFeedback(type) {
 
 // ─── TTS via existing /api/tts endpoint ────────────────────────────────────────
 async function speakWord(word) {
-  try {
-    const res = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: word }),
-    });
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.play();
-    audio.onended = () => URL.revokeObjectURL(url);
-  } catch (e) {
-    // Fallback to browser SpeechSynthesis
-    try {
-      const msg = new SpeechSynthesisUtterance();
-      msg.text = word;
-      msg.lang = 'bn-BD';
-      window.speechSynthesis.speak(msg);
-    } catch (err) {
-      console.log("TTS fallback error", err);
-    }
-  }
+  playBanglaAudio(word, { playbackRate: 0.8 });
 }
 
 // ─── Constants ─────────────────────────────────────────────────────────────────

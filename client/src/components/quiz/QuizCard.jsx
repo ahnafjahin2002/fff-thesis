@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MatchLine from './MatchLine';
+import { playAudio as playBanglaAudio } from '../../utils/audio';
 
 export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
   const [words, setWords] = useState([]);
@@ -105,10 +106,7 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
   }, [selectedWord, selectedImage]);
 
   const speak = (text) => {
-    const msg = new SpeechSynthesisUtterance();
-    msg.text = text;
-    msg.lang = 'bn-BD';
-    window.speechSynthesis.speak(msg);
+    playBanglaAudio(text, { playbackRate: 0.8 });
   };
 
   // Dynamically calculate card height to fill the viewport nicely
