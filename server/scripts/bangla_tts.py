@@ -5,7 +5,8 @@ import traceback
 
 def main():
     try:
-        input_data = sys.stdin.read()
+        # Read stdin as raw bytes and decode as UTF-8 (Windows defaults to cp1252)
+        input_data = sys.stdin.buffer.read().decode('utf-8')
         if not input_data:
             print(json.dumps({"success": False, "error": "No input data"}))
             return

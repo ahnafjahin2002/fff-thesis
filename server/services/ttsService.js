@@ -136,10 +136,17 @@ async function synthesizeWithLocalTTS(text, cacheKey) {
     const pythonScript = path.join(__dirname, '../scripts/bangla_tts.py');
     const outDir = CACHE_DIR;
     const filename = `${cacheKey}.wav`;
-    const pythonExec = path.join(__dirname, '../venv/bin/python3');
-    const pythonCmd = fs.existsSync(pythonExec) ? pythonExec : 'python3';
+    // Cross-platform: check Windows venv path first, then Unix, then system python
+    const pythonExecWin = path.join(__dirname, '../venv/Scripts/python.exe');
+    const pythonExecUnix = path.join(__dirname, '../venv/bin/python3');
+    const pythonCmd = fs.existsSync(pythonExecWin) ? pythonExecWin
+      : fs.existsSync(pythonExecUnix) ? pythonExecUnix
+      : (process.platform === 'win32' ? 'python' : 'python3');
 
-    const child = spawn(pythonCmd, [pythonScript]);
+    // -X utf8 forces UTF-8 mode on Windows (needed for Bangla romanization)
+    const child = spawn(pythonCmd, ['-X', 'utf8', pythonScript], {
+      env: { ...process.env, PYTHONUTF8: '1' }
+    });
     
     let output = '';
     let errorOutput = '';
