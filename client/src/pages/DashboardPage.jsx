@@ -1223,9 +1223,15 @@ function HomePage({
               <div style={{ fontWeight: 700, color: "#1d2b2a", fontSize: 15, lineHeight: 1.2 }}>
                 {user.name}
               </div>
-              <div style={{ fontSize: 12, color: "#18b368", fontWeight: 600 }}>
-                লেভেল {user.level} 📊
-              </div>
+              {user.role === 'parent' || user.role === 'teacher' ? (
+                <div style={{ fontSize: 12, color: "#18b368", fontWeight: 600 }}>
+                  {user.role === 'parent' ? 'অভিভাবক 👨‍👩‍👧' : 'শিক্ষক 👨‍🏫'}
+                </div>
+              ) : (
+                <div style={{ fontSize: 12, color: "#18b368", fontWeight: 600 }}>
+                  লেভেল {user.level} 📊
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1246,10 +1252,13 @@ function HomePage({
             <SunSVG />
           </div>
 
-          {/* Text */}
           <div className="hero-text">
             <div className="hero-title">হ্যালো, {user.name}! 👋</div>
-            <div className="hero-sub">চলো আজ নতুন কিছু শিখি 📚</div>
+            <div className="hero-sub">
+              {user.role === 'parent' || user.role === 'teacher' 
+                ? "বাচ্চাদের শিখতে সাহায্য করি 📚" 
+                : "চলো আজ নতুন কিছু শিখি 📚"}
+            </div>
           </div>
 
           {/* Kid illustration */}
@@ -1390,6 +1399,7 @@ export default function App() {
   const mappedUser = {
     name: userData?.name || DEFAULT_USER.name,
     level: progressData?.currentLevel || DEFAULT_USER.level,
+    role: userData?.role || 'child',
     avatarBg: "#c8f0c8",
   };
   

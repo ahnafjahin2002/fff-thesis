@@ -13,13 +13,23 @@ export const getUser = async (userId) => {
 };
 
 export const createUser = async (data) => {
-  const response = await fetch(`${API_URL}/api/users`, {
+  const res = await fetch(`${API_URL}/api/users`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   });
-  if (!response.ok) throw new Error('Failed to create user');
-  return response.json();
+  if (!res.ok) throw new Error('Failed to create user');
+  return res.json();
+};
+
+export const loginUser = async (userId, pin) => {
+  const res = await fetch(`${API_URL}/api/users/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, pin })
+  });
+  if (!res.ok) throw new Error('Invalid PIN or failed to login');
+  return res.json();
 };
 
 export const getProgress = async (userId) => {
