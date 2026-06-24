@@ -6,4 +6,3 @@ __pycache__/
 # Audio & Models
 cache/
 generated-audio/
-models/

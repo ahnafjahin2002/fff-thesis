@@ -15,8 +15,21 @@ const { estimateWordTimings, estimateFullTimings } = require('./services/phoneme
 const { normalizeForTTS } = require('./services/banglaTextNormalizer');
 const { generateQuiz } = require('./services/quizService');
 
+// ── Database Connection ──
+const connectDB = require('./config/db');
+
+// ── New API Routes ──
+const healthRoutes = require('./routes/healthRoutes');
+const userRoutes = require('./routes/userRoutes');
+const progressRoutes = require('./routes/progressRoutes');
+const sessionRoutes = require('./routes/sessionRoutes');
+const bornoBazarRoutes = require('./routes/bornoBazarRoutes');
+
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
+
+// Connect to MongoDB (Safe fallback if uri is missing)
+connectDB();
 
 // ── Middleware ──
 app.use(cors());
@@ -25,14 +38,12 @@ app.use(express.json());
 // Serve cached audio files statically
 app.use('/audio', express.static(path.resolve(process.env.CACHE_DIR || './cache')));
 
-// ── Health Check ──
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    service: 'fff-thesis-tts-server',
-    timestamp: new Date().toISOString(),
-  });
-});
+// ── New Base API Routes ──
+app.use('/api', healthRoutes); // Provides /api/health and /api/data-status
+app.use('/api/users', userRoutes);
+app.use('/api/progress', progressRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/borno-bazar', bornoBazarRoutes);
 
 // ── TTS Synthesis ──
 // POST /api/tts/synthesize
