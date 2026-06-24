@@ -8,6 +8,7 @@ import imgMascotThink from '../../assets/mascot-think.png';
 import imgMascotCelebrate from '../../assets/mascot-celebrate.png';
 import imgMascotEncourage from '../../assets/mascot-encourage.png';
 import imgStreetBgBlur from '../../assets/street-bg-blur.png';
+import { createSession, updateBornoBazarProgress } from '../../utils/api';
 
 // ─── Fixed canvas dimensions to avoid CSS scaling issues ──────────────────────
 const CANVAS_W = 460;
@@ -170,6 +171,26 @@ export default function Phase1Tracing({ onComplete, onBack }) {
       const nextIdx = currentStrokeIdx + 1;
       if (nextIdx >= letterData.strokes.length) {
         setMascotState('celebrate');
+
+        const activeUserId = localStorage.getItem('activeUserId');
+        if (activeUserId) {
+          updateBornoBazarProgress(activeUserId, {
+            letter: state.currentLetter,
+            phaseCompleted: 1,
+            starsEarned: 1
+          }).catch(err => console.warn(err));
+          
+          createSession({
+            userId: activeUserId,
+            feature: 'borno_bazar',
+            activityType: 'tracing',
+            score: 100,
+            starsEarned: 1,
+            accuracy: 100,
+            durationMs: 15000
+          }).catch(err => console.warn(err));
+        }
+
         setTimeout(() => onComplete(), 1200);
       } else {
         setCurrentStrokeIdx(nextIdx);

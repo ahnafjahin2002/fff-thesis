@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MatchLine from './MatchLine';
 import { playAudio as playBanglaAudio } from '../../utils/audio';
+import { createSession, updateProgress } from '../../utils/api';
 
 export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
   const [words, setWords] = useState([]);
@@ -81,10 +82,34 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
   useEffect(() => {
     if (selectedWord && selectedImage) {
       const isMatch = selectedWord.id === selectedImage.id;
+      const activeUserId = localStorage.getItem('activeUserId');
+
+      const saveQuizActivity = async (correct) => {
+        if (!activeUserId) return;
+        try {
+          await createSession({
+            userId: activeUserId,
+            feature: 'quiz',
+            activityType: 'multiple_choice',
+            score: correct ? 100 : 0,
+            starsEarned: correct ? 1 : 0,
+            accuracy: correct ? 100 : 0,
+            durationMs: 5000 // estimated
+          });
+          
+          await updateProgress(activeUserId, {
+            starsEarned: correct ? 1 : 0,
+            skill: 'quiz'
+          });
+        } catch (err) {
+          console.warn("Failed to save quiz activity", err);
+        }
+      };
       
       if (isMatch) {
         setMatchedPairs(prev => [...prev, { wordId: selectedWord.id, imageId: selectedImage.id }]);
         onMatch(selectedWord);
+        saveQuizActivity(true);
         
         if (matchedPairs.length + 1 === pairs.length) {
           setTimeout(() => {
@@ -94,6 +119,7 @@ export default function QuizCard({ pairs, onMatch, onWrongMatch, onComplete }) {
       } else {
         setWrongAnimation({ wordId: selectedWord.id, imageId: selectedImage.id });
         onWrongMatch(selectedWord, selectedImage);
+        saveQuizActivity(false);
         
         setTimeout(() => {
           setWrongAnimation(null);

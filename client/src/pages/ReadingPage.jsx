@@ -16,6 +16,7 @@ import { usePhoneme } from '../hooks/usePhoneme';
 import { segmentText } from '../utils/phonemeUtils';
 import { decomposeWord } from '../utils/banglaUtils';
 import { synthesizeBanglaTTS } from '../utils/ttsApi';
+import { createSession, updateProgress } from '../utils/api';
 import { DIFFICULTY_LEVELS, READING_CONTENT, getLevelInfo } from '../utils/readingContent';
 
 // Premium UI assets
@@ -519,6 +520,38 @@ export default function ReadingPage() {
     [isPlaying, isGeneratingAudio, stopAllAudio]
   );
 
+  const handleSaveProgress = async () => {
+    const activeUserId = localStorage.getItem('activeUserId');
+    if (!activeUserId) {
+      console.warn("No active user to save progress for.");
+      return;
+    }
+    try {
+      await createSession({
+        userId: activeUserId,
+        feature: 'reading',
+        activityType: 'read_aloud',
+        score: 100,
+        starsEarned: 1,
+        accuracy: 100,
+        durationMs: 30000, // Estimated duration
+        details: {
+          text: displayText,
+          source: 'ReadingPage',
+          level: currentLevel
+        }
+      });
+      
+      await updateProgress(activeUserId, {
+        starsEarned: 1,
+        skill: 'reading'
+      });
+      console.log("Reading progress saved!");
+    } catch (err) {
+      console.warn("Failed to save progress:", err);
+    }
+  };
+
   const handlePrev = () => {
     if (currentItemIdx > 0) {
       stopAllAudio();
@@ -616,7 +649,7 @@ export default function ReadingPage() {
             <span>{btnLabel}</span>
           </button>
 
-          <button className="header-btn save-btn" aria-label="সংরক্ষণ">
+          <button className="header-btn save-btn" aria-label="সংরক্ষণ" onClick={handleSaveProgress}>
             <span className="bookmark-icon">🔖</span>
             <span>সংরক্ষণ</span>
           </button>

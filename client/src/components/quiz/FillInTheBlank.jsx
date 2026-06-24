@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playAudio as playBanglaAudio } from '../../utils/audio';
-
+import { createSession, updateProgress } from '../../utils/api';
 const WORD_IMAGES = {
   // ━━━ া (আ-কার) ━━━
   "হাত":  { file: "hat.jpg",     prompt: "A real close-up photo of a human hand (palm facing up) on a plain white background" },
@@ -304,6 +304,20 @@ export default function FillInTheBlank() {
     setStreak(0);
     playAudioFeedback('wrong');
 
+    const activeUserId = localStorage.getItem('activeUserId');
+    if (activeUserId) {
+      createSession({
+        userId: activeUserId,
+        feature: 'quiz',
+        activityType: 'fill_in_the_blank',
+        score: 0,
+        starsEarned: 0,
+        accuracy: 0,
+        durationMs: 45000
+      }).catch(err => console.warn("Failed to save timeout activity", err));
+      updateProgress(activeUserId, { starsEarned: 0, skill: 'spelling' }).catch(err => console.warn(err));
+    }
+
     feedbackTimerRef.current = setTimeout(() => {
       advanceQuestion();
     }, FEEDBACK_DELAY);
@@ -333,12 +347,36 @@ export default function FillInTheBlank() {
     setSelected(choice);
     setShowHint(false);
 
+    const saveFillBlankActivity = async (isCorrectAnswer) => {
+      const activeUserId = localStorage.getItem('activeUserId');
+      if (!activeUserId) return;
+      try {
+        await createSession({
+          userId: activeUserId,
+          feature: 'quiz',
+          activityType: 'fill_in_the_blank',
+          score: isCorrectAnswer ? 100 : 0,
+          starsEarned: isCorrectAnswer ? 1 : 0,
+          accuracy: isCorrectAnswer ? 100 : 0,
+          durationMs: 5000
+        });
+        
+        await updateProgress(activeUserId, {
+          starsEarned: isCorrectAnswer ? 1 : 0,
+          skill: 'spelling'
+        });
+      } catch (err) {
+        console.warn("Failed to save fill-in-blank activity", err);
+      }
+    };
+
     if (correct) {
       setIsCorrect(true);
       setScore(prev => prev + 1);
       setStreak(prev => prev + 1);
       playAudioFeedback('correct');
       setShowCelebration(true);
+      saveFillBlankActivity(true);
 
       feedbackTimerRef.current = setTimeout(() => {
         setShowCelebration(false);
@@ -348,6 +386,7 @@ export default function FillInTheBlank() {
       setIsCorrect(false);
       setStreak(0);
       playAudioFeedback('wrong');
+      saveFillBlankActivity(false);
 
       feedbackTimerRef.current = setTimeout(() => {
         advanceQuestion();

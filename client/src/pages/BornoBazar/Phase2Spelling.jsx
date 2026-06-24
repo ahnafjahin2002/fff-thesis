@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { PHASE2_WORDS, buildTilePool } from "../../data/words";
 import "./Phase2Spelling.css";
+import { createSession, updateBornoBazarProgress } from '../../utils/api';
 
 export default function Phase2Spelling({ shopColor = "#18b368", onComplete, onBack }) {
   const [wordIndex, setWordIndex] = useState(0);
@@ -82,6 +83,26 @@ export default function Phase2Spelling({ shopColor = "#18b368", onComplete, onBa
   function handleWordComplete(placed) {
     setWordSuccess(true);
     setMascotState("celebrate");
+
+    const activeUserId = localStorage.getItem('activeUserId');
+    if (activeUserId) {
+      updateBornoBazarProgress(activeUserId, {
+        letter: currentWord.letters.join(''),
+        phaseCompleted: 2,
+        starsEarned: 1
+      }).catch(err => console.warn(err));
+
+      createSession({
+        userId: activeUserId,
+        feature: 'borno_bazar',
+        activityType: 'spelling',
+        score: 100,
+        starsEarned: 1,
+        accuracy: 100,
+        durationMs: 10000
+      }).catch(err => console.warn(err));
+    }
+
     setTimeout(() => {
       setCompletedProducts((prev) => [...prev, currentWord]);
       // Move to next word or finish

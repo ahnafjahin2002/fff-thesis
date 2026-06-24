@@ -26,6 +26,7 @@ const STEPS = {
 };
 
 import { playBanglaTTS } from '../../utils/audio';
+import { createSession, updateBornoBazarProgress } from '../../utils/api';
 
 export default function Phase3Conversation({ shopColor = '#18b368', onComplete, onBack }) {
   const { state, dispatch } = useGameState();
@@ -255,6 +256,26 @@ export default function Phase3Conversation({ shopColor = '#18b368', onComplete, 
     playBanglaTTS(fullSentence);
 
     dispatch({ type: 'EARN_STAR', count: 2 });
+
+    // Save progress to MongoDB
+    const activeUserId = localStorage.getItem('activeUserId');
+    if (activeUserId) {
+      updateBornoBazarProgress(activeUserId, {
+        letter: currentConvo.productId,
+        phaseCompleted: 3,
+        starsEarned: 2
+      }).catch(err => console.warn(err));
+
+      createSession({
+        userId: activeUserId,
+        feature: 'borno_bazar',
+        activityType: 'conversation',
+        score: 100,
+        starsEarned: 2,
+        accuracy: 100,
+        durationMs: 20000
+      }).catch(err => console.warn(err));
+    }
 
     // Customer leaves after celebration
     setTimeout(() => {

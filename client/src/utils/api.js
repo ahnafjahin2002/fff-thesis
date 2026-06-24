@@ -50,3 +50,38 @@ export const updateProgress = async (userId, data) => {
   if (!response.ok) throw new Error('Failed to update progress');
   return response.json();
 };
+
+export const createSession = async (data) => {
+  const response = await fetch(`${API_URL}/api/sessions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to create session');
+  return response.json();
+};
+
+export const getSessions = async (userId) => {
+  const response = await fetch(`${API_URL}/api/sessions/${userId}`);
+  if (!response.ok) throw new Error('Failed to fetch sessions');
+  return response.json();
+};
+
+export const updateBornoBazarProgress = async (userId, data) => {
+  const response = await fetch(`${API_URL}/api/borno-bazar/${userId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to update BornoBazar progress');
+  return response.json();
+};
+
+export const getBornoBazarProgress = async (userId) => {
+  const response = await fetch(`${API_URL}/api/borno-bazar/${userId}`);
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error('Failed to fetch BornoBazar progress');
+  }
+  return response.json();
+};
