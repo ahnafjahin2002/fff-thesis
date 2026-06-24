@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { playAudio as playBanglaAudio } from '../utils/audio';
+import { getUsers, createUser } from '../utils/api';
 // Import Generated Assets
 import loginBg from '../assets/login/login-bg.png';
 import loginMascot from '../assets/login/login-mascot.png';
@@ -45,6 +46,8 @@ export default function LoginPage() {
   const [view, setView] = useState("avatar");
   
   // Student State
+  const [avatars, setAvatars] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [pin, setPin] = useState("");
   
@@ -52,12 +55,50 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const avatars = [
-    { id: "child-1", name: "রাফি", img: avatarBoyGreen, bg: "#eef9f1", color: "#18b368" },
-    { id: "child-2", name: "মীনা", img: avatarGirlYellow, bg: "#fffbee", color: "#f5a623" },
-    { id: "child-3", name: "আদিব", img: avatarBoyBlue, bg: "#e0f2fe", color: "#3b82f6" },
-    { id: "child-4", name: "তিশা", img: avatarGirlHijab, bg: "#fff0f5", color: "#f06292" },
-  ];
+  const avatarMap = {
+    'avatar-boy-green': { img: avatarBoyGreen, bg: "#eef9f1", color: "#18b368" },
+    'avatar-girl-yellow': { img: avatarGirlYellow, bg: "#fffbee", color: "#f5a623" },
+    'avatar-boy-blue': { img: avatarBoyBlue, bg: "#e0f2fe", color: "#3b82f6" },
+    'avatar-girl-hijab': { img: avatarGirlHijab, bg: "#fff0f5", color: "#f06292" },
+    'avatar-1': { img: avatarBoyGreen, bg: "#eef9f1", color: "#18b368" }
+  };
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        let users = await getUsers();
+        let children = users.filter(u => u.role === 'child');
+        
+        if (children.length === 0) {
+          const demoChild = await createUser({
+            name: "Aarav",
+            role: "child",
+            avatar: "avatar-1",
+            pin: "1234"
+          });
+          children = [demoChild];
+        }
+        
+        const formattedAvatars = children.map(child => {
+          const style = avatarMap[child.avatar] || avatarMap['avatar-boy-green'];
+          return {
+            id: child._id,
+            name: child.name,
+            img: style.img,
+            bg: style.bg,
+            color: style.color,
+            pin: child.pin || "1234"
+          };
+        });
+        setAvatars(formattedAvatars);
+      } catch (err) {
+        console.error("Failed to load users:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUsers();
+  }, []);
 
   const playAudio = (text) => {
     playBanglaAudio(text, { playbackRate: 0.85 });
@@ -104,6 +145,18 @@ export default function LoginPage() {
       playAudio("আবার চেষ্টা করি");
       return;
     }
+    if (selectedAvatar && pin !== selectedAvatar.pin) {
+      playAudio("ভুল পিন, আবার চেষ্টা করি");
+      return;
+    }
+    
+    // Save to localStorage
+    if (selectedAvatar) {
+      localStorage.setItem('activeUserId', selectedAvatar.id);
+      localStorage.setItem('activeUserName', selectedAvatar.name);
+      localStorage.setItem('activeUserAvatar', selectedAvatar.img);
+    }
+    
     playAudio("চলো শিখি!");
     setTimeout(() => {
       navigate("/dashboard");
@@ -235,7 +288,10 @@ export default function LoginPage() {
               তোমার ছবি বেছে নাও
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 36 }}>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#18b368' }}>লোড হচ্ছে...</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 36 }}>
               {avatars.map(avatar => {
                 const isSelected = selectedAvatar?.id === avatar.id;
                 return (
@@ -280,7 +336,8 @@ export default function LoginPage() {
                   </motion.div>
                 );
               })}
-            </div>
+              </div>
+            )}
 
             <motion.button
               whileHover={{ scale: 1.02 }}

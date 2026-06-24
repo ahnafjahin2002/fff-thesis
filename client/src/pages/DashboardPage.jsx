@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
 import BornoBazar from "./BornoBazar";
 import QuizModule from "../components/quiz/QuizModule";
+import { getUser, getProgress } from '../utils/api';
 
 // ─── Google Fonts ─────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
@@ -1211,7 +1212,13 @@ function HomePage({
           </motion.button>
 
           <div className="profile-pill" onClick={() => onNav && onNav("settings")}>
-            <div className="profile-avatar"><AvatarSVG /></div>
+            <div className="profile-avatar">
+              {localStorage.getItem('activeUserAvatar') ? (
+                <img src={localStorage.getItem('activeUserAvatar')} alt="Avatar" style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+              ) : (
+                <AvatarSVG />
+              )}
+            </div>
             <div>
               <div style={{ fontWeight: 700, color: "#1d2b2a", fontSize: 15, lineHeight: 1.2 }}>
                 {user.name}
@@ -1347,9 +1354,61 @@ function HomePage({
 // ─── Root App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [tab, setTab] = useState("home");
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
+  const [progressData, setProgressData] = useState(null);
+
+  useEffect(() => {
+    const activeUserId = localStorage.getItem('activeUserId');
+    if (!activeUserId) {
+      navigate('/login');
+      return;
+    }
+
+    const loadData = async () => {
+      try {
+        const [user, progress] = await Promise.all([
+          getUser(activeUserId),
+          getProgress(activeUserId)
+        ]);
+        setUserData(user);
+        setProgressData(progress);
+      } catch (err) {
+        console.error("Failed to load dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [navigate]);
+
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f0faf4', color: '#18b368', fontSize: 24, fontWeight: 'bold' }}>লোড হচ্ছে...</div>;
+  }
+
+  const mappedUser = {
+    name: userData?.name || DEFAULT_USER.name,
+    level: progressData?.currentLevel || DEFAULT_USER.level,
+    avatarBg: "#c8f0c8",
+  };
+  
+  const mappedProgress = progressData?.totalStars ? Math.min(100, progressData.totalStars) : 0;
+
+  const mappedAchievements = [
+    { num: "১২", label: "গল্প পড়া হয়েছে", color: "#18b368", bg: "#e8f4ff", icon: <BookSVG /> },
+    { num: "৩৪", label: "অক্ষর শিখেছি", color: "#f5a623", bg: "#fff8e8", icon: <BoardSVG /> },
+    { num: (progressData?.streak || 0).toString(), label: "দিনের স্ট্রিক", color: "#7c75dd", bg: "#f0efff", icon: <GamepadSVG /> },
+    { num: (progressData?.totalStars || 0).toString(), label: "তারকা পয়েন্ট", color: "#18b368", bg: "#fffbdd", icon: <StarSVG size={36} /> },
+  ];
 
   const pages = {
-    home: <HomePage onNav={setTab} />,
+    home: <HomePage 
+      onNav={setTab} 
+      user={mappedUser} 
+      userProgress={mappedProgress}
+      achievements={mappedAchievements}
+    />,
     progress: <ProgressPage />,
     rewards: <RewardsPage />,
     activity: <ActivityPage />,
