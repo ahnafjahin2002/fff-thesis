@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import PreferencesPanel from '../components/reader/PreferencesPanel';
 import PhonemeHighlighter from '../components/reader/PhonemeHighlighter';
+import LetterPracticeView from './LetterPracticeView';
 import PhonemeWord from '../components/reader/PhonemeWord';
 import usePreferences from '../hooks/usePreferences';
 import { usePhoneme } from '../hooks/usePhoneme';
@@ -604,7 +605,7 @@ export default function ReadingPage() {
       : [];
 
   if (subView === null) return <ReadingHub onSelect={setSubView} />;
-  if (subView === 'phoneme') return <PhonemeHighlighter onBack={() => setSubView(null)} />;
+  if (subView === 'phoneme') return <LetterPracticeView onBack={() => setSubView(null)} />;
 
   let btnLabel = 'শোনো';
   if (isGeneratingAudio) btnLabel = 'অডিও তৈরি হচ্ছে...';
