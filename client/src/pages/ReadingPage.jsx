@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PreferencesPanel from '../components/reader/PreferencesPanel';
 import PhonemeHighlighter from '../components/reader/PhonemeHighlighter';
 import LetterPracticeView from './LetterPracticeView';
+import JuktobornoView from './JuktobornoView';
 import PhonemeWord from '../components/reader/PhonemeWord';
 import usePreferences from '../hooks/usePreferences';
 import { usePhoneme } from '../hooks/usePhoneme';
@@ -219,6 +220,20 @@ function LiveWordInfoPanel({
 }
 
 // ── Hub Selection Screen ──
+const JuktobornoSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="8" width="44" height="36" rx="10" fill="#4a90d9" />
+    <text x="26" y="34" fontSize="22" fontWeight="bold" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">ক্ষ</text>
+  </svg>
+);
+
+const PhonemeSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="8" width="44" height="36" rx="10" fill="#0ea5e9" />
+    <text x="26" y="34" fontSize="18" fontWeight="bold" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">অ আ</text>
+  </svg>
+);
+
 function ReadingHub({ onSelect }) {
   const navigate = useNavigate();
 
@@ -235,10 +250,18 @@ function ReadingHub({ onSelect }) {
       id: 'phoneme',
       title: 'অক্ষর অভ্যাস',
       sub: 'অক্ষর চিনি',
-      emoji: '🔤',
+      emoji: <PhonemeSVG />,
       bg: '#fffbee',
       accent: '#f5a623',
     },
+    {
+      id: 'juktoborno',
+      title: 'যুক্তবর্ণ',
+      sub: 'যুক্তবর্ণ শিখি\nসহজ করে',
+      emoji: <JuktobornoSVG />,
+      bg: '#eef5ff',
+      accent: '#4a90e2',
+    }
   ];
 
   return (
@@ -606,6 +629,7 @@ export default function ReadingPage() {
 
   if (subView === null) return <ReadingHub onSelect={setSubView} />;
   if (subView === 'phoneme') return <LetterPracticeView onBack={() => setSubView(null)} />;
+  if (subView === 'juktoborno') return <JuktobornoView onBack={() => setSubView(null)} />;
 
   let btnLabel = 'শোনো';
   if (isGeneratingAudio) btnLabel = 'অডিও তৈরি হচ্ছে...';
