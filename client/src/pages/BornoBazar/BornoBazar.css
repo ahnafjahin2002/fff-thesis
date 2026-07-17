@@ -375,11 +375,13 @@
 .street-shop:active { transform: scale(0.95); }
 
 .shop-facade {
-  width: 130px; height: 150px;
+  width: 130px; height: 210px;
   border-radius: 16px 16px 4px 4px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
 }
 
 .shop-awning {
@@ -416,6 +418,96 @@
   background: #8B6914;
   border-radius: 0 0 4px 4px;
 }
+
+/* ── Product Shelf on each Street Shop ── */
+.shop-shelf {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  background: #a0722a;         /* wooden plank colour */
+  border-top: 3px solid #7a5320;
+  border-bottom: 3px solid #7a5320;
+  padding: 4px 4px 2px;
+  gap: 3px;
+  min-height: 38px;
+}
+
+.shelf-slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  background: rgba(255,255,255,0.12);
+  border-radius: 5px;
+  padding: 2px 1px;
+  min-height: 32px;
+  position: relative;
+}
+
+.shelf-slot--filled {
+  background: rgba(255,255,255,0.2);
+}
+
+.shelf-slot--empty {
+  background: rgba(0,0,0,0.08);
+}
+
+.shelf-slot-emoji {
+  font-size: 16px;
+  line-height: 1;
+  display: block;
+}
+
+.shelf-slot-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  line-height: 1;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 34px;
+  text-overflow: ellipsis;
+}
+
+/* Interactive empty slot — CTA to launch Phase2 */
+.shelf-slot--cta {
+  border: 1.5px dashed rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: background 0.18s;
+  /* reset native button styles */
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: 'Hind Siliguri', sans-serif;
+  padding: 2px 1px;
+}
+.shelf-slot--cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.shelf-slot-plus {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(255,255,255,0.85);
+}
+
+.shelf-slot-cta-label {
+  display: block;
+  font-size: 6.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+
 
 .shop-label {
   font-size: 12px; font-weight: 600;
@@ -514,3 +606,204 @@
   .btn-primary { min-width: 180px; font-size: 18px; }
   .celebration-title { font-size: 26px; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   ShopShelf component  (.ss-*)
+   ════════════════════════════════════════════════════════════ */
+
+/* Outer wrapper — sits inside .shop-facade */
+.ss-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+}
+
+/* ── Progress row ── */
+.ss-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  padding: 3px 6px 2px;
+  background: rgba(0,0,0,0.12);
+}
+
+.ss-progress-text {
+  font-size: 7px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  font-family: 'Hind Siliguri', sans-serif;
+}
+
+.ss-progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ss-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffb300);
+  border-radius: 4px;
+}
+
+/* ── The shelf itself ── */
+.ss-shelf {
+  display: flex;
+  align-items: stretch;
+  background: linear-gradient(
+    180deg,
+    #c8873a 0%,
+    #a0622a 40%,
+    #8b5120 100%
+  );
+  border-top: 3px solid #7a4018;
+  border-bottom: 4px solid #5c2f0e;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.15),
+    inset 0 -2px 4px rgba(0,0,0,0.3);
+  min-height: 52px;
+  position: relative;
+}
+
+/* Grain texture overlay */
+.ss-shelf::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 14px,
+    rgba(0,0,0,0.04) 14px,
+    rgba(0,0,0,0.04) 15px
+  );
+  pointer-events: none;
+}
+
+/* ── Brackets (decorative screws / supports) ── */
+.ss-bracket {
+  width: 6px;
+  background: #5c2f0e;
+  flex-shrink: 0;
+}
+.ss-bracket--left  { border-right: 1px solid rgba(255,255,255,0.1); }
+.ss-bracket--right { border-left:  1px solid rgba(255,255,255,0.1); }
+
+/* ── Slots row ── */
+.ss-slots {
+  flex: 1;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 4px 4px;
+  gap: 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.ss-slot-wrapper { flex: 1; display: flex; }
+
+/* ── Base slot ── */
+.ss-slot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  min-height: 42px;
+  padding: 3px 2px;
+  box-sizing: border-box;
+}
+
+/* ── Filled slot ── */
+.ss-slot--filled {
+  background: rgba(255,255,255,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle glow ring behind new products */
+.ss-slot-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 8px;
+  background: radial-gradient(circle, rgba(255,215,0,0.35) 0%, transparent 70%);
+  pointer-events: none;
+  animation: ssGlowFade 2s ease-out forwards;
+}
+@keyframes ssGlowFade {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.ss-slot-emoji {
+  font-size: 18px;
+  line-height: 1;
+  display: block;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+}
+
+.ss-slot-name {
+  display: block;
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Hind Siliguri', sans-serif;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* ── Empty / CTA slot ── */
+.ss-slot--empty {
+  background: rgba(0,0,0,0.12);
+  border: 1.5px dashed rgba(255,255,255,0.4);
+  cursor: pointer;
+  /* reset native button */
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: 'Hind Siliguri', sans-serif;
+  transition: border-color 0.18s;
+}
+.ss-slot--empty:focus-visible {
+  outline: 2px solid #ffd700;
+  outline-offset: 2px;
+}
+
+.ss-slot-plus {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(255,255,255,0.8);
+}
+
+.ss-slot-empty-label {
+  display: block;
+  font-size: 6.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  font-family: 'Hind Siliguri', sans-serif;
+  text-align: center;
+  line-height: 1.2;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* ── Plank drop shadow edge ── */
+.ss-plank-edge {
+  height: 5px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.28) 0%, transparent 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════ */

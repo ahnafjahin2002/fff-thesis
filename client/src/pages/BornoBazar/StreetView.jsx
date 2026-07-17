@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useGameState } from '../../hooks/useGameState';
 import streetBg from '../../assets/street-empty.png';
 import mascotWave from '../../assets/mascot-wave.png';
+import ShopShelf from './ShopShelf';
 
 export default function StreetView({ onBuild, onTapShop, onBack }) {
   const { state } = useGameState();
@@ -62,8 +63,10 @@ streetShops.map((shop, i) => {
       ? shop.color
       : shop.color?.accent || shopMainColor;
 
+  const stockedProducts = shop.products || [];
+
   return (
-    <motion.div 
+    <motion.div
       key={shop.id}
       className="street-shop"
       initial={{ opacity: 0, y: 20 }}
@@ -71,22 +74,31 @@ streetShops.map((shop, i) => {
       transition={{ delay: i * 0.1 }}
       onClick={() => onTapShop(shop.id)}
       whileHover={{ scale: 1.04 }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.96 }}
       style={{ cursor: 'pointer' }}
     >
       <div className="shop-facade">
-        <div 
-          className="shop-awning" 
+        <div
+          className="shop-awning"
           style={{ '--shop-color': shopAccentColor }}
         />
         <div className="shop-body" style={{ background: shopMainColor }}>
           <div className="shop-sign">{shop.letter}</div>
         </div>
+
+        {/* ── Wooden shelf (extracted component) ── */}
+        <ShopShelf
+          products={stockedProducts}
+          slotCount={3}
+          onAddProduct={() => onTapShop(shop.id)}
+        />
+
         <div className="shop-counter" />
       </div>
     </motion.div>
   );
 })
+
         )}
       </div>
 

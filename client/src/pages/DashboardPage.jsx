@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
-import BornoBazar from "./BornoBazar";
+import BornoBazar from "../features/BornoBazar/BornoBazar";
 import QuizModule from "../components/quiz/QuizModule";
 import { getUser, getProgress } from '../utils/api';
 

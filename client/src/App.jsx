@@ -4,6 +4,7 @@ import DashboardPage from './pages/DashboardPage';
 import ParentsGuidePage from './pages/ParentsGuidePage';
 import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
+import BornoBazar from './features/BornoBazar/BornoBazar';
 
 import './index.css';
 
@@ -17,10 +18,8 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/parents" element={<ParentsGuidePage />} />
-
-       
-
         <Route path="/reading" element={<ReadingPage />} />
+        <Route path="/borno-bazar" element={<BornoBazar />} />
       </Routes>
     </BrowserRouter>
   );
