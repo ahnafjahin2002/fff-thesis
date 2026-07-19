@@ -12,6 +12,7 @@ import PreferencesPanel from '../components/reader/PreferencesPanel';
 import PhonemeHighlighter from '../components/reader/PhonemeHighlighter';
 import LetterPracticeView from './LetterPracticeView';
 import JuktobornoView from './JuktobornoView';
+import KarChihnoView from './KarChihnoView';
 import PhonemeWord from '../components/reader/PhonemeWord';
 import usePreferences from '../hooks/usePreferences';
 import { usePhoneme } from '../hooks/usePhoneme';
@@ -234,6 +235,13 @@ const PhonemeSVG = () => (
   </svg>
 );
 
+const KarChihnoSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="8" width="44" height="36" rx="10" fill="#e91e8c" />
+    <text x="26" y="34" fontSize="20" fontWeight="bold" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">কা কি</text>
+  </svg>
+);
+
 function ReadingHub({ onSelect }) {
   const navigate = useNavigate();
 
@@ -261,6 +269,14 @@ function ReadingHub({ onSelect }) {
       emoji: <JuktobornoSVG />,
       bg: '#eef5ff',
       accent: '#4a90e2',
+    },
+    {
+      id: 'karchihno',
+      title: 'কার চিহ্ন',
+      sub: 'স্বরচিহ্ন শিখি\nকার দিয়ে শব্দ গড়ি',
+      emoji: <KarChihnoSVG />,
+      bg: '#fdf0f8',
+      accent: '#e91e8c',
     }
   ];
 
@@ -630,6 +646,7 @@ export default function ReadingPage() {
   if (subView === null) return <ReadingHub onSelect={setSubView} />;
   if (subView === 'phoneme') return <LetterPracticeView onBack={() => setSubView(null)} />;
   if (subView === 'juktoborno') return <JuktobornoView onBack={() => setSubView(null)} />;
+  if (subView === 'karchihno') return <KarChihnoView onBack={() => setSubView(null)} />;
 
   let btnLabel = 'শোনো';
   if (isGeneratingAudio) btnLabel = 'অডিও তৈরি হচ্ছে...';
