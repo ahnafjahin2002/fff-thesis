@@ -25,6 +25,7 @@ export const STAGES = {
 function BornoBazarInner({ onBack }) {
   const [currentStage, setCurrentStage] = useState(STAGES.MAP);
   const [currentShop, setCurrentShop] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(null);
   const [sessionActivities, setSessionActivities] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -95,10 +96,25 @@ function BornoBazarInner({ onBack }) {
       case STAGES.MAP:
         return <MarketMap onComplete={() => handleStageTransition(STAGES.SHOP)} setShop={setCurrentShop} onBack={onBack} />;
       case STAGES.SHOP:
-        // Shop can go back to MAP or advance to STOCKING
-        return <ShopView shop={currentShop} onComplete={advanceStage} onBack={() => handleStageTransition(STAGES.MAP)} />;
       case STAGES.STOCKING:
-        return <StockingGame shop={currentShop} onComplete={advanceStage} onBack={() => handleStageTransition(STAGES.SHOP)} />;
+        return (
+          <>
+            <ShopView shop={currentShop} onComplete={(productId) => { setSelectedProductId(productId); handleStageTransition(STAGES.STOCKING); }} onNextStage={() => handleStageTransition(STAGES.REWARD_STOCKING, 300)} onBack={() => handleStageTransition(STAGES.MAP)} />
+            <AnimatePresence>
+              {currentStage === STAGES.STOCKING && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 50 }}
+                >
+                  <StockingGame shop={currentShop} targetProductId={selectedProductId} onComplete={() => handleStageTransition(STAGES.SHOP)} onBack={() => handleStageTransition(STAGES.SHOP)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
+        );
       case STAGES.REWARD_STOCKING:
         return <RewardSystem onComplete={advanceStage} stageContext="stocking" />;
       case STAGES.CONVERSATION:
@@ -120,7 +136,7 @@ function BornoBazarInner({ onBack }) {
       <Suspense fallback={<div className="loading-screen"><div className="spinner"></div></div>}>
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentStage}
+            key={currentStage === STAGES.STOCKING ? STAGES.SHOP : currentStage}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}

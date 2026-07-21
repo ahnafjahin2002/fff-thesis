@@ -8,6 +8,9 @@ import Customer from './Customer';
 import DialogueBubble from './DialogueBubble';
 import SentenceBuilder from './SentenceBuilder';
 
+import convoBgImage from '../../../assets/images/convo_bg.png';
+import shopkeeperImgSrc from '../../../assets/images/shopkeeper.png';
+
 export default function ConversationGame({ shop, onComplete, onBack }) {
   const shopConversations = conversations.filter(c => c.shop === shop);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -81,51 +84,121 @@ export default function ConversationGame({ shop, onComplete, onBack }) {
     }
   };
 
-  const bgImage = bornoAssets.backgrounds.bazarMap;
+  const bgImage = convoBgImage;
 
   return (
     <div className="conversation-game-container" role="main" aria-label="কথোপকথন খেলা">
       <img src={bgImage} alt="" className="shop-bg blur-bg" aria-hidden="true" />
       
-      <div className="conversation-overlay game-layout-wrapper">
-        <div className="game-layout-header">
-          <ShopHeader shopName="কাস্টমারের সাথে কথা বলো" onBack={onBack} />
+      <div className="conversation-white-card">
+        {/* Header elements absolutely positioned on the top edge */}
+        <div className="card-header-floating">
+          <button className="floating-back-btn" onClick={onBack}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            ফিরুন
+          </button>
+          <div className="floating-title-pill">
+            <h1>কাস্টমারের সাথে কথোপকথন</h1>
+          </div>
         </div>
         
-        <div className="game-layout-content interaction-area">
-          <div className="customer-area" aria-live="polite">
-            <DialogueBubble text={currentConvo.customer} />
-            <Customer mood={status === 'correct' ? 'happy' : status === 'wrong' ? 'thinking' : 'neutral'} />
-          </div>
-
-          <div className="builder-area game-builder-section">
-            <SentenceBuilder 
-              expectedLength={currentConvo.correctSequence.length} 
-              selectedWords={selectedWords}
-              onRemoveWord={handleRemoveWord}
-              status={status}
-            />
-
-            <div className="words-pool game-letters-section" role="group" aria-label="শব্দ পছন্দ করো">
-              {currentConvo.words.map((word, idx) => {
-                const isSelected = selectedWords.some(item => item.originalIndex === idx);
-                return (
-                  <motion.button 
-                    key={`${currentIndex}-${idx}`}
-                    className={`word-tile ${isSelected ? 'selected' : ''}`}
-                    disabled={status !== 'idle' || isSelected}
-                    onClick={() => handleWordClick(word, idx)}
-                    whileHover={!(status !== 'idle' || isSelected) ? { scale: 1.1, y: -5 } : {}}
-                    whileTap={!(status !== 'idle' || isSelected) ? { scale: 0.95 } : {}}
-                    tabIndex={status !== 'idle' || isSelected ? -1 : 0}
-                    aria-label={word}
-                  >
-                    {word}
-                  </motion.button>
-                );
-              })}
+        <div className="conversation-main-area">
+          {/* Left Panel: Shelf */}
+          <div className="conversation-left-panel">
+            <div className="shelf-header-hints">
+              <h3 className="panel-title">স্টক প্রোডাক্টস</h3>
+              <div className="swipe-arrow-hint">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" style={{transform: 'rotate(90deg)'}}>
+                  <path d="M10 5a7 7 0 0 1 7 7v7m0 0l-4-4m4 4l4-4" />
+                </svg>
+                <span>আপডেটেড সেলফ</span>
+              </div>
+            </div>
+            <div className="static-shelf-container">
+              <div className="static-shelf">
+                {/* Visual Representation of Shelf */}
+                <div className="static-shelf-row">
+                  <img src={bornoAssets.products.banana} alt="কলা" className="static-shelf-item" />
+                  <img src={bornoAssets.products.mango} alt="আম" className="static-shelf-item" />
+                </div>
+                <div className="static-shelf-row">
+                  <img src={bornoAssets.products.banana} alt="কলা" className="static-shelf-item" />
+                  <div className="swipe-hint-container">
+                    <span className="swipe-hint-text">ডান থেকে বামে<br/>সোয়াইপ করুন</span>
+                  </div>
+                </div>
+                <div className="static-shelf-row">
+                  <img src={bornoAssets.products.mango} alt="আম" className="static-shelf-item" />
+                  <img src={bornoAssets.products.apple} alt="আপেল" className="static-shelf-item" />
+                </div>
+              </div>
             </div>
           </div>
+          {/* Center Panel: Shopkeeper */}
+          <div className="conversation-center-panel">
+            <div className="shopkeeper-wrapper">
+              <img src={shopkeeperImgSrc} alt="দোকানদার" className="convo-character-img" />
+              <div className="character-label">দোকানদার</div>
+            </div>
+          </div>
+
+          {/* Right Panel: Customer */}
+          <div className="conversation-right-panel" aria-live="polite">
+            <div className="customer-bubble-wrapper">
+              <DialogueBubble text={currentConvo.customer} />
+              <div className="bubble-label-hint">বুদবুদ লেখা</div>
+            </div>
+            <div className="customer-wrapper">
+              <Customer mood={status === 'correct' ? 'happy' : status === 'wrong' ? 'thinking' : 'neutral'} />
+              <div className="character-label">কাস্টমার</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Central Modal for Sentence Building */}
+        <div className="conversation-builder-modal">
+          <h2 className="builder-title">আপনার উত্তর তৈরি করুন</h2>
+          <SentenceBuilder 
+            expectedLength={currentConvo.correctSequence.length} 
+            selectedWords={selectedWords}
+            onRemoveWord={handleRemoveWord}
+            status={status}
+          />
+          <div className="words-pool" role="group" aria-label="শব্দ পছন্দ করো">
+            {currentConvo.words.map((word, idx) => {
+              const isSelected = selectedWords.some(item => item.originalIndex === idx);
+              return (
+                <motion.button 
+                  key={`${currentIndex}-${idx}`}
+                  className={`builder-word-tile ${isSelected ? 'selected' : ''}`}
+                  disabled={status !== 'idle' || isSelected}
+                  onClick={() => handleWordClick(word, idx)}
+                  whileHover={!(status !== 'idle' || isSelected) ? { scale: 1.05, y: -2 } : {}}
+                  whileTap={!(status !== 'idle' || isSelected) ? { scale: 0.95 } : {}}
+                  tabIndex={status !== 'idle' || isSelected ? -1 : 0}
+                  aria-label={word}
+                >
+                  {word}
+                </motion.button>
+              );
+            })}
+            
+            <button className="submit-answer-btn" disabled={selectedWords.length !== currentConvo.correctSequence.length || status !== 'idle'} onClick={checkAnswer}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="conversation-footer">
+          <div className="progress-bar-container">
+            <div className="progress-bar-fill" style={{ width: `${((currentIndex + 1) / shopConversations.length) * 100}%` }}></div>
+          </div>
+          <button className="finish-convo-btn" onClick={onComplete}>কথা শেষ</button>
         </div>
 
         <AnimatePresence>

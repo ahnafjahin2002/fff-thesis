@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import { bornoAssets } from '../assets/config';
+import customerImageSrc from '../../../assets/images/customer.png';
 
 export default function Customer({ mood = 'neutral' }) {
-  // Using a placeholder customer graphic. 
-  // In a full game, you'd switch this based on mood or specific customer ID.
-  const customerImage = bornoAssets.characters.customer;
+  // Using the custom generated customer graphic.
+  const customerImage = customerImageSrc;
 
   // Animate differently based on mood
   const animations = {

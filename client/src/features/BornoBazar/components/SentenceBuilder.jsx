@@ -9,7 +9,7 @@ export default function SentenceBuilder({ expectedLength, selectedWords, onRemov
 
   return (
     <motion.div 
-      className={`sentence-builder ${statusClass}`}
+      className={`sentence-builder-container ${statusClass}`}
       animate={status === 'wrong' ? { x: [-10, 10, -10, 10, 0] } : {}}
       transition={{ duration: 0.4 }}
     >
@@ -18,7 +18,7 @@ export default function SentenceBuilder({ expectedLength, selectedWords, onRemov
         return (
           <div 
             key={index} 
-            className="word-slot sentence-slot"
+            className="builder-slot"
             onClick={() => wordObj && onRemoveWord(index)}
           >
             {wordObj && (

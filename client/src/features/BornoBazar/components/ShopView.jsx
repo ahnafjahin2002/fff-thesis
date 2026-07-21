@@ -7,7 +7,7 @@ import ShopHeader from './ShopHeader';
 import Shelf from './Shelf';
 import GameButton from './GameButton';
 
-export default function ShopView({ shop, onComplete, onBack }) {
+export default function ShopView({ shop, onComplete, onNextStage, onBack }) {
   const shopData = shops.find(s => s.id === shop);
   const shopName = shopData ? shopData.name : "দোকান";
   const shopProducts = products.filter(p => p.shop === shop);
@@ -70,19 +70,22 @@ export default function ShopView({ shop, onComplete, onBack }) {
           <div className="shop-center-panel" aria-label="তাক">
             <div className="shelves-container">
               {/* Split products into multiple shelves if necessary, simple version: all on one shelf for now, or chunk them */}
-              <Shelf shopProducts={shopProducts.slice(0, 4)} inventory={inventory} />
+
+              <Shelf shopProducts={shopProducts.slice(0, 4)} inventory={inventory} onSlotClick={onComplete} />
               {shopProducts.length > 4 && (
-                <Shelf shopProducts={shopProducts.slice(4, 8)} inventory={inventory} />
+                <Shelf shopProducts={shopProducts.slice(4, 8)} inventory={inventory} onSlotClick={onComplete} />
               )}
             </div>
           </div>
         </div>
 
-        <div className="shop-footer">
-          <GameButton onClick={onComplete} aria-label="পণ্য সাজানো শুরু করুন">
-            পণ্য সাজাও
-          </GameButton>
-        </div>
+        {isFullyStocked && (
+          <div className="shop-footer">
+            <GameButton onClick={onNextStage} aria-label="কাস্টমার ডাকো">
+              কাস্টমার ডাকো
+            </GameButton>
+          </div>
+        )}
       </div>
     </div>
   );

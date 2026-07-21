@@ -8,9 +8,10 @@ import LetterTile from './LetterTile';
 import WordBuilder from './WordBuilder';
 import ProductClue from './ProductClue';
 
-export default function StockingGame({ shop, onComplete, onBack }) {
+export default function StockingGame({ shop, targetProductId, onComplete, onBack }) {
   const shopProducts = products.filter(p => p.shop === shop);
-  const [currentProductIndex, setCurrentProductIndex] = useState(0);
+  const initialIndex = targetProductId ? shopProducts.findIndex(p => p.id === targetProductId) : 0;
+  const [currentProductIndex, setCurrentProductIndex] = useState(initialIndex !== -1 ? initialIndex : 0);
   
   const [selectedLetters, setSelectedLetters] = useState([]);
   const [status, setStatus] = useState('idle'); // 'idle' | 'wrong' | 'correct'
@@ -61,16 +62,9 @@ export default function StockingGame({ shop, onComplete, onBack }) {
       addStar(10);
       addProduct(currentProduct.id);
 
-      // Wait 2s to show success animation, then next product or finish
+      // Wait 2.5s to show success animation, then finish to close the popup
       setTimeout(() => {
-        if (currentProductIndex + 1 < shopProducts.length) {
-          setCurrentProductIndex(prev => prev + 1);
-          setSelectedLetters([]);
-          setStatus('idle');
-          setFeedbackMsg("");
-        } else {
-          onComplete();
-        }
+        onComplete();
       }, 2500);
 
     } else {
@@ -89,10 +83,10 @@ export default function StockingGame({ shop, onComplete, onBack }) {
   const bgImage = bornoAssets.backgrounds.bazarMap; // simple background
 
   return (
-    <div className="stocking-game-container" role="main" aria-label="পণ্য সাজাও খেলা">
-      <img src={bgImage} alt="" className="shop-bg blur-bg" aria-hidden="true" />
+    <div className="stocking-game-container popup-overlay" role="main" aria-label="পণ্য সাজাও খেলা" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 }}>
+      <div className="shop-bg blur-bg" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', position: 'absolute', inset: 0 }} aria-hidden="true" />
       
-      <div className="stocking-overlay game-layout-wrapper">
+      <div className="stocking-overlay game-layout-wrapper" style={{ position: 'relative', zIndex: 1, height: '100%' }}>
         <div className="game-layout-header">
           <ShopHeader shopName="পণ্য সাজাও" onBack={onBack} />
         </div>
