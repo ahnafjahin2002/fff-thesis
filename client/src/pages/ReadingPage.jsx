@@ -484,6 +484,38 @@ export default function ReadingPage() {
     setActiveIdx(-1);
 
     try {
+      if (!customAnalysisActive) {
+        const levelInfo = DIFFICULTY_LEVELS.find(l => l.id === currentLevel) || DIFFICULTY_LEVELS[0];
+        const folderName = levelInfo.label;
+        const audioUrl = `/audio/${folderName}/${currentItemIdx + 1}.m4a`;
+        const audio = new Audio(audioUrl);
+        audio.playbackRate = speed;
+        audioRef.current = audio;
+        
+        await new Promise((resolve) => {
+          audio.onloadedmetadata = resolve;
+          audio.onerror = resolve; // Continue even if metadata fails
+        });
+
+        audio.onended = () => {
+          audioRef.current = null;
+        };
+
+        try {
+          await audio.play();
+          
+          const durationMs = audio.duration ? audio.duration * 1000 : 1500;
+          const effectiveDurationMs = durationMs / speed;
+          startHighlightOnly(effectiveDurationMs);
+          
+          setIsGeneratingAudio(false);
+          return;
+        } catch (e) {
+          console.warn("Could not play static audio file, falling back to TTS", e);
+          audioRef.current = null;
+        }
+      }
+
       const result = await synthesizeBanglaTTS(displayText, "female");
 
       if (result && result.fullAudioUrl) {
@@ -508,7 +540,7 @@ export default function ReadingPage() {
     } finally {
       setIsGeneratingAudio(false);
     }
-  }, [displayText, speed, startHighlightOnly, startNarration]);
+  }, [displayText, speed, startHighlightOnly, startNarration, currentLevel, customAnalysisActive, currentItemIdx]);
 
   useEffect(() => {
     stopAllAudio();
