@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { bornoAssets } from '../assets/config';
-import customerImageSrc from '../../../assets/images/customer.png';
+import customerImageSrc from '../../../assets/images/transparent_customer.png';
 
 export default function Customer({ mood = 'neutral' }) {
   // Using the custom generated customer graphic.

@@ -43,8 +43,26 @@ export default function ShopView({ shop, onComplete, onNextStage, onBack }) {
               animate={{ y: [0, -10, 0] }}
               transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
             >
-              <div className="speech-bubble" role="status" aria-live="polite">
-                <p>
+              <div 
+                className="speech-bubble" 
+                role="status" 
+                aria-live="polite"
+                style={{
+                  backgroundImage: `url(${bornoAssets.gameplayUi.speechBubble})`,
+                  backgroundSize: '100% 100%',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center',
+                  padding: '40px 30px 60px 30px', /* Top, Right, Bottom, Left padding to fit text inside bubble area */
+                  minWidth: '280px',
+                  minHeight: '150px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  marginBottom: '10px'
+                }}
+              >
+                <p style={{ margin: 0, fontWeight: 'bold', color: '#333' }}>
                   {isFullyStocked 
                     ? "বাহ! দোকান একদম সাজানো! কাস্টমারের অপেক্ষা করি!"
                     : "দোকানটি খালি! পণ্য সাজাতে শব্দ বানাও।"
@@ -71,10 +89,7 @@ export default function ShopView({ shop, onComplete, onNextStage, onBack }) {
             <div className="shelves-container">
               {/* Split products into multiple shelves if necessary, simple version: all on one shelf for now, or chunk them */}
 
-              <Shelf shopProducts={shopProducts.slice(0, 4)} inventory={inventory} onSlotClick={onComplete} />
-              {shopProducts.length > 4 && (
-                <Shelf shopProducts={shopProducts.slice(4, 8)} inventory={inventory} onSlotClick={onComplete} />
-              )}
+              <Shelf shopProducts={shopProducts.slice(0, 9)} inventory={inventory} onSlotClick={onComplete} />
             </div>
           </div>
         </div>

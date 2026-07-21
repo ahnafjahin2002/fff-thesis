@@ -37,8 +37,10 @@ export const bornoAssets = {
     toy: "/src/features/BornoBazar/assets/products/toy.png"
   },
   gameplayUi: {
-    woodenShelf: "/src/features/BornoBazar/assets/gameplay-ui/wooden-shelf.png",
-    productBox: "/src/features/BornoBazar/assets/gameplay-ui/product-box.png",
+    woodenShelf: "/src/features/BornoBazar/assets/gameplay-ui/wooden-shelf-v2.png",
+    productBox: "/src/features/BornoBazar/assets/gameplay-ui/product-box-v2.png",
+    speechBubble: "/src/features/BornoBazar/assets/gameplay-ui/speech-bubble.png",
+    infoCard: "/src/features/BornoBazar/assets/gameplay-ui/info-card.png",
     letterCard: "/src/features/BornoBazar/assets/gameplay-ui/letter-card.png",
     sentenceCard: "/src/features/BornoBazar/assets/gameplay-ui/sentence-card.png",
     hintButton: "/src/features/BornoBazar/assets/gameplay-ui/hint-button.png",

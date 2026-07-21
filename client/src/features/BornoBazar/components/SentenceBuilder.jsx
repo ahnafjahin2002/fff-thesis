@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-export default function SentenceBuilder({ expectedLength, selectedWords, onRemoveWord, status }) {
+export default function SentenceBuilder({ expectedLength, selectedWords, onRemoveWord, status, immersive }) {
   const slots = Array.from({ length: expectedLength });
 
   let statusClass = '';
@@ -9,7 +9,7 @@ export default function SentenceBuilder({ expectedLength, selectedWords, onRemov
 
   return (
     <motion.div 
-      className={`sentence-builder-container ${statusClass}`}
+      className={`sentence-builder-container ${statusClass} ${immersive ? 'immersive-slots' : ''}`}
       animate={status === 'wrong' ? { x: [-10, 10, -10, 10, 0] } : {}}
       transition={{ duration: 0.4 }}
     >
