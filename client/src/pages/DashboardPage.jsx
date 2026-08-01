@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
@@ -1091,9 +1091,20 @@ function HomePage({
   achievements = DEFAULT_ACHIEVEMENTS,
   onNav,
 }) {
-  const [view, setView] = useState("home");
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const initialView = searchParams.get("view") || "home";
+  const [view, setView] = useState(initialView);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const viewParam = params.get("view") || "home";
+    if (viewParam !== view) {
+      setView(viewParam);
+    }
+  }, [location.search]);
 
   if (view === "game") return <BornoBazar onBack={() => setView("home")} />;
   if (view === "trace") return <TraceView onBack={() => setView("home")} />;

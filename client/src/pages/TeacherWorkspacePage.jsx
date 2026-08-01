@@ -26,6 +26,10 @@ const translateActivityName = (act) => {
   if (!act || act === '-' || act === 'None') return 'কোনো অ্যাক্টিভিটি নেই';
   if (act === 'Reading Story') return 'গল্প পড়া (Reading Story)';
   if (act === 'BornoBazar') return 'বর্ণবাজার (BornoBazar)';
+  if (act === 'Quiz Game') return 'মজার কুইজ (Quiz Game)';
+  if (act === 'Word Practice') return 'শব্দ অনুশীলন (Word Practice)';
+  if (act === 'Sentence Builder') return 'বাক্য তৈরি (Sentence Builder)';
+  if (act === 'Custom Reading') return 'কাস্টম পড়া (Custom Reading)';
   return act;
 };
 
@@ -1097,7 +1101,37 @@ export default function TeacherWorkspacePage() {
               </div>
             </div>
 
-            {/* Activity 3: Word Practice */}
+            {/* Activity 3: Quiz Game */}
+            <div
+              className={`tw-activity-card ${
+                selectedActivity === 'Quiz Game' ? 'selected' : ''
+              }`}
+              onClick={() => setSelectedActivity('Quiz Game')}
+            >
+              <div>
+                <div className="tw-activity-top">
+                  <div className="tw-activity-icon">🧩</div>
+                  <span className="tw-activity-tag">কুইজ ও খেলা</span>
+                </div>
+                <h3>মজার কুইজ (Quiz Game)</h3>
+                <p>
+                  শব্দ ও ছবি মেলাও এবং শূন্যস্থান পূরণের ইন্টারেক্টিভ কুইজ গেম।
+                </p>
+              </div>
+              <div
+                style={{
+                  marginTop: 14,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color:
+                    selectedActivity === 'Quiz Game' ? '#0f9055' : '#687076',
+                }}
+              >
+                {selectedActivity === 'Quiz Game' ? '● নির্বাচিত' : '○ নির্বাচন করুন'}
+              </div>
+            </div>
+
+            {/* Activity 4: Word Practice */}
             <div
               className={`tw-activity-card ${
                 selectedActivity === 'Word Practice' ? 'selected' : ''
@@ -1127,7 +1161,37 @@ export default function TeacherWorkspacePage() {
               </div>
             </div>
 
-            {/* Activity 4: Custom Reading */}
+            {/* Activity 5: Sentence Builder */}
+            <div
+              className={`tw-activity-card ${
+                selectedActivity === 'Sentence Builder' ? 'selected' : ''
+              }`}
+              onClick={() => setSelectedActivity('Sentence Builder')}
+            >
+              <div>
+                <div className="tw-activity-top">
+                  <div className="tw-activity-icon">📝</div>
+                  <span className="tw-activity-tag">ভাষা গঠন</span>
+                </div>
+                <h3>বাক্য তৈরি (Sentence Builder)</h3>
+                <p>
+                  শব্দ সাজিয়ে সঠিক বাংলা বাক্য তৈরি করার ইন্টারেক্টিভ অনুশীলন।
+                </p>
+              </div>
+              <div
+                style={{
+                  marginTop: 14,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color:
+                    selectedActivity === 'Sentence Builder' ? '#0f9055' : '#687076',
+                }}
+              >
+                {selectedActivity === 'Sentence Builder' ? '● নির্বাচিত' : '○ নির্বাচন করুন'}
+              </div>
+            </div>
+
+            {/* Activity 6: Custom Reading */}
             <div
               className={`tw-activity-card ${
                 selectedActivity === 'Custom Reading' ? 'selected' : ''
@@ -1772,9 +1836,22 @@ export default function TeacherWorkspacePage() {
                     setClassroomModalOpen(false);
                     // Navigate to appropriate activity
                     if (
-                      launchedActivityTitle.includes('BornoBazar')
+                      launchedActivityTitle.includes('BornoBazar') ||
+                      launchedActivityTitle.includes('বর্ণবাজার') ||
+                      launchedActivityTitle.includes('Sentence') ||
+                      launchedActivityTitle.includes('বাক্য')
                     ) {
                       navigate('/borno-bazar');
+                    } else if (
+                      launchedActivityTitle.includes('Quiz') ||
+                      launchedActivityTitle.includes('কুইজ')
+                    ) {
+                      navigate('/dashboard?view=quiz');
+                    } else if (
+                      launchedActivityTitle.includes('Word') ||
+                      launchedActivityTitle.includes('শব্দ')
+                    ) {
+                      navigate('/dashboard?view=trace');
                     } else {
                       navigate('/reading');
                     }
