@@ -8,6 +8,7 @@ import './TeacherWorkspacePage.css';
 // Existing friendly classroom illustrations from assets
 import classroomIllustration from '../assets/mother_child_reading.png';
 import mascotEncourage from '../assets/mascot-encourage.png';
+import dashboardMeaningfulBg from '../assets/dashboard-meaningful-bg.png';
 
 // Bangla numeral converter & translators
 const toBanglaNum = (num) => {
@@ -696,9 +697,24 @@ export default function TeacherWorkspacePage() {
       />
 
       {/* ── MAIN WORKSPACE AREA ── */}
-      <main className="tw-main-area">
+      <main
+        className="tw-main-area"
+        style={{
+          background: `linear-gradient(180deg, rgba(235, 248, 240, 0.65) 0%, rgba(228, 245, 235, 0.70) 100%), url(${dashboardMeaningfulBg}) center/cover no-repeat fixed`,
+        }}
+      >
         {/* ── SECTION 1: WELCOME HEADER ── */}
-        <header className="tw-top-bar">
+        <header
+          className="tw-top-bar"
+          style={{
+            background: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(10px)',
+            padding: '16px 24px',
+            borderRadius: '22px',
+            border: '1px solid rgba(24, 179, 104, 0.3)',
+            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.06)',
+          }}
+        >
           <div className="tw-top-left">
             <button
               className="tw-hamburger"
@@ -1018,7 +1034,15 @@ export default function TeacherWorkspacePage() {
         </section>
 
         {/* ── SECTION 3: START CLASSROOM ── */}
-        <section className="tw-start-classroom-card">
+        <section
+          className="tw-start-classroom-card"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 254, 246, 0.98) 100%)',
+            backdropFilter: 'blur(12px)',
+            border: '2px solid rgba(24, 179, 104, 0.4)',
+            boxShadow: '0 10px 32px rgba(24, 179, 104, 0.16)',
+          }}
+        >
           <div className="tw-start-header-wrap">
             <div className="tw-start-title-area">
               <div className="tw-start-badge">

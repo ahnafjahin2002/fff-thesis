@@ -8,7 +8,7 @@
   display: flex;
   width: 100vw;
   min-height: 100vh;
-  background: #f0faf4;
+  background: transparent;
   position: relative;
   overflow-x: hidden;
   font-family: 'Hind Siliguri', sans-serif;
@@ -399,10 +399,9 @@
 
 /* ── SECTION 3: START CLASSROOM ── */
 .tw-start-classroom-card {
-  background: linear-gradient(135deg, #e2f5ea 0%, #cdeadb 100%);
   border-radius: 26px;
   padding: 34px 38px;
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 32px rgba(24, 179, 104, 0.16);
   margin-bottom: 36px;
   position: relative;
   overflow: hidden;

@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import heroKid from "../assets/hero-kid.png";
+import dashboardMeaningfulBg from "../assets/dashboard-meaningful-bg.png";
 import BornoBazar from "../features/BornoBazar/BornoBazar";
 import QuizModule from "../components/quiz/QuizModule";
 import { getUser, getProgress } from '../utils/api';
@@ -44,7 +45,7 @@ styleEl.textContent = `
     display: flex;
     width: 100vw;
     min-height: 100vh;
-    background: var(--bg);
+    background: linear-gradient(180deg, rgba(235, 248, 240, 0.65) 0%, rgba(228, 245, 235, 0.70) 100%), url(${dashboardMeaningfulBg}) center/cover no-repeat fixed;
     position: relative;
     overflow-x: hidden;
   }
@@ -177,15 +178,18 @@ styleEl.textContent = `
   .hero-banner {
     width: 100%;
     border-radius: var(--radius-card);
-    background: linear-gradient(135deg, #e2f5ea 0%, #cdeadb 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(235, 253, 243, 0.97) 100%);
+    backdrop-filter: blur(10px);
     padding: 32px 40px 0 40px;
     margin-bottom: 22px;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    min-height: 180px;
+    min-height: 200px;
     position: relative;
     overflow: hidden;
+    border: 2px solid rgba(24, 179, 104, 0.35);
+    box-shadow: 0 10px 32px rgba(24, 179, 104, 0.15);
   }
   .hero-text { z-index: 2; padding-bottom: 32px; }
   .hero-title {
@@ -1209,7 +1213,12 @@ function HomePage({
       </aside>
 
       {/* ── Main ── */}
-      <main className="main-area">
+      <main
+        className="main-area"
+        style={{
+          background: `linear-gradient(180deg, rgba(240, 250, 244, 0.90) 0%, rgba(232, 248, 238, 0.92) 50%, rgba(224, 245, 232, 0.95) 100%), url(${dashboardMeaningfulBg}) center/cover no-repeat fixed`,
+        }}
+      >
 
         {/* Top bar */}
         <div className="top-bar">
@@ -1274,6 +1283,12 @@ function HomePage({
         {/* Hero Banner */}
         <motion.div
           className="hero-banner"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(235, 253, 243, 0.97) 100%)',
+            backdropFilter: 'blur(10px)',
+            border: '2px solid rgba(24, 179, 104, 0.35)',
+            boxShadow: '0 10px 30px rgba(24, 179, 104, 0.15)',
+          }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -1288,6 +1303,21 @@ function HomePage({
           </div>
 
           <div className="hero-text">
+            <div
+              style={{
+                display: 'inline-block',
+                background: 'rgba(24, 179, 104, 0.95)',
+                color: 'white',
+                padding: '5px 15px',
+                borderRadius: '50px',
+                fontSize: '13px',
+                fontWeight: '700',
+                marginBottom: '10px',
+                boxShadow: '0 2px 8px rgba(24, 179, 104, 0.3)',
+              }}
+            >
+              🌱 বটতলার আনন্দে বাংলা শেখার আসর
+            </div>
             <div className="hero-title">হ্যালো, {user.name}! 👋</div>
             <div className="hero-sub">
               {user.role === 'parent' || user.role === 'teacher' 
