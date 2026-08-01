@@ -1183,8 +1183,29 @@ export default function TeacherWorkspacePage() {
           <div className="tw-students-split-layout">
             {/* Left Panel: Student List */}
             <div className="tw-student-list-panel">
-              <div className="tw-student-list-header">
+              <div className="tw-student-list-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3>শিক্ষার্থী তালিকা ({toBanglaNum(filteredStudents.length)})</h3>
+                <button
+                  onClick={() => setAddStudentModalOpen(true)}
+                  style={{
+                    background: '#10b981',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                  }}
+                  title="নতুন শিক্ষার্থী যোগ করুন"
+                >
+                  <span>➕</span>
+                  <span>শিক্ষার্থী যোগ করুন</span>
+                </button>
               </div>
 
               <input
@@ -1205,7 +1226,13 @@ export default function TeacherWorkspacePage() {
                       onClick={() => setSelectedStudentId(s.id)}
                     >
                       <div className="tw-student-row-left">
-                        <div className="tw-student-avatar">{s.avatar}</div>
+                        <div className="tw-student-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {s.avatar && (s.avatar.startsWith('data:image') || s.avatar.startsWith('http')) ? (
+                            <img src={s.avatar} alt={s.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                          ) : (
+                            s.avatar || '👦'
+                          )}
+                        </div>
                         <div className="tw-student-name-box">
                           <span className="tw-student-name">
                             {s.name} ({s.nameBangla})
@@ -1250,14 +1277,34 @@ export default function TeacherWorkspacePage() {
                 <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
                   <div style={{ fontSize: 48, marginBottom: 16 }}>👧👦</div>
                   <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 8, color: '#334155' }}>কোনো শিক্ষার্থী তালিকা নেই</div>
-                  <div style={{ fontSize: 14 }}>পড়ার অগ্রগতি দেখতে শিক্ষার্থীদের প্রোফাইল তৈরি করুন।</div>
+                  <div style={{ fontSize: 14, marginBottom: 20 }}>পড়ার অগ্রগতি দেখতে শিক্ষার্থীদের প্রোফাইল তৈরি করুন।</div>
+                  <button
+                    onClick={() => setAddStudentModalOpen(true)}
+                    style={{
+                      background: '#10b981',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: 12,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.3)'
+                    }}
+                  >
+                    ➕ শিক্ষার্থী যোগ করুন (Add Student)
+                  </button>
                 </div>
               ) : (
                 <>
                   <div className="tw-detail-top-card">
                     <div className="tw-detail-profile-main">
-                      <div className="tw-detail-avatar-large">
-                        {selectedStudent.avatar}
+                      <div className="tw-detail-avatar-large" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {selectedStudent.avatar && (selectedStudent.avatar.startsWith('data:image') || selectedStudent.avatar.startsWith('http')) ? (
+                          <img src={selectedStudent.avatar} alt={selectedStudent.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                        ) : (
+                          selectedStudent.avatar || '👦'
+                        )}
                       </div>
                   <div>
                     <div className="tw-detail-name">
