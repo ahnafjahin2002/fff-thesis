@@ -368,10 +368,11 @@ router.get('/classroom-stats', async (req, res) => {
     // 7. Roster calculation
     const getAvatarEmoji = (avatar, idx) => {
       if (!avatar) return idx % 2 === 0 ? '👦' : '👧';
+      if (avatar.startsWith('data:image') || avatar.startsWith('http')) return avatar;
       if (avatar === 'avatar-girl-hijab') return '🧕';
       if (avatar === 'avatar-girl-yellow' || avatar.includes('girl')) return '👧';
       if (avatar === 'avatar-boy-green' || avatar === 'avatar-boy-blue' || avatar.includes('boy')) return '👦';
-      if (avatar.length <= 2) return avatar;
+      if (avatar.length <= 4) return avatar;
       return idx % 2 === 0 ? '👦' : '👧';
     };
 

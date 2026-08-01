@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getClassroomStats, updateStudentNote, updateUserProfile } from '../utils/api';
+import { getClassroomStats, updateStudentNote, updateUserProfile, createUser } from '../utils/api';
 import { useClassroom } from '../context/ClassroomContext';
 import './TeacherWorkspacePage.css';
 
@@ -347,6 +347,56 @@ export default function TeacherWorkspacePage() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const photoInputRef = useRef(null);
+
+  // Add Student modal & form state
+  const [addStudentModalOpen, setAddStudentModalOpen] = useState(false);
+  const [newStudentName, setNewStudentName] = useState('');
+  const [newStudentAvatar, setNewStudentAvatar] = useState('👦');
+  const [isAddingStudent, setIsAddingStudent] = useState(false);
+  const [addStudentError, setAddStudentError] = useState('');
+  const studentPhotoInputRef = useRef(null);
+
+  const EMOJI_OPTIONS = [
+    '👦', '👧', '👶', '🧑‍🎓', '👩‍🎓', '👨‍🎓', '🧕',
+    '🐯', '🦁', '🐱', '🐼', '🦊', '🐰', '🐨', '🐵',
+    '🦋', '🌟', '🏆', '📚', '🚀'
+  ];
+
+  const handleStudentPhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setNewStudentAvatar(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreateStudent = async (e) => {
+    e.preventDefault();
+    if (!newStudentName.trim()) {
+      setAddStudentError('অনুগ্রহ করে শিক্ষার্থীর নাম লিখুন।');
+      return;
+    }
+    try {
+      setIsAddingStudent(true);
+      setAddStudentError('');
+      await createUser({
+        name: newStudentName.trim(),
+        role: 'child',
+        avatar: newStudentAvatar || '👦'
+      });
+      await fetchDashboardData();
+      setNewStudentName('');
+      setNewStudentAvatar('👦');
+      setAddStudentModalOpen(false);
+    } catch (err) {
+      console.error('Failed to create student:', err);
+      setAddStudentError('শিক্ষার্থী যোগ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+    } finally {
+      setIsAddingStudent(false);
+    }
+  };
 
   const handleSaveName = async () => {
     localStorage.setItem('activeUserName', teacherName);
@@ -1841,6 +1891,227 @@ export default function TeacherWorkspacePage() {
               <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 12 }}>
                 আপনার আপলোড করা ছবি প্রোফাইল কার্ড এবং হেডার বারে প্রদর্শিত হবে।
               </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── ADD STUDENT MODAL ── */}
+      <AnimatePresence>
+        {addStudentModalOpen && (
+          <div
+            className="tw-modal-overlay"
+            onClick={() => setAddStudentModalOpen(false)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(15, 23, 42, 0.6)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+            }}
+          >
+            <div
+              className="tw-modal-card"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: '#ffffff',
+                borderRadius: 24,
+                padding: 28,
+                width: '100%',
+                maxWidth: 460,
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h3 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', margin: 0 }}>
+                  ➕ নতুন শিক্ষার্থী যোগ করুন (Add Student)
+                </h3>
+                <button
+                  onClick={() => setAddStudentModalOpen(false)}
+                  style={{
+                    background: '#f1f5f9',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: 36,
+                    height: 36,
+                    cursor: 'pointer',
+                    fontSize: 18,
+                    color: '#64748b',
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateStudent}>
+                {/* 1. Student Name */}
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#475569', marginBottom: 8 }}>
+                    শিক্ষার্থীর নাম (Student Name) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="যেমন: সাদিয়া বা সাকিব"
+                    value={newStudentName}
+                    onChange={(e) => setNewStudentName(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: 12,
+                      border: '1.5px solid #cbd5e1',
+                      fontSize: 15,
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+
+                {/* 2. Avatar / Emoji selector or Custom Photo Upload */}
+                <div style={{ marginBottom: 24 }}>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#475569', marginBottom: 8 }}>
+                    প্রোফাইল ছবি বা ইমোজি নির্বাচন করুন (Select Avatar or Upload Photo)
+                  </label>
+
+                  {/* Preview box */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
+                    <div
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: '50%',
+                        background: '#f1f5f9',
+                        border: '2px solid #10b981',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 28,
+                        overflow: 'hidden',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {newStudentAvatar && (newStudentAvatar.startsWith('data:image') || newStudentAvatar.startsWith('http')) ? (
+                        <img
+                          src={newStudentAvatar}
+                          alt="Student Avatar"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        newStudentAvatar || '👦'
+                      )}
+                    </div>
+
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={studentPhotoInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleStudentPhotoUpload}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => studentPhotoInputRef.current?.click()}
+                        style={{
+                          background: '#e0f2fe',
+                          color: '#0369a1',
+                          border: 'none',
+                          padding: '8px 14px',
+                          borderRadius: 8,
+                          fontSize: 13,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        📷 ছবি আপলোড করুন (Upload Photo)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Emoji grid */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(6, 1fr)',
+                      gap: 8,
+                      maxHeight: 140,
+                      overflowY: 'auto',
+                      padding: 4,
+                    }}
+                  >
+                    {EMOJI_OPTIONS.map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => setNewStudentAvatar(emoji)}
+                        style={{
+                          background: newStudentAvatar === emoji ? '#d1fae5' : '#f8fafc',
+                          border: newStudentAvatar === emoji ? '2px solid #10b981' : '1px solid #e2e8f0',
+                          borderRadius: 10,
+                          height: 44,
+                          fontSize: 22,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {addStudentError && (
+                  <div style={{ color: '#dc2626', fontSize: 14, marginBottom: 16, fontWeight: 500 }}>
+                    {addStudentError}
+                  </div>
+                )}
+
+                {/* Buttons */}
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    onClick={() => setAddStudentModalOpen(false)}
+                    style={{
+                      background: '#f1f5f9',
+                      color: '#64748b',
+                      border: 'none',
+                      padding: '12px 20px',
+                      borderRadius: 12,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontSize: 15,
+                    }}
+                  >
+                    বাতিল
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isAddingStudent}
+                    style={{
+                      background: '#10b981',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      fontSize: 15,
+                      boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.3)',
+                      opacity: isAddingStudent ? 0.7 : 1,
+                    }}
+                  >
+                    {isAddingStudent ? 'যোগ করা হচ্ছে...' : '✓ সংরক্ষণ করুন'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
