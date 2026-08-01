@@ -57,6 +57,8 @@ export default function LoginPage() {
   const [newUserPin, setNewUserPin] = useState("");
   const [newUserRole, setNewUserRole] = useState("parent");
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserSchoolName, setNewUserSchoolName] = useState("");
+  const [newUserTeacherPin, setNewUserTeacherPin] = useState("");
 
   const avatarMap = {
     'avatar-boy-green': { img: avatarBoyGreen, bg: "#eef9f1", color: "#18b368" },
@@ -93,9 +95,9 @@ export default function LoginPage() {
               name: u.name,
               role: u.role,
               img: null, // Render an emoji later
-              bg: "#fff0f5",
-              color: "#f06292",
-              hasPin: false
+              bg: u.role === 'teacher' ? "#eef9f1" : "#fff0f5",
+              color: u.role === 'teacher' ? "#0f9055" : "#f06292",
+              hasPin: u.hasPin || false
             };
           }
         });
@@ -159,7 +161,11 @@ export default function LoginPage() {
       localStorage.setItem('activeUserId', selectedAvatar.id);
       localStorage.setItem('activeUserName', selectedAvatar.name);
       localStorage.removeItem('activeUserAvatar'); // Clear avatar since it's an emoji
-      navigate("/dashboard");
+      if (selectedAvatar.role === 'teacher') {
+        navigate("/teacher-workspace");
+      } else {
+        navigate("/dashboard");
+      }
     }
   };
 
@@ -183,7 +189,18 @@ export default function LoginPage() {
     if (selectedAvatar) {
       localStorage.setItem('activeUserId', selectedAvatar.id);
       localStorage.setItem('activeUserName', selectedAvatar.name);
-      localStorage.setItem('activeUserAvatar', selectedAvatar.img);
+      if (selectedAvatar.img) {
+        localStorage.setItem('activeUserAvatar', selectedAvatar.img);
+      } else {
+        localStorage.removeItem('activeUserAvatar');
+      }
+      if (selectedAvatar.role === 'teacher') {
+        playAudio("শিক্ষক ওয়ার্কস্পেসে স্বাগতম!");
+        setTimeout(() => {
+          navigate("/teacher-workspace");
+        }, 800);
+        return;
+      }
     }
     
     playAudio("চলো শিখি!");
@@ -211,6 +228,13 @@ export default function LoginPage() {
       console.error(err);
       setLoading(false);
     }
+  };
+
+  const handleTeacherDemo = () => {
+    localStorage.setItem('activeUserId', 'teacher-demo');
+    localStorage.setItem('activeUserName', 'শিক্ষক (Teacher)');
+    localStorage.removeItem('activeUserAvatar');
+    navigate('/teacher-workspace');
   };
 
   const handleCreateChild = async (e) => {
@@ -250,7 +274,32 @@ export default function LoginPage() {
       localStorage.setItem('activeUserId', parent._id);
       localStorage.setItem('activeUserName', parent.name);
       localStorage.removeItem('activeUserAvatar');
-      navigate("/dashboard");
+      if (newUserRole === 'teacher') {
+        navigate("/teacher-workspace");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  };
+
+  const handleCreateTeacher = async (e) => {
+    e.preventDefault();
+    if (!newUserName) return;
+    try {
+      setLoading(true);
+      const teacher = await createUser({
+        name: newUserName,
+        role: "teacher",
+        schoolName: newUserSchoolName,
+        pin: newUserTeacherPin
+      });
+      localStorage.setItem('activeUserId', teacher._id);
+      localStorage.setItem('activeUserName', teacher.name);
+      localStorage.removeItem('activeUserAvatar');
+      navigate("/teacher-workspace");
     } catch (err) {
       console.error(err);
       setLoading(false);
@@ -317,11 +366,17 @@ export default function LoginPage() {
               <button className="action-btn" onClick={() => setView('createChild')} style={{ background: '#18b368', color: 'white', boxShadow: '0 8px 24px rgba(24,179,104,0.3)' }}>
                 👶 শিশুর প্রোফাইল তৈরি করুন
               </button>
+              <button className="action-btn" onClick={() => { setNewUserName(""); setNewUserSchoolName(""); setNewUserTeacherPin(""); setView('createTeacher'); }} style={{ background: '#0f9055', color: 'white', boxShadow: '0 8px 24px rgba(15,144,85,0.3)' }}>
+                👨‍🏫 শিক্ষক প্রোফাইল তৈরি করুন
+              </button>
               <button className="action-btn" onClick={() => setView('createParent')} style={{ background: '#f5a623', color: 'white', boxShadow: '0 8px 24px rgba(245,166,35,0.3)' }}>
-                👨‍🏫 অভিভাবক/শিক্ষক প্রোফাইল
+                👨‍👩‍👧 অভিভাবক প্রোফাইল তৈরি করুন
               </button>
               <button className="action-btn" onClick={handleUseDemo} style={{ background: '#e2e8f0', color: '#4a5568', marginTop: 12 }}>
                 🚀 ডেমো প্রোফাইল ব্যবহার করুন
+              </button>
+              <button className="action-btn" onClick={handleTeacherDemo} style={{ background: '#eef9f1', color: '#18b368', border: '2px solid #18b368', marginTop: 4 }}>
+                👨‍🏫 শিক্ষক ওয়ার্কস্পেস (Teacher Mode)
               </button>
             </div>
           </motion.div>
@@ -406,6 +461,39 @@ export default function LoginPage() {
         )}
 
         {/* =========================================
+            SCREEN 0.3: CREATE TEACHER PROFILE
+        ========================================= */}
+        {view === "createTeacher" && (
+          <motion.div key="create-teacher-view" className="login-card" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}>
+            <button onClick={() => setView(avatars.length ? "avatar" : "setup")} style={{ background: 'none', border: 'none', color: '#687076', fontSize: 16, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 24 }}>
+              <BackSVG /> ফিরে যান
+            </button>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1d2b2a', marginBottom: 20 }}>শিক্ষক প্রোফাইল তৈরি করুন</h2>
+            
+            <form onSubmit={handleCreateTeacher}>
+              <div className="input-group">
+                <div className="input-icon"><UserSVG /></div>
+                <input type="text" className="t-input" placeholder="শিক্ষকের নাম (যেমন: নাদিয়া ম্যাডাম)" value={newUserName} onChange={e => setNewUserName(e.target.value)} required />
+              </div>
+
+              <div className="input-group">
+                <div className="input-icon" style={{ fontSize: 20 }}>🏫</div>
+                <input type="text" className="t-input" placeholder="বিদ্যালয়ের নাম (ঐচ্ছিক)" value={newUserSchoolName} onChange={e => setNewUserSchoolName(e.target.value)} />
+              </div>
+
+              <div className="input-group" style={{ marginBottom: 32 }}>
+                <div className="input-icon"><LockSVG /></div>
+                <input type="text" className="t-input" placeholder="৪-সংখ্যার পিন (ঐচ্ছিক)" maxLength={4} value={newUserTeacherPin} onChange={e => setNewUserTeacherPin(e.target.value.replace(/\D/g, ''))} />
+              </div>
+
+              <button type="submit" className="action-btn" style={{ background: '#0f9055', color: 'white', boxShadow: '0 8px 24px rgba(15,144,85,0.3)' }}>
+                {loading ? "তৈরি হচ্ছে..." : "শিক্ষক প্রোফাইল সেভ করুন"}
+              </button>
+            </form>
+          </motion.div>
+        )}
+
+        {/* =========================================
             SCREEN 1: EXISTING PROFILES
         ========================================= */}
         {view === "avatar" && (
@@ -467,12 +555,18 @@ export default function LoginPage() {
               এগিয়ে যাও
             </motion.button>
 
-            <div style={{ textAlign: 'center', marginTop: 28, display: 'flex', justifyContent: 'center', gap: 16 }}>
+            <div style={{ textAlign: 'center', marginTop: 24, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 14 }}>
               <button onClick={() => { setNewUserRole("child"); setView("createChild"); }} style={{ background: 'none', border: 'none', color: '#18b368', fontSize: 15, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
                 + নতুন শিশু প্রোফাইল
               </button>
+              <button onClick={() => { setNewUserName(""); setNewUserSchoolName(""); setNewUserTeacherPin(""); setView("createTeacher"); }} style={{ background: 'none', border: 'none', color: '#0f9055', fontSize: 15, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}>
+                + নতুন শিক্ষক প্রোফাইল
+              </button>
               <button onClick={() => { setNewUserRole("parent"); setView("createParent"); }} style={{ background: 'none', border: 'none', color: '#f5a623', fontSize: 15, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
                 + অভিভাবক প্রোফাইল
+              </button>
+              <button onClick={handleTeacherDemo} style={{ background: 'none', border: 'none', color: '#687076', fontSize: 14, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
+                ডেমো শিক্ষক মোড
               </button>
             </div>
           </motion.div>

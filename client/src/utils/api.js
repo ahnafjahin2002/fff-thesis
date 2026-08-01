@@ -58,7 +58,11 @@ export const createSession = async (data) => {
     body: JSON.stringify(data),
   });
   if (!response.ok) throw new Error('Failed to create session');
-  return response.json();
+  const result = await response.json();
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('fff_session_created', { detail: result }));
+  }
+  return result;
 };
 
 export const getSessions = async (userId) => {
@@ -85,3 +89,30 @@ export const getBornoBazarProgress = async (userId) => {
   }
   return response.json();
 };
+
+export const getClassroomStats = async () => {
+  const response = await fetch(`${API_URL}/api/teacher/classroom-stats`);
+  if (!response.ok) throw new Error('Failed to fetch classroom stats');
+  return response.json();
+};
+
+export const updateStudentNote = async (studentId, notes) => {
+  const response = await fetch(`${API_URL}/api/teacher/students/${studentId}/notes`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notes }),
+  });
+  if (!response.ok) throw new Error('Failed to update student note');
+  return response.json();
+};
+
+export const updateUserProfile = async (userId, data) => {
+  const response = await fetch(`${API_URL}/api/users/${userId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to update user profile');
+  return response.json();
+};
+

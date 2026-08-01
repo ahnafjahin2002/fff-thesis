@@ -1,0 +1,1376 @@
+/* =========================================================
+   Teacher Workspace Page — TeacherWorkspacePage.css
+   Designed for Low-Resource Bangladeshi Foundation Schools
+   ========================================================= */
+
+/* ── Root Layout ── */
+.tw-app-root {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  background: #f0faf4;
+  position: relative;
+  overflow-x: hidden;
+  font-family: 'Hind Siliguri', sans-serif;
+  color: #1d2b2a;
+}
+
+/* ── Sidebar (matching DashboardPage exactly) ── */
+.tw-sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 260px;
+  height: 100vh;
+  background: #e8f7ee;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 18px 24px;
+  border-right: 1px solid rgba(24, 179, 104, 0.13);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 200;
+  overflow-y: auto;
+}
+
+.tw-sidebar.open {
+  left: 0;
+}
+
+.tw-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+  z-index: 190;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.tw-sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.tw-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding-left: 4px;
+  cursor: pointer;
+}
+
+.tw-sidebar-logo-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: #c8f0d8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.tw-sidebar-logo-text {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0a6e3a;
+  line-height: 1.2;
+}
+
+.tw-sidebar-logo-sub {
+  font-size: 11px;
+  color: #4caf7d;
+  margin-top: 1px;
+}
+
+.tw-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  height: 50px;
+  border-radius: 15px;
+  padding: 0 15px;
+  cursor: pointer;
+  color: #687076;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  transition: background 0.18s, color 0.18s;
+  user-select: none;
+}
+
+.tw-nav-item:hover {
+  background: #c8f0d8;
+  color: #0a6e3a;
+}
+
+.tw-nav-item.active {
+  background: #c8f0d8;
+  color: #0a6e3a;
+  font-weight: 700;
+}
+
+.tw-sidebar-motivate {
+  margin-top: auto;
+  background: white;
+  border-radius: 20px;
+  padding: 20px 14px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+/* ── Main Area ── */
+.tw-main-area {
+  flex: 1;
+  width: 100%;
+  min-height: 100vh;
+  padding: 28px 36px 48px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── SECTION 1: WELCOME HEADER ── */
+.tw-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.tw-top-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tw-hamburger {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  border: none;
+  background: white;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.tw-hamburger span {
+  display: block;
+  height: 2.8px;
+  background: #1d2b2a;
+  border-radius: 3px;
+  transition: width 0.2s;
+}
+
+.tw-welcome-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.tw-page-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #18b368;
+  margin-bottom: 2px;
+}
+
+.tw-welcome-heading {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1d2b2a;
+  line-height: 1.2;
+}
+
+.tw-welcome-sub {
+  font-size: 15px;
+  color: #687076;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.tw-top-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tw-date-pill {
+  background: white;
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5568;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tw-search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 100px;
+  padding: 4px 18px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  width: 260px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.tw-search-bar:focus-within {
+  box-shadow: 0 4px 16px rgba(24, 179, 104, 0.15);
+  border-color: #18b368;
+}
+
+.tw-search-bar input {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1d2b2a;
+  width: 100%;
+  padding: 8px 4px;
+  background: transparent;
+}
+
+.tw-search-bar input::placeholder {
+  color: #94a3b8;
+}
+
+.tw-notification-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.18s;
+}
+
+.tw-notification-btn:hover {
+  transform: scale(1.05);
+}
+
+.tw-notification-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #18b368;
+  border: 2px solid white;
+}
+
+.tw-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: white;
+  padding: 6px 16px 6px 6px;
+  border-radius: 100px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: box-shadow 0.18s;
+}
+
+.tw-profile-pill:hover {
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+}
+
+.tw-profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #c8f0c8;
+  overflow: hidden;
+  border: 2px solid #a8e6bf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* ── Section Header ── */
+.tw-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.tw-section-heading {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1d2b2a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tw-section-subtitle {
+  font-size: 14px;
+  color: #687076;
+  font-weight: 500;
+}
+
+/* ── SECTION 2: TODAY'S CLASSROOM (6 Summary Cards) ── */
+.tw-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.tw-summary-card {
+  border-radius: 22px;
+  padding: 22px 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tw-summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.tw-summary-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.tw-summary-content {
+  flex: 1;
+}
+
+.tw-summary-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #687076;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.tw-summary-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1d2b2a;
+  line-height: 1.2;
+}
+
+.tw-summary-sub {
+  font-size: 12px;
+  color: #4caf7d;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ── SECTION 3: START CLASSROOM ── */
+.tw-start-classroom-card {
+  background: linear-gradient(135deg, #e2f5ea 0%, #cdeadb 100%);
+  border-radius: 26px;
+  padding: 34px 38px;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.08);
+  margin-bottom: 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tw-start-header-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 26px;
+  position: relative;
+  z-index: 2;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.tw-start-title-area h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1a2e1a;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.tw-start-title-area p {
+  font-size: 16px;
+  color: #3a6b4a;
+  font-weight: 600;
+  max-width: 650px;
+  line-height: 1.5;
+}
+
+.tw-start-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  color: #0f9055;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 100px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  margin-bottom: 12px;
+}
+
+.tw-start-illustration-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tw-start-illustration-img {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.08));
+}
+
+.tw-activity-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 2;
+}
+
+.tw-activity-card {
+  background: white;
+  border-radius: 20px;
+  padding: 22px 20px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.tw-activity-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.tw-activity-card.selected {
+  border-color: #18b368;
+  background: #f4fdf8;
+  box-shadow: 0 8px 26px rgba(24, 179, 104, 0.18);
+}
+
+.tw-activity-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.tw-activity-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: #eef9f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.tw-activity-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: #f0f0f0;
+  color: #555;
+}
+
+.tw-activity-card.selected .tw-activity-tag {
+  background: #d4f3e3;
+  color: #0f9055;
+}
+
+.tw-activity-card h3 {
+  font-size: 19px;
+  font-weight: 800;
+  color: #1d2b2a;
+  margin-bottom: 6px;
+}
+
+.tw-activity-card p {
+  font-size: 13px;
+  color: #687076;
+  line-height: 1.5;
+}
+
+.tw-start-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 6px;
+}
+
+.tw-projector-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #2e593c;
+  font-weight: 600;
+}
+
+.tw-projector-info-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.tw-launch-classroom-btn {
+  background: linear-gradient(135deg, #18b368, #0f9055);
+  color: white;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 100px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(24, 179, 104, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.tw-launch-classroom-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(24, 179, 104, 0.45);
+}
+
+/* ── SECTION 4: STUDENTS (Split Layout) ── */
+.tw-students-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.tw-student-list-panel {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  height: 640px;
+}
+
+.tw-student-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.tw-student-list-header h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1d2b2a;
+}
+
+.tw-student-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1d2b2a;
+  background: #f8fafc;
+  outline: none;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.tw-student-search-input:focus {
+  border-color: #18b368;
+  background: white;
+  box-shadow: 0 2px 10px rgba(24, 179, 104, 0.1);
+}
+
+.tw-student-search-input::placeholder {
+  color: #94a3b8;
+}
+
+.tw-student-list-items {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.tw-student-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: all 0.18s ease;
+  background: #fafcfb;
+}
+
+.tw-student-row:hover {
+  background: #f0faf4;
+}
+
+.tw-student-row.active {
+  background: #e8f7ee;
+  border-left-color: #18b368;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.tw-student-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tw-student-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #d4f3e3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0a6e3a;
+  flex-shrink: 0;
+}
+
+.tw-student-name-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.tw-student-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1d2b2a;
+}
+
+.tw-student-level-badge {
+  font-size: 12px;
+  color: #687076;
+  font-weight: 600;
+}
+
+.tw-status-badge {
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tw-status-green {
+  background: #d4f3e3;
+  color: #0a6e3a;
+}
+
+.tw-status-yellow {
+  background: #fffbee;
+  color: #a16207;
+}
+
+/* Right Panel: Selected Student Details */
+.tw-student-detail-panel {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  height: 640px;
+  overflow-y: auto;
+}
+
+.tw-detail-top-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 20px;
+}
+
+.tw-detail-profile-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tw-detail-avatar-large {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #c8f0c8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  border: 3px solid #a8e6bf;
+  flex-shrink: 0;
+}
+
+.tw-detail-name {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1d2b2a;
+  line-height: 1.2;
+}
+
+.tw-detail-sub-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.tw-detail-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.tw-mini-stat-card {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 14px 12px;
+  text-align: center;
+  border: 1px solid #f1f5f9;
+}
+
+.tw-mini-stat-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.tw-mini-stat-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1d2b2a;
+}
+
+.tw-detail-section {
+  margin-bottom: 22px;
+}
+
+.tw-detail-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1d2b2a;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tw-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tw-practice-chip {
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  background: #fffbee;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tw-recommended-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tw-recommended-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  transition: all 0.18s ease;
+}
+
+.tw-recommended-item:hover {
+  background: #f0faf4;
+  border-color: #d4f3e3;
+}
+
+.tw-recommended-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1d2b2a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tw-launch-item-btn {
+  background: white;
+  color: #18b368;
+  border: 1px solid #18b368;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.tw-launch-item-btn:hover {
+  background: #18b368;
+  color: white;
+}
+
+.tw-teacher-notes-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tw-notes-textarea {
+  width: 100%;
+  min-height: 95px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+  font-size: 14px;
+  color: #334155;
+  background: #f8fafc;
+  outline: none;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.tw-notes-textarea:focus {
+  border-color: #18b368;
+  background: white;
+}
+
+.tw-notes-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tw-notes-visibility-badge {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tw-save-note-btn {
+  background: #e8f7ee;
+  color: #0a6e3a;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.tw-save-note-btn:hover {
+  background: #18b368;
+  color: white;
+}
+
+/* ── SECTION 5: CLASSROOM INSIGHTS (Simple Cards) ── */
+.tw-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 36px;
+}
+
+.tw-insight-card {
+  background: white;
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 175px;
+  border: 1px solid #f1f5f9;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tw-insight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.tw-insight-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tw-insight-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.tw-insight-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.tw-insight-main-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1d2b2a;
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.tw-insight-sub {
+  font-size: 13px;
+  color: #486581;
+  line-height: 1.5;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.tw-insight-chip {
+  background: #e8f7ee;
+  color: #0f9055;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ── SECTION 6: TEACHING TIP (Evidence-Based Recommendation) ── */
+.tw-teaching-tip-card {
+  background: white;
+  border-radius: 24px;
+  padding: 26px 30px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-left: 6px solid #18b368;
+  margin-bottom: 32px;
+}
+
+.tw-tip-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex: 1;
+}
+
+.tw-tip-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: #fffbee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tw-tip-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.tw-tip-heading {
+  font-size: 16px;
+  font-weight: 800;
+  color: #18b368;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tw-tip-quote {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1d2b2a;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.tw-tip-explanation {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.tw-rotate-tip-btn {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.tw-rotate-tip-btn:hover {
+  background: #e8f7ee;
+  color: #0a6e3a;
+  border-color: #18b368;
+}
+
+/* ── Classroom Mode Modal ── */
+.tw-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.tw-modal-box {
+  background: white;
+  border-radius: 32px;
+  max-width: 640px;
+  width: 100%;
+  padding: 36px 40px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.tw-modal-header-banner {
+  background: linear-gradient(135deg, #e2f5ea 0%, #cdeadb 100%);
+  margin: -36px -40px 24px;
+  padding: 30px 40px;
+  border-bottom: 1px solid #d4f3e3;
+}
+
+.tw-modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tw-modal-close-btn:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.tw-modal-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1d2b2a;
+  margin-bottom: 8px;
+}
+
+.tw-modal-desc {
+  font-size: 16px;
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.tw-modal-activity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #e8f7ee;
+  color: #0a6e3a;
+  padding: 12px 24px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.tw-modal-footer-btn {
+  background: #18b368;
+  color: white;
+  border: none;
+  padding: 14px 36px;
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(24, 179, 104, 0.3);
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tw-modal-footer-btn:hover {
+  background: #0f9055;
+  transform: translateY(-2px);
+}
+
+/* ── Responsive Rules ── */
+@media (max-width: 1200px) {
+  .tw-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tw-insights-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tw-activity-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tw-students-split-layout {
+    grid-template-columns: 1fr;
+  }
+  .tw-student-list-panel,
+  .tw-student-detail-panel {
+    height: 520px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tw-main-area {
+    padding: 20px 16px 36px;
+  }
+  .tw-summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .tw-insights-grid {
+    grid-template-columns: 1fr;
+  }
+  .tw-activity-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .tw-teaching-tip-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tw-rotate-tip-btn {
+    align-self: flex-end;
+  }
+  .tw-search-bar {
+    width: 100%;
+  }
+}
+
+/* ── Teacher Profile & Photo Upload Modal Styles ── */
+.tw-profile-photo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0 24px;
+}
+
+.tw-profile-photo-circle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 4px solid #a8e6bf;
+  background: #e8f7ee;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  box-shadow: 0 4px 18px rgba(24, 179, 104, 0.2);
+  position: relative;
+}
+
+.tw-profile-photo-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tw-photo-btn-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.tw-upload-photo-btn {
+  background: #18b368;
+  color: white;
+  border: none;
+  border-radius: 100px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(24, 179, 104, 0.3);
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tw-upload-photo-btn:hover {
+  background: #0f9055;
+  transform: translateY(-2px);
+}
+
+.tw-remove-photo-btn {
+  background: #fee2e2;
+  color: #991b1b;
+  border: none;
+  border-radius: 100px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tw-remove-photo-btn:hover {
+  background: #fecaca;
+  transform: translateY(-2px);
+}
+
+.tw-teacher-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.tw-teacher-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+}
+
+.tw-teacher-info-label {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.tw-teacher-info-value {
+  color: #0f172a;
+  font-weight: 800;
+}
+

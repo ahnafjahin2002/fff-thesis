@@ -20,6 +20,7 @@ import { segmentText } from '../utils/phonemeUtils';
 import { decomposeWord } from '../utils/banglaUtils';
 import { synthesizeBanglaTTS } from '../utils/ttsApi';
 import { createSession, updateProgress } from '../utils/api';
+import { useEffectiveUserId } from '../hooks/useEffectiveUserId';
 import { DIFFICULTY_LEVELS, READING_CONTENT, getLevelInfo } from '../utils/readingContent';
 
 // Premium UI assets
@@ -410,6 +411,7 @@ function ReadingHub({ onSelect }) {
 
 // ── Main Page Component ──
 export default function ReadingPage() {
+  const effectiveUserId = useEffectiveUserId();
   const [subView, setSubView] = useState(null);
   const { isPanelOpen, togglePanel } = usePreferences();
 
@@ -593,14 +595,13 @@ export default function ReadingPage() {
   );
 
   const handleSaveProgress = async () => {
-    const activeUserId = localStorage.getItem('activeUserId');
-    if (!activeUserId) {
+    if (!effectiveUserId) {
       console.warn("No active user to save progress for.");
       return;
     }
     try {
       await createSession({
-        userId: activeUserId,
+        userId: effectiveUserId,
         feature: 'reading',
         activityType: 'read_aloud',
         score: 100,
@@ -614,7 +615,7 @@ export default function ReadingPage() {
         }
       });
       
-      await updateProgress(activeUserId, {
+      await updateProgress(effectiveUserId, {
         starsEarned: 1,
         skill: 'reading'
       });

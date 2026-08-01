@@ -4,8 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { PHASE2_WORDS, buildTilePool } from "../../data/words";
 import "./Phase2Spelling.css";
 import { createSession, updateBornoBazarProgress } from '../../utils/api';
+import { useEffectiveUserId } from '../../hooks/useEffectiveUserId';
 
 export default function Phase2Spelling({ shopColor = "#18b368", onComplete, onBack }) {
+  const effectiveUserId = useEffectiveUserId();
   const [wordIndex, setWordIndex] = useState(0);
   const [placedLetters, setPlacedLetters] = useState([]);
   const [tilePool, setTilePool] = useState([]);
@@ -84,16 +86,15 @@ export default function Phase2Spelling({ shopColor = "#18b368", onComplete, onBa
     setWordSuccess(true);
     setMascotState("celebrate");
 
-    const activeUserId = localStorage.getItem('activeUserId');
-    if (activeUserId) {
-      updateBornoBazarProgress(activeUserId, {
+    if (effectiveUserId) {
+      updateBornoBazarProgress(effectiveUserId, {
         letter: currentWord.letters.join(''),
         phaseCompleted: 2,
         starsEarned: 1
       }).catch(err => console.warn(err));
 
       createSession({
-        userId: activeUserId,
+        userId: effectiveUserId,
         feature: 'borno_bazar',
         activityType: 'spelling',
         score: 100,

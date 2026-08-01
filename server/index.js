@@ -24,6 +24,7 @@ const userRoutes = require('./routes/userRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
 const bornoBazarRoutes = require('./routes/bornoBazarRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -44,6 +45,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/borno-bazar', bornoBazarRoutes);
+app.use('/api/teacher', teacherRoutes);
 
 // ── TTS Synthesis ──
 // POST /api/tts/synthesize

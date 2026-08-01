@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   passwordHash: { type: String },
   avatar: { type: String },
   pin: { type: String },
+  schoolName: { type: String },
+  teacherNotes: { type: String, default: '' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

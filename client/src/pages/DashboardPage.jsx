@@ -460,6 +460,7 @@ const DEFAULT_ACHIEVEMENTS = [
 
 const NAV_ITEMS = [
   { id: "home", label: "হোম", icon: <HomeSVG /> },
+  { id: "teacher", label: "শিক্ষক ওয়ার্কস্পেস", icon: <span style={{fontSize: 20}}>👨‍🏫</span> },
   { id: "read", label: "পড়া", icon: <BookSVG /> },
   { id: "game", label: "বর্ণের দোকান", icon: <GamepadSVG /> },
   { id: "trace", label: "ট্রেনিং", icon: <PencilSVG /> },
@@ -1173,6 +1174,7 @@ function HomePage({
               onClick={() => {
                 setSidebarOpen(false);
                 if (item.id === "home") { onNav("home"); }
+                else if (item.id === "teacher") { navigate("/teacher-workspace"); }
                 else if (item.id === "read") { navigate("/reading"); }
                 else if (item.id === "quiz") { navigate("/quiz"); }
                 else if (item.id === "logout") { navigate("/login"); }
@@ -1210,6 +1212,28 @@ function HomePage({
             <span style={{ width: 22 }} />
             <span style={{ width: 15, alignSelf: "flex-start", marginLeft: 3 }} />
           </motion.button>
+
+          <button
+            onClick={() => navigate("/teacher-workspace")}
+            style={{
+              background: "#eef9f1",
+              border: "2px solid #18b368",
+              color: "#18b368",
+              padding: "8px 16px",
+              borderRadius: "24px",
+              fontWeight: 700,
+              fontSize: "14px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              boxShadow: "0 4px 12px rgba(24,179,104,0.15)",
+              transition: "all 0.2s"
+            }}
+          >
+            <span style={{ fontSize: "18px" }}>👨‍🏫</span>
+            <span>শিক্ষক ওয়ার্কস্পেস</span>
+          </button>
 
           <div className="profile-pill" onClick={() => onNav && onNav("settings")}>
             <div className="profile-avatar">
