@@ -116,3 +116,11 @@ export const updateUserProfile = async (userId, data) => {
   return response.json();
 };
 
+export const deleteUser = async (userId) => {
+  const response = await fetch(`${API_URL}/api/users/${userId}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Failed to delete user');
+  return response.json();
+};
+

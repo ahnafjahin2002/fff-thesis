@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getClassroomStats, updateStudentNote, updateUserProfile, createUser } from '../utils/api';
+import { getClassroomStats, updateStudentNote, updateUserProfile, createUser, deleteUser } from '../utils/api';
 import { useClassroom } from '../context/ClassroomContext';
 import './TeacherWorkspacePage.css';
 
@@ -395,6 +395,19 @@ export default function TeacherWorkspacePage() {
       setAddStudentError('শিক্ষার্থী যোগ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
     } finally {
       setIsAddingStudent(false);
+    }
+  };
+
+  const handleDeleteStudent = async (studentId, studentName) => {
+    if (!window.confirm(`আপনি কি নিশ্চিত যে শিক্ষার্থী '${studentName}'-কে তালিকা থেকে মুছে ফেলতে চান?`)) {
+      return;
+    }
+    try {
+      await deleteUser(studentId);
+      await fetchDashboardData();
+    } catch (err) {
+      console.error('Failed to delete student:', err);
+      alert('শিক্ষার্থী মুছতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
     }
   };
 
@@ -1297,7 +1310,7 @@ export default function TeacherWorkspacePage() {
                 </div>
               ) : (
                 <>
-                  <div className="tw-detail-top-card">
+                  <div className="tw-detail-top-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div className="tw-detail-profile-main">
                       <div className="tw-detail-avatar-large" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {selectedStudent.avatar && (selectedStudent.avatar.startsWith('data:image') || selectedStudent.avatar.startsWith('http')) ? (
@@ -1326,6 +1339,27 @@ export default function TeacherWorkspacePage() {
                     </div>
                   </div>
                 </div>
+                <button
+                  onClick={() => handleDeleteStudent(selectedStudent.id, selectedStudent.name)}
+                  style={{
+                    background: '#fee2e2',
+                    color: '#dc2626',
+                    border: '1px solid #fecaca',
+                    padding: '8px 14px',
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    transition: 'all 0.15s ease',
+                  }}
+                  title="এই শিক্ষার্থীকে তালিকা থেকে মুছুন"
+                >
+                  <span>🗑️</span>
+                  <span>শিক্ষার্থী মুছুন</span>
+                </button>
               </div>
 
               {/* 6 Summary Stats */}

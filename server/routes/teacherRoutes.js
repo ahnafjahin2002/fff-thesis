@@ -390,7 +390,53 @@ router.get('/classroom-stats', async (req, res) => {
         const isToday = lastSession && new Date(lastSession) >= startOfToday;
 
         const bbLevel = uBorno ? 1 + Math.min(5, Math.floor((uBorno.totalStars || 0) / 4)) : 1;
-        const rLevel = 1 + (idx % 3);
+        const rLevel = Math.max(1, Math.min(10, 1 + Math.floor(storiesCompleted / 2)));
+
+        // Calculate student's specific difficult letters/words from their sessions
+        const uLetterCounts = {};
+        const uWordCounts = {};
+        uSessions.forEach(s => {
+          const details = s.details || {};
+          const letters = [
+            ...(Array.isArray(details.failedLetters) ? details.failedLetters : []),
+            ...(Array.isArray(details.tappedConjuncts) ? details.tappedConjuncts : []),
+            ...(details.letter ? [details.letter] : [])
+          ];
+          letters.forEach(char => {
+            if (char && typeof char === 'string' && char.trim().length > 0) {
+              uLetterCounts[char] = (uLetterCounts[char] || 0) + 1;
+            }
+          });
+          const words = [
+            ...(Array.isArray(details.tappedWords) ? details.tappedWords : []),
+            ...(details.word ? [details.word] : [])
+          ];
+          words.forEach(w => {
+            if (w && typeof w === 'string' && w.trim().length > 1) {
+              uWordCounts[w] = (uWordCounts[w] || 0) + 1;
+            }
+          });
+        });
+
+        const sortedULetters = Object.entries(uLetterCounts).sort((a, b) => b[1] - a[1]).map(e => e[0]);
+        const sortedUWords = Object.entries(uWordCounts).sort((a, b) => b[1] - a[1]).map(e => e[0]);
+        let needsMorePractice = [...sortedULetters.slice(0, 2), ...sortedUWords.slice(0, 1)];
+        if (needsMorePractice.length === 0) {
+          needsMorePractice = totalSessions === 0 ? ['এখনও কোনো অনুশীলন হয়নি'] : ['উত্তম অগ্রগতি'];
+        }
+
+        const recommendedActivities = [
+          {
+            id: `rec-${uId}-1`,
+            title: `গল্প ${rLevel}`,
+            type: 'Story'
+          },
+          {
+            id: `rec-${uId}-2`,
+            title: `বর্ণবাজার লেভেল ${bbLevel}`,
+            type: 'Interactive Game'
+          }
+        ];
 
         return {
           id: uId,
@@ -404,12 +450,9 @@ router.get('/classroom-stats', async (req, res) => {
           readingSessions: totalSessions.toString(),
           bornoBazarLevel: bbLevel.toString(),
           lastPracticeDate: formatPracticeDate(lastSession),
-          readingTime: `${totalDurationMins} Minutes`,
-          needsMorePractice: ['যুক্তবর্ণ', 'কারচিহ্ন', 'Long Words'],
-          recommendedActivities: [
-            { id: `rec-${uId}-1`, title: 'Story 1', type: 'Story' },
-            { id: `rec-${uId}-2`, title: 'BornoBazar Level 1', type: 'Interactive Game' },
-          ],
+          readingTime: `${totalDurationMins} মিনিট`,
+          needsMorePractice,
+          recommendedActivities,
           notes: u.teacherNotes || '',
         };
       });
@@ -430,7 +473,7 @@ router.get('/classroom-stats', async (req, res) => {
           sub: mostUsedActivitySub
         },
         averageReadingTime: {
-          value: `${avgReadingTimeMins} Minutes`,
+          value: `${avgReadingTimeMins} মিনিট`,
           sub: `Per student today (${avgReadingTimeMins} মিনিট)`
         },
         studentsPracticedToday: {
