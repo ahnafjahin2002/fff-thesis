@@ -424,7 +424,6 @@ function ReadingHub({ onSelect }) {
     </div>
   );
 }
-
 // ── Main Page Component ──
 export default function ReadingPage() {
   const location = useLocation();
@@ -432,6 +431,14 @@ export default function ReadingPage() {
   const { isClassroomMode, activeClassroomStudent } = useClassroom();
   const [subView, setSubView] = useState(location.state?.subView || null);
   const { isPanelOpen, togglePanel } = usePreferences();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const view = params.get('view');
+    if (view && ['line', 'phoneme', 'juktoborno', 'karchihno'].includes(view)) {
+      setSubView(view);
+    }
+  }, [location.search]);
 
   const [tappedWord, setTappedWord] = useState(null);
   const [activeIdx, setActiveIdx] = useState(-1);
