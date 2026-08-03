@@ -6,6 +6,26 @@ export const getUsers = async () => {
   return response.json();
 };
 
+export const getChildStudents = async (teacherId) => {
+  const url = teacherId ? `${API_URL}/api/users?role=child&teacherId=${teacherId}` : `${API_URL}/api/users?role=child`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Failed to fetch students');
+  return response.json();
+};
+
+export const createStudent = async (studentData) => {
+  const res = await fetch(`${API_URL}/api/users`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      role: 'child',
+      ...studentData
+    })
+  });
+  if (!res.ok) throw new Error('Failed to create student');
+  return res.json();
+};
+
 export const getUser = async (userId) => {
   const response = await fetch(`${API_URL}/api/users/${userId}`);
   if (!response.ok) throw new Error('Failed to fetch user');

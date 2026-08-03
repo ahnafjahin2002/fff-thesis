@@ -275,7 +275,7 @@ function formatPracticeDate(date) {
 router.get('/classroom-stats', async (req, res) => {
   try {
     const allSessions = await ActivitySession.find({}).sort({ createdAt: -1 });
-    const childUsers = await User.find({ role: 'child' });
+    const childUsers = await User.find({ role: 'child', isDeleted: { $ne: true } });
     const bornoBazarProgressList = await BornoBazarProgress.find({});
 
     const now = new Date();

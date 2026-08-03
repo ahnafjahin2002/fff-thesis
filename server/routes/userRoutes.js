@@ -5,7 +5,11 @@ const User = require('../models/User');
 
 router.get('/', async (req, res) => {
   try {
-    const users = await User.find({});
+    const query = { isDeleted: { $ne: true } };
+    if (req.query.role) query.role = req.query.role;
+    if (req.query.teacherId) query.teacherId = req.query.teacherId;
+
+    const users = await User.find(query);
     const safeUsers = users.map(u => {
       const obj = u.toObject();
       obj.hasPin = !!obj.pin;
@@ -21,7 +25,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user || user.isDeleted) return res.status(404).json({ error: 'User not found' });
     
     const safeUser = user.toObject();
     safeUser.hasPin = !!safeUser.pin;
@@ -54,7 +58,7 @@ router.post('/login', async (req, res) => {
     if (!userId) return res.status(400).json({ error: 'User ID is required' });
 
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user || user.isDeleted) return res.status(404).json({ error: 'User not found' });
 
     if (user.role === 'child' && user.pin) {
       if (!pin || pin !== user.pin) {
@@ -73,7 +77,7 @@ router.post('/login', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user || user.isDeleted) return res.status(404).json({ error: 'User not found' });
     const safeUser = user.toObject();
     delete safeUser.pin;
     res.json(safeUser);
@@ -82,10 +86,10 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-// Delete a user by ID
+// Soft Delete a user by ID (preserves historical sessions for telemetry)
 router.delete('/:id', async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findByIdAndUpdate(req.params.id, { isDeleted: true }, { new: true });
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json({ message: 'User deleted successfully', userId: req.params.id });
   } catch (err) {

@@ -356,6 +356,8 @@ export default function TeacherWorkspacePage() {
   // Add Student modal & form state
   const [addStudentModalOpen, setAddStudentModalOpen] = useState(false);
   const [newStudentName, setNewStudentName] = useState('');
+  const [newStudentNickname, setNewStudentNickname] = useState('');
+  const [newStudentGrade, setNewStudentGrade] = useState('প্রথম শ্রেণী');
   const [newStudentAvatar, setNewStudentAvatar] = useState('👦');
   const [isAddingStudent, setIsAddingStudent] = useState(false);
   const [addStudentError, setAddStudentError] = useState('');
@@ -388,11 +390,17 @@ export default function TeacherWorkspacePage() {
       setAddStudentError('');
       await createUser({
         name: newStudentName.trim(),
+        nameBangla: newStudentName.trim(),
+        nickname: newStudentNickname.trim() || '',
+        classGrade: newStudentGrade.trim() || 'প্রথম শ্রেণী',
         role: 'child',
-        avatar: newStudentAvatar || '👦'
+        avatar: newStudentAvatar || '👦',
+        teacherId: localStorage.getItem('activeUserId') || null
       });
       await fetchDashboardData();
       setNewStudentName('');
+      setNewStudentNickname('');
+      setNewStudentGrade('প্রথম শ্রেণী');
       setNewStudentAvatar('👦');
       setAddStudentModalOpen(false);
     } catch (err) {
@@ -470,6 +478,11 @@ export default function TeacherWorkspacePage() {
       setClassroomData(data);
       if (data.roster) {
         setStudents(data.roster);
+        try {
+          localStorage.setItem('fff_classroom_roster', JSON.stringify(data.roster));
+        } catch (e) {
+          console.warn('Failed to cache roster offline:', e);
+        }
         if (data.roster.length > 0) {
           setSelectedStudentId((prevId) => {
             const exists = data.roster.some(
@@ -485,9 +498,21 @@ export default function TeacherWorkspacePage() {
     } catch (err) {
       console.error('Error fetching classroom stats:', err);
       setStatsError(err.message || 'Failed to load live classroom data');
+      const cached = localStorage.getItem('fff_classroom_roster');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setStudents(parsed);
+            if (!selectedStudentId) setSelectedStudentId(parsed[0].id);
+          }
+        } catch (e) {
+          console.warn('Failed to parse offline cached roster:', e);
+        }
+      }
       setLoadingStats(false);
     }
-  }, []);
+  }, [selectedStudentId]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -786,6 +811,60 @@ export default function TeacherWorkspacePage() {
           </div>
         </header>
 
+
+        {/* ── GUIDED CLASSROOM SETUP BANNER (First Time / Empty Roster) ── */}
+        {students.length === 0 && !loadingStats && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+              border: '2px dashed #10b981',
+              borderRadius: 22,
+              padding: '24px 30px',
+              marginBottom: 24,
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 16
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ fontSize: 38, background: '#e0f2fe', padding: 14, borderRadius: 18 }}>🏫</div>
+              <div>
+                <h3 style={{ fontSize: 20, fontWeight: 800, color: '#065f46', marginBottom: 4 }}>
+                  আপনার ক্লাসরুম সেটআপ সম্পন্ন করুন (Setup Your Classroom)
+                </h3>
+                <p style={{ fontSize: 14, color: '#047857', fontWeight: 600, margin: 0 }}>
+                  আপনার ক্লাসরুমে এখনো কোনো শিক্ষার্থী যোগ করা হয়নি। ড্যাশবোর্ড ও ক্লাসরুম প্র্যাকটিস চালু করতে প্রথমে শিক্ষার্থী যোগ করুন।
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAddStudentModalOpen(true)}
+              style={{
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 14,
+                padding: '12px 24px',
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}
+            >
+              <span>➕</span>
+              <span>নতুন শিক্ষার্থী যোগ করুন</span>
+            </button>
+          </motion.div>
+        )}
 
         {/* ── SECTION 2: TODAY'S CLASSROOM (6 Summary Cards) ── */}
         <section style={{ marginBottom: 12 }}>
@@ -2152,6 +2231,54 @@ export default function TeacherWorkspacePage() {
                       boxSizing: 'border-box',
                     }}
                   />
+                </div>
+
+                {/* 1b. Student Nickname (Optional) */}
+                <div style={{ marginBottom: 18 }}>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                    ডাকনাম (Optional Nickname)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="যেমন: রাইহান"
+                    value={newStudentNickname}
+                    onChange={(e) => setNewStudentNickname(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: 12,
+                      border: '1.5px solid #cbd5e1',
+                      fontSize: 15,
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+
+                {/* 1c. Student Grade / Class */}
+                <div style={{ marginBottom: 18 }}>
+                  <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                    শ্রেণী (Grade / Class)
+                  </label>
+                  <select
+                    value={newStudentGrade}
+                    onChange={(e) => setNewStudentGrade(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      borderRadius: 12,
+                      border: '1.5px solid #cbd5e1',
+                      fontSize: 15,
+                      outline: 'none',
+                      background: '#fff',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    <option value="প্রথম শ্রেণী">প্রথম শ্রেণী (Grade 1)</option>
+                    <option value="দ্বিতীয় শ্রেণী">দ্বিতীয় শ্রেণী (Grade 2)</option>
+                    <option value="তৃতীয় শ্রেণী">তৃতীয় শ্রেণী (Grade 3)</option>
+                    <option value="প্রাক-প্রাথমিক">প্রাক-প্রাথমিক (Pre-Primary)</option>
+                  </select>
                 </div>
 
                 {/* 2. Avatar / Emoji selector or Custom Photo Upload */}
