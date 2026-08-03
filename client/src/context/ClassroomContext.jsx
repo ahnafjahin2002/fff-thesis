@@ -42,6 +42,34 @@ export const ClassroomProvider = ({ children }) => {
     setActiveClassroomStudent(null);
   }, []);
 
+  // Manually select a student or assign active student
+  const selectActiveStudent = useCallback((student) => {
+    setActiveClassroomStudent(student);
+  }, []);
+
+  // Mark student turn completed and move them to completedPool
+  const markStudentCompleted = useCallback((student) => {
+    if (!student) return;
+    setRemainingPool((prev) => prev.filter((s) => String(s.id) !== String(student.id)));
+    setCompletedPool((prev) => {
+      const exists = prev.some((s) => String(s.id) === String(student.id));
+      return exists ? prev : [...prev, student];
+    });
+  }, []);
+
+  // Skip a student for today (e.g. absent child)
+  const skipStudentTurn = useCallback((student) => {
+    if (!student) return;
+    setRemainingPool((prev) => prev.filter((s) => String(s.id) !== String(student.id)));
+  }, []);
+
+  // Reset round pool when all students completed
+  const resetRoundPool = useCallback((fullRoster) => {
+    setRemainingPool([...fullRoster]);
+    setCompletedPool([]);
+    setActiveClassroomStudent(null);
+  }, []);
+
   return (
     <ClassroomContext.Provider
       value={{
@@ -52,6 +80,10 @@ export const ClassroomProvider = ({ children }) => {
         activeClassroomStudent,
         startClassroomSession,
         pickNextRandomStudent,
+        selectActiveStudent,
+        markStudentCompleted,
+        skipStudentTurn,
+        resetRoundPool,
         endClassroomSession,
       }}
     >

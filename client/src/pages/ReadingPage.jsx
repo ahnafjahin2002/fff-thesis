@@ -698,6 +698,18 @@ export default function ReadingPage() {
 
   return (
     <div className="reading-page-shell">
+      {isClassroomMode && activeClassroomStudent && (
+        <div style={{ background: 'linear-gradient(90deg, #0284c7 0%, #0369a1 100%)', color: '#ffffff', padding: '10px 24px', fontWeight: 800, fontSize: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.2)', borderBottom: '2px solid #38bdf8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 20 }}>📽️</span>
+            <span>ক্লাসরুম প্র্যাকটিস • আজকের শিক্ষার্থী: {activeClassroomStudent.name} ({activeClassroomStudent.classGrade || 'প্রথম শ্রেণী'})</span>
+          </div>
+          <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 8, fontSize: 13, fontWeight: 700 }}>
+            {activeClassroomStudent.avatar || '👦'} সক্রিয়
+          </span>
+        </div>
+      )}
+
       <div className="reading-decor-layer" aria-hidden="true">
         <img src={cloudSoft} alt="" className="reading-bottom-cloud" />
         <img src={readingKid} alt="" className="reading-bottom-kid" />

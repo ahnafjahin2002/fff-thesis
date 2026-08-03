@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getClassroomStats, updateStudentNote, updateUserProfile, createUser, deleteUser, getSessions, getBornoBazarProgress } from '../utils/api';
 import { useClassroom } from '../context/ClassroomContext';
+import ClassroomTurnSelector from '../features/ClassroomPractice/ClassroomTurnSelector';
+import ClassroomCelebrationModal from '../features/ClassroomPractice/ClassroomCelebrationModal';
 import './TeacherWorkspacePage.css';
 
 // Existing friendly classroom illustrations from assets
@@ -545,6 +547,7 @@ export default function TeacherWorkspacePage() {
   const [selectedActivity, setSelectedActivity] = useState('Reading Story');
   const [classroomModalOpen, setClassroomModalOpen] = useState(false);
   const [launchedActivityTitle, setLaunchedActivityTitle] = useState('');
+  const [turnSelectorOpen, setTurnSelectorOpen] = useState(false);
 
   // Teaching tip rotation
   const [tipIndex, setTipIndex] = useState(0);
@@ -590,9 +593,14 @@ export default function TeacherWorkspacePage() {
 
   const handleLaunchClassroomMode = (activityName) => {
     const title = activityName || selectedActivity;
+    if (!students || students.length === 0) {
+      alert('ক্লাসরুম অনুশীলন শুরু করতে আগে অন্তত ১ জন শিক্ষার্থী যোগ করুন।');
+      setAddStudentModalOpen(true);
+      return;
+    }
     setLaunchedActivityTitle(title);
     startClassroomSession(students, title);
-    setClassroomModalOpen(true);
+    setTurnSelectorOpen(true);
   };
 
   const handleNextTip = () => {
@@ -2478,6 +2486,21 @@ export default function TeacherWorkspacePage() {
             onClose={() => setProgressModalOpen(false)}
             onUpdateNote={handleNoteChange}
             onLaunchActivity={(actName) => handleLaunchClassroomMode(actName)}
+          />
+        )}
+        {/* ── CLASSROOM TURN SELECTOR MODAL ── */}
+        {turnSelectorOpen && (
+          <ClassroomTurnSelector
+            roster={students}
+            onLaunchActivity={(actName) => {
+              setTurnSelectorOpen(false);
+              if (actName === 'BornoBazar') {
+                navigate('/borno-bazar');
+              } else {
+                navigate('/reading');
+              }
+            }}
+            onClose={() => setTurnSelectorOpen(false)}
           />
         )}
       </AnimatePresence>
