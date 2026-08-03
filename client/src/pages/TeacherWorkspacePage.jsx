@@ -306,28 +306,28 @@ const INITIAL_STUDENTS = [
 // Evidence-based recommendations for Bengali foundation classroom reading
 const TEACHING_TIPS = [
   {
-    title: 'Teaching Tip',
-    quote: 'Praise effort before correcting mistakes.',
+    title: 'প্যাডাগজিক্যাল পরামর্শ (Teaching Tip)',
+    quote: 'ভুল সংশোধনের আগে শিক্ষার্থীর প্রচেষ্টার প্রশংসা করুন।',
     explanation:
-      'Children become more willing to participate when mistakes are treated as opportunities to learn.',
+      'ভুলকে শিক্ষার নতুন সুযোগ হিসেবে দেখলে শিশুরা আত্মবিশ্বাসের সাথে ক্লাসে অংশগ্রহণ করতে উৎসাহিত হয়।',
   },
   {
-    title: 'Teaching Tip',
-    quote: 'Use choral reading for tricky conjunct letters.',
+    title: 'প্যাডাগজিক্যাল পরামর্শ (Teaching Tip)',
+    quote: 'কঠিন যুক্তবর্ণের জন্য সমবেত স্বরপাঠ (Choral Reading) ব্যবহার করুন।',
     explanation:
-      'Reading together aloud reduces individual anxiety and builds rhythmic familiarity with words like ক্ষ and জ্ঞ.',
+      'সবাই একসাথে মুখে মুখে পড়লে একা পড়ার ভয় দূর হয় এবং "ক্ষ" ও "জ্ঞ"-এর মতো যুক্তবর্ণের উচ্চারণ সহজ হয়।',
   },
   {
-    title: 'Teaching Tip',
-    quote: 'Break long words into syllables first.',
+    title: 'প্যাডাগজিক্যাল পরামর্শ (Teaching Tip)',
+    quote: 'পড়া শুরু করার আগে ছবি দেখে বিষয়বস্তু অনুমান করতে দিন।',
     explanation:
-      'Dyslexic readers process smaller phoneme chunks much faster than whole complex words.',
+      'গল্পের ছবি নিয়ে আলোচনা করলে শিশুদের শব্দ চেনার ও গল্পের অর্থ বোঝার ক্ষমতা দ্রুত বৃদ্ধি পায়।',
   },
   {
-    title: 'Teaching Tip',
-    quote: 'Connect letters to familiar everyday objects.',
+    title: 'প্যাডাগজিক্যাল পরামর্শ (Teaching Tip)',
+    quote: 'বর্ণবাজার গেমের মাধ্যমে আনন্দের সাথে বানান চর্চা করুন।',
     explanation:
-      'In BornoBazar, associating letters with local market items reinforces multi-sensory memory.',
+      'কেনাকাটার ছলে বানান শিখলে শিশুরা পড়ালেখাকে আনন্দদায়ক মনে করে এবং দীর্ঘসময় মনে রাখতে পারে।',
   },
 ];
 
