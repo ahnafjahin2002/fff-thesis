@@ -11,6 +11,10 @@ import './TeacherWorkspacePage.css';
 import classroomIllustration from '../assets/mother_child_reading.png';
 import mascotEncourage from '../assets/mascot-encourage.png';
 import dashboardMeaningfulBg from '../assets/dashboard-meaningful-bg.png';
+import iconProjector from '../assets/icon-projector.png';
+import iconBornoBazar from '../assets/icon-borno-bazar.png';
+import iconStoryBook from '../assets/icon-story-book.png';
+import iconLightbulb from '../assets/icon-lightbulb.png';
 
 // Bangla numeral converter & translators
 const toBanglaNum = (num) => {
@@ -1290,7 +1294,9 @@ export default function TeacherWorkspacePage() {
             >
               <div>
                 <div className="tw-activity-top">
-                  <div className="tw-activity-icon">📚</div>
+                  <div className="tw-activity-icon" style={{ padding: 0, overflow: 'hidden' }}>
+                    <img src={iconStoryBook} alt="Reading Story" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8 }} />
+                  </div>
                   <span className="tw-activity-tag">পুরো ক্লাস</span>
                 </div>
                 <h3>গল্প পড়া (Reading Story)</h3>
@@ -1320,7 +1326,9 @@ export default function TeacherWorkspacePage() {
             >
               <div>
                 <div className="tw-activity-top">
-                  <div className="tw-activity-icon">🏪</div>
+                  <div className="tw-activity-icon" style={{ padding: 0, overflow: 'hidden' }}>
+                    <img src={iconBornoBazar} alt="BornoBazar" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8 }} />
+                  </div>
                   <span className="tw-activity-tag">ইন্টারেক্টিভ</span>
                 </div>
                 <h3>বর্ণবাজার (BornoBazar)</h3>
@@ -2659,7 +2667,7 @@ export default function TeacherWorkspacePage() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 20 }}>💡</span>
+                <img src={iconLightbulb} alt="Teaching Tip" style={{ width: 28, height: 28, objectFit: 'contain' }} />
                 <span style={{ fontSize: 13, fontWeight: 800, color: '#065f46' }}>
                   {currentTip.title}
                 </span>
@@ -2716,23 +2724,22 @@ export default function TeacherWorkspacePage() {
               bottom: 24,
               right: 24,
               zIndex: 9999,
-              width: 54,
-              height: 54,
+              width: 56,
+              height: 56,
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              border: '3px solid #ffffff',
-              color: '#ffffff',
-              fontSize: 26,
+              background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+              border: '2px solid #10b981',
               cursor: 'pointer',
-              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.45)',
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              alignItems: 'center',
+              padding: 0,
+              overflow: 'hidden'
             }}
             title="প্যাডাগজিক্যাল টিপস পপ-আপ চালু করুন"
           >
-            💡
+            <img src={iconLightbulb} alt="Teaching Tips" style={{ width: 36, height: 36, objectFit: 'contain' }} />
           </motion.button>
         )}
       </AnimatePresence>
