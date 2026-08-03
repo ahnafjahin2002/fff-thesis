@@ -2496,6 +2496,12 @@ export default function TeacherWorkspacePage() {
               setTurnSelectorOpen(false);
               if (actName === 'BornoBazar') {
                 navigate('/borno-bazar');
+              } else if (actName === 'Quiz Game') {
+                navigate('/reading');
+              } else if (actName === 'Word Practice') {
+                navigate('/reading');
+              } else if (actName === 'Sentence Builder') {
+                navigate('/reading');
               } else {
                 navigate('/reading');
               }

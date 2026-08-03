@@ -266,48 +266,142 @@ export default function ClassroomTurnSelector({ roster, onLaunchActivity, onClos
               প্র্যাকটিস অ্যাক্টিভিটি বেছে নিন (Select Activity)
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 18, maxHeight: 220, overflowY: 'auto' }}>
               <button
+                type="button"
                 onClick={() => setSelectedActivity('Reading Story')}
                 style={{
                   background: selectedActivity === 'Reading Story' ? '#0369a1' : '#1e293b',
                   border: selectedActivity === 'Reading Story' ? '2px solid #38bdf8' : '1px solid #334155',
                   borderRadius: 14,
-                  padding: '16px 20px',
+                  padding: '12px 14px',
                   textAlign: 'left',
                   color: '#ffffff',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 14,
+                  gap: 10,
                 }}
               >
-                <span style={{ fontSize: 32 }}>📖</span>
+                <span style={{ fontSize: 24 }}>📖</span>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 800 }}>গল্প পড়া (Reading Story)</div>
-                  <div style={{ fontSize: 12, color: '#94a3b8' }}>ভয়েস ইভালুয়েশন ও বাংলা পড়ার সাবলীলতা</div>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>গল্প পড়া</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Reading Story</div>
                 </div>
               </button>
 
               <button
+                type="button"
                 onClick={() => setSelectedActivity('BornoBazar')}
                 style={{
                   background: selectedActivity === 'BornoBazar' ? '#0369a1' : '#1e293b',
                   border: selectedActivity === 'BornoBazar' ? '2px solid #38bdf8' : '1px solid #334155',
                   borderRadius: 14,
-                  padding: '16px 20px',
+                  padding: '12px 14px',
                   textAlign: 'left',
                   color: '#ffffff',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 14,
+                  gap: 10,
                 }}
               >
-                <span style={{ fontSize: 32 }}>🏪</span>
+                <span style={{ fontSize: 24 }}>🏪</span>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 800 }}>বর্ণবাজার (BornoBazar)</div>
-                  <div style={{ fontSize: 12, color: '#94a3b8' }}>ইন্টারেক্টিভ বানান ও ফল-মূলের দোকান গেম</div>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>বর্ণবাজার</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8' }}>BornoBazar</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedActivity('Quiz Game')}
+                style={{
+                  background: selectedActivity === 'Quiz Game' ? '#0369a1' : '#1e293b',
+                  border: selectedActivity === 'Quiz Game' ? '2px solid #38bdf8' : '1px solid #334155',
+                  borderRadius: 14,
+                  padding: '12px 14px',
+                  textAlign: 'left',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <span style={{ fontSize: 24 }}>🧩</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>মজার কুইজ</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Quiz Game</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedActivity('Word Practice')}
+                style={{
+                  background: selectedActivity === 'Word Practice' ? '#0369a1' : '#1e293b',
+                  border: selectedActivity === 'Word Practice' ? '2px solid #38bdf8' : '1px solid #334155',
+                  borderRadius: 14,
+                  padding: '12px 14px',
+                  textAlign: 'left',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <span style={{ fontSize: 24 }}>✏️</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>শব্দ অনুশীলন</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Word Practice</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedActivity('Sentence Builder')}
+                style={{
+                  background: selectedActivity === 'Sentence Builder' ? '#0369a1' : '#1e293b',
+                  border: selectedActivity === 'Sentence Builder' ? '2px solid #38bdf8' : '1px solid #334155',
+                  borderRadius: 14,
+                  padding: '12px 14px',
+                  textAlign: 'left',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <span style={{ fontSize: 24 }}>📝</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>বাক্য তৈরি</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Sentence Builder</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedActivity('Custom Reading')}
+                style={{
+                  background: selectedActivity === 'Custom Reading' ? '#0369a1' : '#1e293b',
+                  border: selectedActivity === 'Custom Reading' ? '2px solid #38bdf8' : '1px solid #334155',
+                  borderRadius: 14,
+                  padding: '12px 14px',
+                  textAlign: 'left',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <span style={{ fontSize: 24 }}>🎯</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>কাস্টম পড়া</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Custom Reading</div>
                 </div>
               </button>
             </div>
