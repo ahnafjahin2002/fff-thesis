@@ -579,11 +579,16 @@ export default function ReadingPage() {
     playAudioWithBackend();
   }, [isPlaying, isGeneratingAudio, stopAllAudio, playAudioWithBackend]);
 
+  const tappedWordsRef = useRef(new Set());
+
   const handleWordTap = useCallback(
     (word, wordData, wordIdx) => {
       if (isPlaying || isGeneratingAudio) stopAllAudio();
 
       const cleanWord = cleanDisplayWord(word) || word;
+      if (cleanWord) {
+        tappedWordsRef.current.add(cleanWord);
+      }
 
       setTappedWord({
         word: cleanWord,
@@ -613,7 +618,8 @@ export default function ReadingPage() {
         details: {
           text: displayText,
           source: 'ReadingPage',
-          level: currentLevel
+          level: currentLevel,
+          tappedWords: Array.from(tappedWordsRef.current)
         }
       });
       

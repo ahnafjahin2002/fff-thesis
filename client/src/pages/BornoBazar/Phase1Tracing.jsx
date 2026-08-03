@@ -188,7 +188,11 @@ export default function Phase1Tracing({ onComplete, onBack }) {
             score: 100,
             starsEarned: 1,
             accuracy: 100,
-            durationMs: 15000
+            durationMs: 15000,
+            details: {
+              letter: state.currentLetter,
+              source: 'Phase1Tracing'
+            }
           }).catch(err => console.warn(err));
         }
 

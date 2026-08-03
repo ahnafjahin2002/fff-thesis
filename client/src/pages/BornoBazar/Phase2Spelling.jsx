@@ -100,7 +100,12 @@ export default function Phase2Spelling({ shopColor = "#18b368", onComplete, onBa
         score: 100,
         starsEarned: 1,
         accuracy: 100,
-        durationMs: 10000
+        durationMs: 10000,
+        details: {
+          word: currentWord.product || currentWord.letters.join(''),
+          letters: currentWord.letters,
+          source: 'Phase2Spelling'
+        }
       }).catch(err => console.warn(err));
     }
 

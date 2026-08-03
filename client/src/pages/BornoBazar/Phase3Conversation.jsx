@@ -274,7 +274,12 @@ export default function Phase3Conversation({ shopColor = '#18b368', onComplete, 
         score: 100,
         starsEarned: 2,
         accuracy: 100,
-        durationMs: 20000
+        durationMs: 20000,
+        details: {
+          word: currentConvo.productId || currentConvo.productName,
+          sentence: currentConvo.shopkeeperResponse.join(' '),
+          source: 'Phase3Conversation'
+        }
       }).catch(err => console.warn(err));
     }
 
