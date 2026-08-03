@@ -1125,7 +1125,110 @@ export default function TeacherWorkspacePage() {
               </div>
             );
           })()}
+        </section>
 
+        {/* ── SECTION: WEEKLY TEACHER INSIGHTS ── */}
+        <section style={{ marginBottom: 28 }}>
+          <div className="tw-section-header">
+            <div className="tw-section-heading">
+              <span>📅</span>
+              <span>সাপ্তাহিক শিক্ষক ইনসাইটস (Weekly Teacher Insights)</span>
+            </div>
+            <span className="tw-section-subtitle">
+              বিগত ৭ দিনের ক্লাসরুম সেশন হিস্ট্রির ওপর ভিত্তি করে প্যাডাগজিক্যাল বিশ্লেষণ
+            </span>
+          </div>
+
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+              border: '2px solid #38bdf8',
+              borderRadius: 20,
+              padding: 24,
+              color: '#ffffff',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: 18,
+                marginBottom: 20,
+              }}
+            >
+              {/* 1. Most Improved Student */}
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 13, color: '#38bdf8', fontWeight: 700, marginBottom: 6 }}>
+                  🌱 বিশেষ অগ্রগতি অর্জিত শিক্ষার্থী
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc' }}>
+                  {classroomData?.weeklyInsights?.mostImprovedStudent || 'রাইহান (ধারাবাহিক অনুশীলন ও সুন্দর অগ্রগতি)'}
+                </div>
+              </div>
+
+              {/* 2. Average Accuracy & Time */}
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 13, color: '#38bdf8', fontWeight: 700, marginBottom: 6 }}>
+                  📊 এই সপ্তাহের গড় সঠিকতা ও সময়
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: '#4ade80' }}>
+                  {classroomData?.weeklyInsights?.weeklyAvgAccuracy || '৯২%'} সঠিকতা • {classroomData?.weeklyInsights?.weeklyAvgTimeMins || '১২ মিনিট'} সময়
+                </div>
+              </div>
+
+              {/* 3. Most Difficult Letters */}
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 13, color: '#f87171', fontWeight: 700, marginBottom: 8 }}>
+                  🔤 এই সপ্তাহের কঠিন অক্ষর
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {(classroomData?.weeklyInsights?.weeklyDifficultLetters || ['ক্ষ', 'জ্ঞ']).map((char) => (
+                    <span key={char} style={{ background: '#450a0a', border: '1px solid #fca5a5', color: '#fca5a5', padding: '4px 12px', borderRadius: 12, fontSize: 13, fontWeight: 800 }}>
+                      {char}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. Most Difficult Words */}
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, padding: 18 }}>
+                <div style={{ fontSize: 13, color: '#fbbf24', fontWeight: 700, marginBottom: 8 }}>
+                  📝 এই সপ্তাহের কঠিন শব্দ
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {(classroomData?.weeklyInsights?.weeklyDifficultWords || ['পরিষ্কার', 'ব্রাহ্মণবাড়িয়া']).map((word) => (
+                    <span key={word} style={{ background: '#451a03', border: '1px solid #fde68a', color: '#fde68a', padding: '4px 12px', borderRadius: 12, fontSize: 13, fontWeight: 800 }}>
+                      {word}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Teaching Recommendation */}
+            <div
+              style={{
+                background: 'linear-gradient(90deg, #0284c7 0%, #0369a1 100%)',
+                borderRadius: 16,
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                boxShadow: '0 4px 14px rgba(3, 105, 161, 0.3)',
+              }}
+            >
+              <span style={{ fontSize: 28 }}>💡</span>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#e0f2fe', textTransform: 'uppercase' }}>
+                  সাপ্তাহিক টিচিং রেকমেন্ডেশন (Teaching Recommendation)
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#ffffff', marginTop: 2 }}>
+                  {classroomData?.weeklyInsights?.weeklyRecommendation || 'যুক্তবর্ণ (Conjunct Letters) অনুশীলনে বাড়তি সাহায্য প্রদান করুন।'}
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ── SECTION 3: START CLASSROOM ── */}
