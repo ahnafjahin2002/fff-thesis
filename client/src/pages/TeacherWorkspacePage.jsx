@@ -529,11 +529,15 @@ export default function TeacherWorkspacePage() {
     };
 
     window.addEventListener('fff_session_created', handleSessionCreated);
+    window.addEventListener('fff_session_synced', handleSessionCreated);
     window.addEventListener('focus', handleFocus);
+    window.addEventListener('online', handleFocus);
 
     return () => {
       window.removeEventListener('fff_session_created', handleSessionCreated);
+      window.removeEventListener('fff_session_synced', handleSessionCreated);
       window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('online', handleFocus);
     };
   }, [fetchDashboardData]);
 

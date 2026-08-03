@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const activitySessionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  clientSessionId: { type: String, sparse: true },
   feature: { type: String },
   activityType: { type: String },
   score: { type: Number },

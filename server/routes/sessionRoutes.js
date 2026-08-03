@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 // POST /api/sessions — create a new activity session
 router.post('/', async (req, res) => {
   try {
-    const { userId, feature, activityType, score, starsEarned, accuracy, durationMs, details } = req.body;
+    const { userId, clientSessionId, feature, activityType, score, starsEarned, accuracy, durationMs, details } = req.body;
 
     if (!userId) {
       return res.status(400).json({ error: 'userId is required' });
@@ -17,8 +17,17 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid userId format' });
     }
 
+    // Prevent duplicate sessions if clientSessionId is supplied
+    if (clientSessionId) {
+      const existing = await ActivitySession.findOne({ clientSessionId });
+      if (existing) {
+        return res.status(200).json(existing);
+      }
+    }
+
     const session = await ActivitySession.create({
       userId,
+      clientSessionId,
       feature,
       activityType,
       score,
