@@ -549,8 +549,18 @@ export default function TeacherWorkspacePage() {
   const [launchedActivityTitle, setLaunchedActivityTitle] = useState('');
   const [turnSelectorOpen, setTurnSelectorOpen] = useState(false);
 
-  // Teaching tip rotation
+  // Teaching tip rotation & auto-slide toast
   const [tipIndex, setTipIndex] = useState(0);
+  const [floatingTipVisible, setFloatingTipVisible] = useState(true);
+  const [autoRotateTips, setAutoRotateTips] = useState(true);
+
+  useEffect(() => {
+    if (!autoRotateTips) return;
+    const timer = setInterval(() => {
+      setTipIndex((prev) => (prev + 1) % TEACHING_TIPS.length);
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [autoRotateTips]);
 
   // Filtered student roster
   const filteredStudents = useMemo(() => {
@@ -2620,6 +2630,110 @@ export default function TeacherWorkspacePage() {
             }}
             onClose={() => setTurnSelectorOpen(false)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* ── FLOATING CORNER TEACHING TIP TOAST (Auto-sliding slide show) ── */}
+      <AnimatePresence>
+        {floatingTipVisible ? (
+          <motion.div
+            key={tipIndex}
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            style={{
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              zIndex: 9999,
+              maxWidth: 380,
+              width: '90%',
+              background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
+              border: '2px solid #10b981',
+              borderRadius: 20,
+              padding: 18,
+              boxShadow: '0 12px 36px rgba(16, 185, 129, 0.25)',
+              color: '#0f172a',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 20 }}>💡</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: '#065f46' }}>
+                  {currentTip.title}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => setAutoRotateTips(!autoRotateTips)}
+                  title={autoRotateTips ? 'অটো-স্লাইড পজ করুন' : 'অটো-স্লাইড চালু করুন'}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}
+                >
+                  {autoRotateTips ? '⏸️' : '▶️'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextTip}
+                  title="পরবর্তী টিপ্স"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}
+                >
+                  ⏭️
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFloatingTipVisible(false)}
+                  title="বন্ধ করুন"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#94a3b8' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#047857', marginBottom: 6, lineHeight: 1.3 }}>
+              &ldquo;{currentTip.quote}&rdquo;
+            </div>
+
+            <div style={{ fontSize: 12, color: '#334155', lineHeight: 1.4 }}>
+              {currentTip.explanation}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingTop: 8, borderTop: '1px solid #dcfce7', fontSize: 11, color: '#059669', fontWeight: 700 }}>
+              <span>স্লাইড {toBanglaNum(tipIndex + 1)} / {toBanglaNum(TEACHING_TIPS.length)}</span>
+              <span>{autoRotateTips ? '● অটো-স্লাইড চালু (৮ সে.)' : '○ পজ করা'}</span>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.button
+            type="button"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            onClick={() => setFloatingTipVisible(true)}
+            style={{
+              position: 'fixed',
+              bottom: 24,
+              right: 24,
+              zIndex: 9999,
+              width: 54,
+              height: 54,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              border: '3px solid #ffffff',
+              color: '#ffffff',
+              fontSize: 26,
+              cursor: 'pointer',
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.45)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            title="প্যাডাগজিক্যাল টিপস পপ-আপ চালু করুন"
+          >
+            💡
+          </motion.button>
         )}
       </AnimatePresence>
     </div>
