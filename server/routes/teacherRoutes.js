@@ -377,7 +377,7 @@ router.get('/classroom-stats', async (req, res) => {
       });
     });
     const sortedWeeklyLetters = Object.entries(weeklyLetterCounts).sort((a, b) => b[1] - a[1]).map(e => e[0]);
-    const weeklyDifficultLetters = sortedWeeklyLetters.length > 0 ? sortedWeeklyLetters.slice(0, 3) : ['ক্ষ', 'জ্ঞ'];
+    const weeklyDifficultLetters = sortedWeeklyLetters.slice(0, 3);
 
     // Weekly difficult words
     const weeklyWordCounts = {};
@@ -395,21 +395,20 @@ router.get('/classroom-stats', async (req, res) => {
       });
     });
     const sortedWeeklyWords = Object.entries(weeklyWordCounts).sort((a, b) => b[1] - a[1]).map(e => e[0]);
-    const weeklyDifficultWords = sortedWeeklyWords.length > 0 ? sortedWeeklyWords.slice(0, 3) : ['পরিষ্কার', 'ব্রাহ্মণবাড়িয়া'];
+    const weeklyDifficultWords = sortedWeeklyWords.slice(0, 3);
 
     // Weekly average accuracy & duration
     const totalWeeklyAccuracy = weeklySessions.reduce((acc, s) => acc + (s.accuracy || 100), 0);
-    const weeklyAvgAccuracy = weeklySessions.length > 0 ? Math.round(totalWeeklyAccuracy / weeklySessions.length) : 92;
+    const weeklyAvgAccuracy = weeklySessions.length > 0 ? Math.round(totalWeeklyAccuracy / weeklySessions.length) : 0;
     
     const totalWeeklyDurationMs = weeklySessions.reduce((acc, s) => acc + (s.durationMs || 0), 0);
     const weeklyAvgTimeMins = weeklySessions.length > 0
       ? Math.max(1, Math.round(totalWeeklyDurationMs / (1000 * 60 * Math.max(1, new Set(weeklySessions.map(s => s.userId?.toString())).size))))
-      : 12;
+      : 0;
 
     // Most Improved Student (Supportive growth language, ZERO rankings)
-    let mostImprovedStudent = 'রাইহান (ধারাবাহিক আগ্রহ ও বিশেষ অগ্রগতি)';
+    let mostImprovedStudent = 'এখনও কোনো সেশন সম্পন্ন হয়নি';
     if (childUsers && childUsers.length > 0 && weeklySessions.length > 0) {
-      // Find student with most sessions / highest growth in past 7 days
       const userSessionCounts = {};
       weeklySessions.forEach(s => {
         if (s.userId) {
@@ -427,13 +426,17 @@ router.get('/classroom-stats', async (req, res) => {
     }
 
     // Weekly Teaching Recommendation based on weekly telemetry
-    let weeklyRecommendation = 'গল্প পড়া (Reading Story) অনুশীলনে উৎসাহিত করুন।';
-    if (weeklyDifficultLetters.some(l => l === 'ক্ষ' || l === 'জ্ঞ' || l === 'শ্র')) {
-      weeklyRecommendation = 'যুক্তবর্ণ (Conjunct Letters) অনুশীলনে বাড়তি সাহায্য প্রদান করুন।';
-    } else if (weeklyDifficultLetters.length > 0) {
-      weeklyRecommendation = 'কারচিহ্ন (Vowel Signs) চর্চায় জোর দিন।';
-    } else if (bornoCount < readingCount) {
-      weeklyRecommendation = 'বর্ণবাজার (BornoBazar) গেমের মাধ্যমে শব্দ ও বানান চর্চা বাড়িয়ে দিন।';
+    let weeklyRecommendation = 'আজকের সেশন শুরু করতে ক্লাসরুম মোড চালু করুন।';
+    if (weeklySessions.length > 0) {
+      if (weeklyDifficultLetters.some(l => l === 'ক্ষ' || l === 'জ্ঞ' || l === 'শ্র')) {
+        weeklyRecommendation = 'যুক্তবর্ণ (Conjunct Letters) অনুশীলনে বাড়তি সাহায্য প্রদান করুন।';
+      } else if (weeklyDifficultLetters.length > 0) {
+        weeklyRecommendation = 'কারচিহ্ন (Vowel Signs) চর্চায় জোর দিন।';
+      } else if (bornoCount < readingCount) {
+        weeklyRecommendation = 'বর্ণবাজার (BornoBazar) গেমের মাধ্যমে শব্দ ও বানান চর্চা বাড়িয়ে দিন।';
+      } else {
+        weeklyRecommendation = 'গল্প পড়া (Reading Story) অনুশীলনে উৎসাহিত করুন।';
+      }
     }
 
     // 7. Teaching Focus derived from most difficult letter
