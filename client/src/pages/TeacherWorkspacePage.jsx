@@ -15,6 +15,13 @@ import iconProjector from '../assets/icon-projector.png';
 import iconBornoBazar from '../assets/icon-borno-bazar.png';
 import iconStoryBook from '../assets/icon-story-book.png';
 import iconLightbulb from '../assets/icon-lightbulb.png';
+import iconSchool from '../assets/icon-school.png';
+import iconCalendar from '../assets/icon-calendar.png';
+import iconAlphabets from '../assets/icon-alphabets.png';
+import iconTimer from '../assets/icon-timer.png';
+import iconStudents from '../assets/icon-students.png';
+import iconTarget from '../assets/icon-target.png';
+import iconGamepad from '../assets/icon-gamepad.png';
 
 // Bangla numeral converter & translators
 const toBanglaNum = (num) => {
@@ -899,8 +906,8 @@ export default function TeacherWorkspacePage() {
         {/* ── SECTION 2: TODAY'S CLASSROOM (6 Summary Cards) ── */}
         <section style={{ marginBottom: 12 }}>
           <div className="tw-section-header">
-            <div className="tw-section-heading">
-              <span>🏫</span>
+            <div className="tw-section-heading" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <img src={iconSchool} alt="School" style={{ width: 32, height: 32, objectFit: 'contain' }} />
               <span>আজকের শ্রেণীকক্ষ (Today&apos;s Classroom)</span>
             </div>
             <span className="tw-section-subtitle">
@@ -987,9 +994,9 @@ export default function TeacherWorkspacePage() {
                 >
                   <div
                     className="tw-summary-icon-box"
-                    style={{ color: '#0a6e3a' }}
+                    style={{ background: 'transparent', padding: 0 }}
                   >
-                    🔤
+                    <img src={iconAlphabets} alt="Difficult Letter" style={{ width: 44, height: 44, objectFit: 'contain' }} />
                   </div>
                   <div className="tw-summary-content">
                     <div className="tw-summary-label">
@@ -1012,9 +1019,9 @@ export default function TeacherWorkspacePage() {
                 >
                   <div
                     className="tw-summary-icon-box"
-                    style={{ color: '#b45309' }}
+                    style={{ background: 'transparent', padding: 0 }}
                   >
-                    📖
+                    <img src={iconStoryBook} alt="Difficult Word" style={{ width: 44, height: 44, objectFit: 'contain' }} />
                   </div>
                   <div className="tw-summary-content">
                     <div className="tw-summary-label">সবচেয়ে কঠিন শব্দ</div>
@@ -1038,9 +1045,9 @@ export default function TeacherWorkspacePage() {
                 >
                   <div
                     className="tw-summary-icon-box"
-                    style={{ color: '#5b3fd9' }}
+                    style={{ background: 'transparent', padding: 0 }}
                   >
-                    🎮
+                    <img src={iconGamepad} alt="Most Used Activity" style={{ width: 44, height: 44, objectFit: 'contain' }} />
                   </div>
                   <div className="tw-summary-content">
                     <div className="tw-summary-label">সর্বাধিক ব্যবহৃত অ্যাক্টিভিটি</div>
@@ -1064,9 +1071,9 @@ export default function TeacherWorkspacePage() {
                 >
                   <div
                     className="tw-summary-icon-box"
-                    style={{ color: '#be185d' }}
+                    style={{ background: 'transparent', padding: 0 }}
                   >
-                    ⏱️
+                    <img src={iconTimer} alt="Average Reading Time" style={{ width: 44, height: 44, objectFit: 'contain' }} />
                   </div>
                   <div className="tw-summary-content">
                     <div className="tw-summary-label">
@@ -1092,9 +1099,9 @@ export default function TeacherWorkspacePage() {
                 >
                   <div
                     className="tw-summary-icon-box"
-                    style={{ color: '#0f9055' }}
+                    style={{ background: 'transparent', padding: 0 }}
                   >
-                    👧👦
+                    <img src={iconStudents} alt="Students Practiced Today" style={{ width: 44, height: 44, objectFit: 'contain' }} />
                   </div>
                   <div className="tw-summary-content">
                     <div className="tw-summary-label">
@@ -1117,9 +1124,9 @@ export default function TeacherWorkspacePage() {
                 >
                   <div
                     className="tw-summary-icon-box"
-                    style={{ color: '#a16207' }}
+                    style={{ background: 'transparent', padding: 0 }}
                   >
-                    🎯
+                    <img src={iconTarget} alt="Teaching Focus" style={{ width: 44, height: 44, objectFit: 'contain' }} />
                   </div>
                   <div className="tw-summary-content">
                     <div className="tw-summary-label">
@@ -1144,8 +1151,8 @@ export default function TeacherWorkspacePage() {
         {/* ── SECTION: WEEKLY TEACHER INSIGHTS ── */}
         <section style={{ marginBottom: 28 }}>
           <div className="tw-section-header">
-            <div className="tw-section-heading">
-              <span>📅</span>
+            <div className="tw-section-heading" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <img src={iconCalendar} alt="Weekly Insights" style={{ width: 28, height: 28, objectFit: 'contain' }} />
               <span>সাপ্তাহিক শিক্ষক ইনসাইটস (Weekly Teacher Insights)</span>
             </div>
             <span className="tw-section-subtitle">
