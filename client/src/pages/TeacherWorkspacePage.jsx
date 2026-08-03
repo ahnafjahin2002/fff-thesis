@@ -2595,6 +2595,7 @@ export default function TeacherWorkspacePage() {
         {turnSelectorOpen && (
           <ClassroomTurnSelector
             roster={students}
+            classroomStats={classroomData}
             onLaunchActivity={(actName) => {
               setTurnSelectorOpen(false);
               if (actName === 'BornoBazar') {

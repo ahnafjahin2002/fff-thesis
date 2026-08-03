@@ -7,7 +7,7 @@ const toBanglaNum = (num) => {
   return String(num).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d]);
 };
 
-export default function ClassroomTurnSelector({ roster, onLaunchActivity, onClose }) {
+export default function ClassroomTurnSelector({ roster, classroomStats, onLaunchActivity, onClose }) {
   const {
     remainingPool,
     completedPool,
@@ -61,6 +61,177 @@ export default function ClassroomTurnSelector({ roster, onLaunchActivity, onClos
     selectActiveStudent(studentToUse);
     onLaunchActivity(activityName || selectedActivity);
   };
+
+  // When all students have completed their turn in this round
+  if (remainingCount === 0 && completedCount > 0) {
+    const stats = classroomStats?.summary || {};
+    const weekly = classroomStats?.weeklyInsights || {};
+
+    const practicedTodayText = `${toBanglaNum(completedCount)} / ${toBanglaNum(totalStudents)} জন`;
+    const avgReadingTimeText = stats.averageReadingTime?.value || '১২ মিনিট';
+    const difficultLetterText = stats.mostDifficultLetter?.value || 'ক্ষ';
+    const difficultWordText = stats.mostDifficultWord?.value || 'পরিষ্কার';
+    const recommendationText = weekly.weeklyRecommendation || stats.teachingFocus?.sub || 'যুক্তবর্ণ (Conjunct Letters) অনুশীলনে সাহায্য করুন।';
+
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(15, 23, 42, 0.94)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 20,
+        }}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          style={{
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            border: '2px solid #10b981',
+            borderRadius: 24,
+            maxWidth: 680,
+            width: '95%',
+            color: '#ffffff',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7)',
+            padding: 32,
+            textAlign: 'center',
+          }}
+        >
+          <div style={{ fontSize: 64, marginBottom: 12 }}>🎉</div>
+
+          <h2 style={{ fontSize: 28, fontWeight: 900, color: '#34d399', margin: '0 0 8px 0' }}>
+            আজ সবাই অংশগ্রহণ করেছে!
+          </h2>
+          <p style={{ fontSize: 15, color: '#94a3b8', margin: '0 0 28px 0' }}>
+            ক্লাসের সকল শিক্ষার্থী সফলভাবে আজকের ১টি করে প্র্যাকটিস সম্পন্ন করেছে।
+          </p>
+
+          {/* Metrics & Insights Summary Grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 14,
+              marginBottom: 24,
+              textAlign: 'left',
+            }}
+          >
+            {/* 1. Students Practiced Today */}
+            <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, padding: 16 }}>
+              <div style={{ fontSize: 12, color: '#38bdf8', fontWeight: 700, marginBottom: 4 }}>
+                👧👦 আজ অংশগ্রহণকারী শিক্ষার্থী
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff' }}>
+                {practicedTodayText}
+              </div>
+            </div>
+
+            {/* 2. Average Reading Time */}
+            <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, padding: 16 }}>
+              <div style={{ fontSize: 12, color: '#38bdf8', fontWeight: 700, marginBottom: 4 }}>
+                ⏱️ গড় পড়ার সময় (Avg Reading Time)
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#ffffff' }}>
+                {avgReadingTimeText}
+              </div>
+            </div>
+
+            {/* 3. Most Difficult Letter */}
+            <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, padding: 16 }}>
+              <div style={{ fontSize: 12, color: '#f87171', fontWeight: 700, marginBottom: 4 }}>
+                🔤 সবচেয়ে কঠিন অক্ষর (Most Difficult Letter)
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#fca5a5' }}>
+                {difficultLetterText}
+              </div>
+            </div>
+
+            {/* 4. Most Difficult Word */}
+            <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 16, padding: 16 }}>
+              <div style={{ fontSize: 12, color: '#fbbf24', fontWeight: 700, marginBottom: 4 }}>
+                📝 সবচেয়ে কঠিন শব্দ (Most Difficult Word)
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#fde68a' }}>
+                {difficultWordText}
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Teaching Recommendation Card */}
+          <div
+            style={{
+              background: 'linear-gradient(90deg, #0284c7 0%, #0369a1 100%)',
+              borderRadius: 16,
+              padding: '16px 20px',
+              textAlign: 'left',
+              marginBottom: 28,
+              boxShadow: '0 4px 14px rgba(3, 105, 161, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+            }}
+          >
+            <span style={{ fontSize: 32 }}>💡</span>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#e0f2fe', textTransform: 'uppercase' }}>
+                শিক্ষক নির্দেশিকা (Teaching Recommendation)
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#ffffff', marginTop: 2 }}>
+                {recommendationText}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Choice Buttons */}
+          <div style={{ display: 'flex', gap: 14 }}>
+            <button
+              onClick={onClose}
+              style={{
+                flex: 1,
+                background: '#334155',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: 14,
+                padding: '14px 20px',
+                fontSize: 16,
+                fontWeight: 800,
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              }}
+            >
+              🏁 ক্লাস শেষ করুন (Finish Class)
+            </button>
+
+            <button
+              onClick={() => resetRoundPool(roster)}
+              style={{
+                flex: 1.2,
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: 14,
+                padding: '14px 20px',
+                fontSize: 16,
+                fontWeight: 800,
+                cursor: 'pointer',
+                boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)',
+              }}
+            >
+              🔄 নতুন রাউন্ড শুরু করুন (Start Another Round)
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div
