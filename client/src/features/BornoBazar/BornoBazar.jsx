@@ -1,5 +1,7 @@
 import { useState, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useClassroom } from '../../context/ClassroomContext';
 import useBornoProgress from './hooks/useBornoProgress';
 import { BornoBazarProvider } from './context/BornoBazarContext';
 import MarketMap from './components/MarketMap';
@@ -23,11 +25,23 @@ export const STAGES = {
 };
 
 function BornoBazarInner({ onBack }) {
+  const navigate = useNavigate();
+  const { isClassroomMode } = useClassroom();
   const [currentStage, setCurrentStage] = useState(STAGES.MAP);
   const [currentShop, setCurrentShop] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [sessionActivities, setSessionActivities] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else if (isClassroomMode) {
+      navigate('/teacher-workspace');
+    } else {
+      navigate('/dashboard');
+    }
+  };
 
   const handleStageTransition = (newStage, delay = 0) => {
     if (delay > 0) {
@@ -94,7 +108,7 @@ function BornoBazarInner({ onBack }) {
 
     switch (currentStage) {
       case STAGES.MAP:
-        return <MarketMap onComplete={() => handleStageTransition(STAGES.SHOP)} setShop={setCurrentShop} onBack={onBack} />;
+        return <MarketMap onComplete={() => handleStageTransition(STAGES.SHOP)} setShop={setCurrentShop} onBack={handleBack} />;
       case STAGES.SHOP:
       case STAGES.STOCKING:
         return (
@@ -127,7 +141,7 @@ function BornoBazarInner({ onBack }) {
       case STAGES.BREAK:
         return <BreakReminder onComplete={advanceStage} />;
       default:
-        return <MarketMap onComplete={() => handleStageTransition(STAGES.SHOP)} setShop={setCurrentShop} onBack={onBack} />;
+        return <MarketMap onComplete={() => handleStageTransition(STAGES.SHOP)} setShop={setCurrentShop} onBack={handleBack} />;
     }
   };
 

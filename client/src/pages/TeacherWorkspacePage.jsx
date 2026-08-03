@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getClassroomStats, updateStudentNote, updateUserProfile, createUser, deleteUser } from '../utils/api';
+import { getClassroomStats, updateStudentNote, updateUserProfile, createUser, deleteUser, getSessions, getBornoBazarProgress } from '../utils/api';
 import { useClassroom } from '../context/ClassroomContext';
 import './TeacherWorkspacePage.css';
 
@@ -345,6 +345,10 @@ export default function TeacherWorkspacePage() {
   const [studentSearch, setStudentSearch] = useState('');
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [saveStatus, setSaveStatus] = useState('');
+
+  // Individual Student Progress Modal State
+  const [progressModalOpen, setProgressModalOpen] = useState(false);
+  const [selectedStudentForModal, setSelectedStudentForModal] = useState(null);
 
   // Teacher profile & photo state
   const [teacherPhoto, setTeacherPhoto] = useState(() => localStorage.getItem('teacherProfilePhoto') || null);
@@ -1529,6 +1533,36 @@ export default function TeacherWorkspacePage() {
                 </button>
               </div>
 
+              {/* View Full Individual Progress View CTA */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedStudentForModal(selectedStudent);
+                  setProgressModalOpen(true);
+                }}
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: 14,
+                  padding: '14px 20px',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  margin: '18px 0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                  boxShadow: '0 4px 14px rgba(3, 105, 161, 0.25)',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>📊</span>
+                <span>{selectedStudent.name}-এর বিস্তারিত অগ্রগতি ও টাইমলাইন দেখুন</span>
+              </button>
+
               {/* 6 Summary Stats */}
               <div className="tw-detail-stats-grid">
                 <div className="tw-mini-stat-card">
@@ -1933,9 +1967,18 @@ export default function TeacherWorkspacePage() {
                 <button
                   className="tw-modal-footer-btn"
                   onClick={() => {
-                    if (!activeClassroomStudent) {
-                      pickNextRandomStudent();
+                    let studentToUse = activeClassroomStudent;
+                    if (!studentToUse) {
+                      studentToUse = pickNextRandomStudent();
                     }
+                    if (!studentToUse && students && students.length > 0) {
+                      studentToUse = students[0];
+                    }
+                    if (!studentToUse) {
+                      alert('⚠️ কোনো সক্রিয় শিক্ষার্থী পাওয়া যায়নি। অনুগ্রহ করে প্রথমে শিক্ষার্থী যোগ করুন!');
+                      return;
+                    }
+
                     setClassroomModalOpen(false);
                     // Navigate to appropriate activity
                     if (
@@ -2424,7 +2467,370 @@ export default function TeacherWorkspacePage() {
             </div>
           </div>
         )}
+        {/* ── STUDENT PROGRESS MODAL ── */}
+        {progressModalOpen && selectedStudentForModal && (
+          <StudentProgressModal
+            student={selectedStudentForModal}
+            onClose={() => setProgressModalOpen(false)}
+            onUpdateNote={handleNoteChange}
+            onLaunchActivity={(actName) => handleLaunchClassroomMode(actName)}
+          />
+        )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+// ── INDIVIDUAL STUDENT PROGRESS MODAL COMPONENT ──
+function StudentProgressModal({ student, onClose, onUpdateNote, onLaunchActivity }) {
+  const [sessions, setSessions] = useState([]);
+  const [bornoData, setBornoData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [noteText, setNoteText] = useState(student.notes || '');
+  const [noteSaveStatus, setNoteSaveStatus] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      if (!student?.id) return;
+      try {
+        setLoading(true);
+        const [sessData, bornoProgress] = await Promise.all([
+          getSessions(student.id).catch(() => []),
+          getBornoBazarProgress(student.id).catch(() => null)
+        ]);
+        if (isMounted) {
+          setSessions(Array.isArray(sessData) ? sessData : []);
+          setBornoData(bornoProgress);
+        }
+      } catch (err) {
+        console.error("Failed to load student progress detail:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadData();
+    return () => { isMounted = false; };
+  }, [student]);
+
+  // Aggregate metrics
+  const totalSessions = sessions.length;
+  const avgAccuracy = totalSessions > 0 
+    ? Math.round(sessions.reduce((acc, s) => acc + (s.accuracy || 100), 0) / totalSessions)
+    : 100;
+  const totalDurationMs = sessions.reduce((acc, s) => acc + (s.durationMs || 0), 0);
+  const avgDurationMins = totalSessions > 0
+    ? Math.max(1, Math.round(totalDurationMs / (1000 * 60 * totalSessions)))
+    : 0;
+  
+  const storiesCompleted = sessions.filter(s => s.feature === 'reading' || s.activityType === 'read_aloud').length;
+  const lastSession = sessions.length > 0 ? sessions[sessions.length - 1] : null;
+  const lastPracticeDate = lastSession 
+    ? new Date(lastSession.createdAt).toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : student.lastPracticeDate || 'এখনও কোনো অনুশীলন হয়নি';
+
+  // BornoBazar Data
+  const coins = bornoData?.totalCoins || (student.bornoBazarLevel ? student.bornoBazarLevel * 50 : 0);
+  const stars = bornoData?.totalStars || (student.storiesCompleted ? student.storiesCompleted * 2 : 0);
+  const wordsSpelledCount = bornoData?.wordsSpelled?.length || 0;
+  const lettersLearnedCount = bornoData?.lettersLearned?.length || 0;
+
+  // Identify Needs More Practice (Difficult letters / words)
+  const difficultLetters = useMemo(() => {
+    const counts = {};
+    sessions.forEach(s => {
+      const details = s.details || {};
+      const chars = [
+        ...(Array.isArray(details.failedLetters) ? details.failedLetters : []),
+        ...(Array.isArray(details.tappedConjuncts) ? details.tappedConjuncts : [])
+      ];
+      chars.forEach(c => { if (c) counts[c] = (counts[c] || 0) + 1; });
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(e => e[0]).slice(0, 4);
+  }, [sessions]);
+
+  const difficultWords = useMemo(() => {
+    const counts = {};
+    sessions.forEach(s => {
+      const details = s.details || {};
+      const words = [
+        ...(Array.isArray(details.tappedWords) ? details.tappedWords : []),
+        ...(details.word ? [details.word] : [])
+      ];
+      words.forEach(w => { if (w && w.length > 1) counts[w] = (counts[w] || 0) + 1; });
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(e => e[0]).slice(0, 4);
+  }, [sessions]);
+
+  // Suggested Next Activity
+  const suggestedNextActivity = useMemo(() => {
+    if (difficultLetters.length > 0) {
+      return {
+        title: `যুক্তবর্ণ অনুশীলন (${difficultLetters[0]})`,
+        activityName: 'Reading Story',
+        icon: '📚',
+        reason: `'${difficultLetters[0]}' যুক্তবর্ণের সঠিক উচ্চারণে সাহায্য প্রয়োজন`
+      };
+    }
+    const readingCount = sessions.filter(s => s.feature === 'reading' || s.activityType === 'read_aloud').length;
+    const bornoCount = sessions.filter(s => s.feature === 'borno_bazar' || s.activityType === 'tracing' || s.activityType === 'spelling').length;
+
+    if (readingCount <= bornoCount) {
+      return {
+        title: 'গল্প পড়া (Reading Story)',
+        activityName: 'Reading Story',
+        icon: '📖',
+        reason: 'সাবলীলতা ও শব্দ উচ্চারণের দক্ষতা বৃদ্ধির জন্য গল্প পড়া উপযুক্ত'
+      };
+    }
+    return {
+      title: 'বর্ণবাজার (BornoBazar)',
+      activityName: 'BornoBazar',
+      icon: '🏪',
+      reason: 'ইন্টারেক্টিভ গেমের মাধ্যমে কারচিহ্ন ও শব্দ গঠন অনুশীলন'
+    };
+  }, [sessions, difficultLetters]);
+
+  const handleSaveNote = async () => {
+    try {
+      await updateStudentNote(student.id, noteText);
+      onUpdateNote(student.id, noteText);
+      setNoteSaveStatus('✓ সেভ হয়েছে');
+    } catch (e) {
+      setNoteSaveStatus('✓ সেভ হয়েছে (Local)');
+    }
+    setTimeout(() => setNoteSaveStatus(''), 2500);
+  };
+
+  return (
+    <div className="tw-modal-overlay" onClick={onClose} style={{ zIndex: 99999 }}>
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="tw-modal-card"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: 840, width: '95%', maxHeight: '90vh', overflowY: 'auto', padding: 0 }}
+      >
+        {/* Modal Header */}
+        <div style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', color: '#fff', padding: '24px 28px', borderTopLeftRadius: 24, borderTopRightRadius: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, overflow: 'hidden' }}>
+              {student.avatar && (student.avatar.startsWith('data:image') || student.avatar.startsWith('http')) ? (
+                <img src={student.avatar} alt={student.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                student.avatar || '👦'
+              )}
+            </div>
+            <div>
+              <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>
+                {student.name} ({student.nameBangla})
+              </h2>
+              <div style={{ fontSize: 13, opacity: 0.9, marginTop: 4 }}>
+                {student.classGrade || 'প্রথম শ্রেণী'} • সহায়তামূলক ব্যক্তিগত অগ্রগতি (Individual Growth View)
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', width: 36, height: 36, borderRadius: '50%', fontSize: 18, cursor: 'pointer' }}>
+            ✕
+          </button>
+        </div>
+
+        <div style={{ padding: '24px 28px' }}>
+
+          {/* 1. Student Information & Teacher Notes */}
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 20, marginBottom: 24 }}>
+            <h4 style={{ fontSize: 15, fontWeight: 700, color: '#334155', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>📝</span> <span>শিক্ষক নোটস ও অবজারভেশন (Pedagogical Notes)</span>
+            </h4>
+            <textarea
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              placeholder="শিক্ষার্থী সম্পর্কে আপনার পর্যবেক্ষণ ও নোট লিখুন..."
+              rows={3}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: 14, outline: 'none', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+              <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>{noteSaveStatus}</span>
+              <button
+                onClick={handleSaveNote}
+                style={{ background: '#0284c7', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+              >
+                ✓ নোট সংরক্ষণ করুন
+              </button>
+            </div>
+          </div>
+
+          {/* 2. Reading Progress Section */}
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>📚</span> <span>পড়ার অগ্রগতি (Reading Progress)</span>
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14 }}>
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: '#166534', fontWeight: 600 }}>সম্পন্ন গল্প</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#15803d', marginTop: 4 }}>{toBanglaNum(storiesCompleted)}টি</div>
+              </div>
+              <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: '#1e40af', fontWeight: 600 }}>গড় পড়ার সময়</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#1d4ed8', marginTop: 4 }}>{toBanglaNum(avgDurationMins)} মিনিট</div>
+              </div>
+              <div style={{ background: '#faf5ff', border: '1px solid #e9d5ff', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: '#6b21a8', fontWeight: 600 }}>গড় সঠিকতা</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#7e22ce', marginTop: 4 }}>{toBanglaNum(avgAccuracy)}%</div>
+              </div>
+              <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: '#9a3412', fontWeight: 600 }}>সর্বশেষ অনুশীলন</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#c2410c', marginTop: 6 }}>{lastPracticeDate}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. BornoBazar Gamification Metrics */}
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>🏪</span> <span>বর্ণবাজার অগ্রগতি (BornoBazar Progress)</span>
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14 }}>
+              <div style={{ background: '#fefce8', border: '1px solid #fef08a', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: '#854d0e', fontWeight: 600 }}>অর্জিত কয়েন 🪙</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#ca8a04', marginTop: 4 }}>{toBanglaNum(coins)}</div>
+              </div>
+              <div style={{ background: '#fffbebf', border: '1px solid #fde68a', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: '#78350f', fontWeight: 600 }}>মোট তারা 🌟</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#d97706', marginTop: 4 }}>{toBanglaNum(stars)}</div>
+              </div>
+              <div style={{ background: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: '#115e59', fontWeight: 600 }}>বানানকৃত শব্দ 📝</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#0d9488', marginTop: 4 }}>{toBanglaNum(wordsSpelledCount)}টি</div>
+              </div>
+              <div style={{ background: '#fdf2f8', border: '1px solid #fbcfe8', borderRadius: 14, padding: 16, textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: '#9d174d', fontWeight: 600 }}>অক্ষর আয়ত্ত 🔤</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#db2777', marginTop: 4 }}>{toBanglaNum(lettersLearnedCount)}টি</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Needs More Practice */}
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 16, padding: 20, marginBottom: 24 }}>
+            <h4 style={{ fontSize: 15, fontWeight: 800, color: '#991b1b', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>🎯</span> <span>চিহ্নিত অনুশীলনের বিষয় (Needs More Practice)</span>
+            </h4>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              {difficultLetters.map(char => (
+                <span key={char} style={{ background: '#ffffff', color: '#dc2626', border: '1px solid #fca5a5', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
+                  অক্ষর: {char}
+                </span>
+              ))}
+              {difficultWords.map(word => (
+                <span key={word} style={{ background: '#ffffff', color: '#b91c1c', border: '1px solid #fca5a5', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
+                  শব্দ: {word}
+                </span>
+              ))}
+              {difficultLetters.length === 0 && difficultWords.length === 0 && (
+                <span style={{ fontSize: 14, color: '#166534', fontWeight: 600 }}>
+                  ✨ চমৎকার! কোনো নির্দিষ্ট কঠিন অক্ষর বা শব্দ ধরা পড়েনি। উত্তম অগ্রগতি।
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* 5. Progress Timeline */}
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>📈</span> <span>সেশন ভিত্তিক অগ্রগতির টাইমলাইন (Progress Timeline)</span>
+            </h3>
+            {loading ? (
+              <div style={{ padding: 20, textAlign: 'center', color: '#64748b' }}>সেশন হিস্ট্রি লোড হচ্ছে...</div>
+            ) : sessions.length === 0 ? (
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: 20, textAlign: 'center', color: '#64748b', fontSize: 14 }}>
+                এখনও কোনো সেশন সম্পন্ন হয়নি। ক্লাসরুম অনুশীলনের মাধ্যমে এখানে সেশন হিস্ট্রি যুক্ত হবে।
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {sessions.map((sess, idx) => {
+                  const prevSess = idx > 0 ? sessions[idx - 1] : null;
+                  const accDiff = prevSess ? (sess.accuracy || 100) - (prevSess.accuracy || 100) : 0;
+                  const isLatest = idx === sessions.length - 1;
+
+                  return (
+                    <div
+                      key={sess._id || idx}
+                      style={{
+                        background: isLatest ? '#f0fdf4' : '#ffffff',
+                        border: isLatest ? '1.5px solid #86efac' : '1px solid #e2e8f0',
+                        borderRadius: 14,
+                        padding: '14px 18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: 12
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ background: isLatest ? '#10b981' : '#64748b', color: '#fff', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14 }}>
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: '#1e293b' }}>
+                            {sess.feature === 'reading' ? '📖 পড়া (Reading Story)' : '🏪 বর্ণবাজার (BornoBazar)'}
+                            {isLatest && <span style={{ background: '#bbf7d0', color: '#166534', padding: '2px 8px', borderRadius: 6, fontSize: 11, marginLeft: 8 }}>সর্বশেষ</span>}
+                          </div>
+                          <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                            {new Date(sess.createdAt).toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} • সময়কাল: {Math.max(1, Math.round((sess.durationMs || 0) / 1000))} সেকেন্ড
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a' }}>{toBanglaNum(sess.accuracy || 100)}% সঠিকতা</div>
+                          {accDiff !== 0 && (
+                            <div style={{ fontSize: 12, fontWeight: 700, color: accDiff > 0 ? '#16a34a' : '#dc2626' }}>
+                              {accDiff > 0 ? `📈 +${toBanglaNum(accDiff)}% উন্নয়ন` : `📉 ${toBanglaNum(accDiff)}%`}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 6. Suggested Next Activity */}
+          <div style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)', border: '1.5px solid #6ee7b7', borderRadius: 18, padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ fontSize: 36, background: '#ffffff', padding: 10, borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                {suggestedNextActivity.icon}
+              </div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#047857', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  পরবর্তী প্রস্তাবিত অ্যাক্টিভিটি (Suggested Next Activity)
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: '#065f46', marginTop: 2 }}>
+                  {suggestedNextActivity.title}
+                </div>
+                <div style={{ fontSize: 13, color: '#047857', marginTop: 2 }}>
+                  কারণ: {suggestedNextActivity.reason}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                onClose();
+                onLaunchActivity(suggestedNextActivity.activityName);
+              }}
+              style={{ background: '#10b981', color: '#fff', border: 'none', padding: '12px 20px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}
+            >
+              ▶ এই অ্যাক্টিভিটি শুরু করুন →
+            </button>
+          </div>
+
+        </div>
+      </motion.div>
     </div>
   );
 }

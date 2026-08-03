@@ -21,6 +21,7 @@ import { decomposeWord } from '../utils/banglaUtils';
 import { synthesizeBanglaTTS } from '../utils/ttsApi';
 import { createSession, updateProgress } from '../utils/api';
 import { useEffectiveUserId } from '../hooks/useEffectiveUserId';
+import { useClassroom } from '../context/ClassroomContext';
 import { DIFFICULTY_LEVELS, READING_CONTENT, getLevelInfo } from '../utils/readingContent';
 
 // Premium UI assets
@@ -293,7 +294,7 @@ function ReadingHub({ onSelect }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
         <motion.button
           whileTap={{ scale: 0.9 }}
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate(isClassroomMode ? '/teacher-workspace' : '/dashboard')}
           style={{
             width: 48,
             height: 48,
@@ -412,6 +413,7 @@ function ReadingHub({ onSelect }) {
 // ── Main Page Component ──
 export default function ReadingPage() {
   const effectiveUserId = useEffectiveUserId();
+  const { isClassroomMode } = useClassroom();
   const [subView, setSubView] = useState(null);
   const { isPanelOpen, togglePanel } = usePreferences();
 
@@ -635,13 +637,22 @@ export default function ReadingPage() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentItemIdx < levelContent.length - 1) {
       stopAllAudio();
       setCurrentItemIdx(currentItemIdx + 1);
       setTappedWord(null);
       setActiveIdx(-1);
       setCustomAnalysisActive(false);
+    } else {
+      // Reached final story item in reading activity!
+      stopAllAudio();
+      await handleSaveProgress();
+      if (isClassroomMode) {
+        navigate('/teacher-workspace');
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
