@@ -2562,14 +2562,38 @@ function StudentProgressModal({ student, onClose, onUpdateNote, onLaunchActivity
     return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(e => e[0]).slice(0, 4);
   }, [sessions]);
 
-  // Suggested Next Activity
+  // Growth Summary Trend Calculation
+  const growthTrend = useMemo(() => {
+    if (sessions.length < 2) {
+      return { accuracyChange: 0, durationChange: 0 };
+    }
+    const latest = sessions[sessions.length - 1];
+    const previous = sessions[sessions.length - 2];
+    const accDiff = (latest.accuracy || 100) - (previous.accuracy || 100);
+    const durDiffSec = Math.round(((latest.durationMs || 0) - (previous.durationMs || 0)) / 1000);
+    return { accuracyChange: accDiff, durationChange: durDiffSec };
+  }, [sessions]);
+
+  // Suggested Next Activity based on ActivitySession history
   const suggestedNextActivity = useMemo(() => {
     if (difficultLetters.length > 0) {
+      const charSessCount = sessions.filter(s => 
+        s.details?.failedLetters?.includes(difficultLetters[0]) || 
+        s.details?.tappedConjuncts?.includes(difficultLetters[0])
+      ).length;
       return {
         title: `যুক্তবর্ণ অনুশীলন (${difficultLetters[0]})`,
         activityName: 'Reading Story',
         icon: '📚',
-        reason: `'${difficultLetters[0]}' যুক্তবর্ণের সঠিক উচ্চারণে সাহায্য প্রয়োজন`
+        reason: `সেশন হিস্ট্রি অনুযায়ী '${difficultLetters[0]}' যুক্তবর্ণের ব্যবহারে শিক্ষার্থী চ্যালেঞ্জ বোধ করেছে (${toBanglaNum(charSessCount || 1)}টি সেশনে চিহ্নিত)।`
+      };
+    }
+    if (difficultWords.length > 0) {
+      return {
+        title: `শব্দ রিডিং ড্রিল (${difficultWords[0]})`,
+        activityName: 'Reading Story',
+        icon: '📖',
+        reason: `অতীত সেশনে '${difficultWords[0]}' পড়তে শিক্ষার্থী একাধিকবার অডিও রি-প্লে বেছে নিয়েছে। পুনরাবৃত্তি প্রয়োজন।`
       };
     }
     const readingCount = sessions.filter(s => s.feature === 'reading' || s.activityType === 'read_aloud').length;
@@ -2580,16 +2604,16 @@ function StudentProgressModal({ student, onClose, onUpdateNote, onLaunchActivity
         title: 'গল্প পড়া (Reading Story)',
         activityName: 'Reading Story',
         icon: '📖',
-        reason: 'সাবলীলতা ও শব্দ উচ্চারণের দক্ষতা বৃদ্ধির জন্য গল্প পড়া উপযুক্ত'
+        reason: `শিক্ষার্থীর মোট ${toBanglaNum(sessions.length)}টি অনুশীলনের মধ্যে বর্ণবাজার সম্পন্ন হয়েছে বেশি (${toBanglaNum(bornoCount)}টি)। পড়ার ফ্লুয়েন্সি ও সাবলীলতার জন্য গল্প পড়া উপযুক্ত।`
       };
     }
     return {
       title: 'বর্ণবাজার (BornoBazar)',
       activityName: 'BornoBazar',
       icon: '🏪',
-      reason: 'ইন্টারেক্টিভ গেমের মাধ্যমে কারচিহ্ন ও শব্দ গঠন অনুশীলন'
+      reason: `শিক্ষার্থীর বিগত ${toBanglaNum(readingCount)}টি গল্প পড়ার সেশনের পর আনন্দের সাথে কারচিহ্ন ও শব্দ গঠন অনুশীলনের জন্য বর্ণবাজার সেরা।`
     };
-  }, [sessions, difficultLetters]);
+  }, [sessions, difficultLetters, difficultWords]);
 
   const handleSaveNote = async () => {
     try {
@@ -2637,6 +2661,43 @@ function StudentProgressModal({ student, onClose, onUpdateNote, onLaunchActivity
         </div>
 
         <div style={{ padding: '24px 28px' }}>
+
+          {/* 0. COMPACT GROWTH SUMMARY CARD */}
+          <div style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', border: '1.5px solid #86efac', borderRadius: 18, padding: '16px 22px', marginBottom: 20, boxShadow: '0 4px 14px rgba(16, 185, 129, 0.1)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 28 }}>🌱</span>
+                <div>
+                  <h4 style={{ fontSize: 16, fontWeight: 800, color: '#166534', margin: 0 }}>
+                    ব্যক্তিগত বৃদ্ধি সারসংক্ষেপ (Growth Summary)
+                  </h4>
+                  <span style={{ fontSize: 12, color: '#15803d', fontWeight: 600 }}>
+                    বিগত {toBanglaNum(sessions.length)}টি সেশনের রিয়েল-টাইম তথ্য বিশ্লেষণ
+                  </span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <div style={{ background: '#ffffff', padding: '6px 14px', borderRadius: 12, border: '1px solid #bbf7d0', textAlign: 'center' }}>
+                  <span style={{ fontSize: 11, color: '#166534', display: 'block', fontWeight: 600 }}>সঠিকতা পরিবর্তন</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#15803d' }}>
+                    {growthTrend.accuracyChange >= 0 ? `📈 +${toBanglaNum(growthTrend.accuracyChange)}%` : `📉 ${toBanglaNum(growthTrend.accuracyChange)}%`}
+                  </span>
+                </div>
+                <div style={{ background: '#ffffff', padding: '6px 14px', borderRadius: 12, border: '1px solid #bbf7d0', textAlign: 'center' }}>
+                  <span style={{ fontSize: 11, color: '#166534', display: 'block', fontWeight: 600 }}>পড়ার সময় পরিবর্তন</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#15803d' }}>
+                    {growthTrend.durationChange <= 0 ? `⚡ ${toBanglaNum(Math.abs(growthTrend.durationChange))}s দ্রুত` : `⏱️ ${toBanglaNum(growthTrend.durationChange)}s`}
+                  </span>
+                </div>
+                <div style={{ background: '#ffffff', padding: '6px 14px', borderRadius: 12, border: '1px solid #bbf7d0', textAlign: 'center' }}>
+                  <span style={{ fontSize: 11, color: '#166534', display: 'block', fontWeight: 600 }}>সম্পন্ন গল্প</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#15803d' }}>
+                    📚 {toBanglaNum(storiesCompleted)}টি
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* 1. Student Information & Teacher Notes */}
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 20, marginBottom: 24 }}>
