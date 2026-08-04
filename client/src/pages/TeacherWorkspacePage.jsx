@@ -65,6 +65,65 @@ const translateSubText = (sub) => {
   return sub;
 };
 
+// ─── Shared SVGs from Dashboard ──────────────────────────────────────────────
+const BookSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="6" y="8" width="40" height="34" rx="4" fill="#69b3e7" />
+    <rect x="8" y="10" width="17" height="30" rx="2" fill="white" />
+    <rect x="27" y="10" width="17" height="30" rx="2" fill="white" />
+    <rect x="10" y="8" width="14" height="14" rx="4" fill="#ff6b6b" />
+    <rect x="28" y="8" width="14" height="14" rx="4" fill="#4a90d9" />
+    <rect x="10" y="26" width="14" height="10" rx="3" fill="#3cb371" />
+    <rect x="28" y="26" width="14" height="10" rx="3" fill="#8b5cf6" />
+    <text x="17" y="20" fontSize="10" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">অ</text>
+    <text x="35" y="20" fontSize="10" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">আ</text>
+    <text x="17" y="34" fontSize="10" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">ক</text>
+    <text x="35" y="34" fontSize="10" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">খ</text>
+  </svg>
+);
+
+const GamepadSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="14" width="44" height="28" rx="14" fill="#6b6fba" />
+    <circle cx="14" cy="28" r="7" fill="#5555a0" />
+    <line x1="14" y1="24" x2="14" y2="32" stroke="#888ddd" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="10" y1="28" x2="18" y2="28" stroke="#888ddd" strokeWidth="2.5" strokeLinecap="round" />
+    <circle cx="36" cy="25" r="3" fill="#ff6b6b" />
+    <circle cx="42" cy="28" r="3" fill="#ffd700" />
+    <circle cx="36" cy="31" r="3" fill="#5ba0e0" />
+    <circle cx="30" cy="28" r="3" fill="#3cb371" />
+  </svg>
+);
+
+const PencilSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="22" y="4" width="10" height="36" rx="4" fill="#f5a623" transform="rotate(25 26 26)" />
+    <polygon points="26,42 30,34 22,34" fill="#ff6b6b" transform="rotate(25 26 26)" />
+    <polygon points="26,46 29,42 23,42" fill="#ffd700" transform="rotate(25 26 26)" />
+    <rect x="22" y="4" width="10" height="7" rx="4 4 0 0" fill="#ccc" transform="rotate(25 26 26)" />
+  </svg>
+);
+
+const PuzzleSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="4" width="20" height="20" rx="4" fill="#e04e81" />
+    <rect x="28" y="4" width="20" height="20" rx="4" fill="#f5a623" />
+    <rect x="4" y="28" width="20" height="20" rx="4" fill="#18b368" />
+    <rect x="28" y="28" width="20" height="20" rx="4" fill="#4a90d9" />
+    <circle cx="24" cy="14" r="6" fill="#e04e81" />
+    <circle cx="24" cy="38" r="6" fill="#18b368" />
+    <circle cx="14" cy="24" r="6" fill="#e04e81" />
+    <circle cx="38" cy="24" r="6" fill="#4a90d9" />
+  </svg>
+);
+
+const DASHBOARD_ACTIVITIES = [
+  { id: "Reading Story", title: "পড়া", sub: "লাইন ধরে পড়ি\nআর অক্ষর চিনি", bg: "#eef9f1", accent: "#18b368", icon: <BookSVG /> },
+  { id: "BornoBazar", title: "বর্ণের দোকান", sub: "খেলার মাধ্যমে\nশিখি আর মজা করি", bg: "#f0efff", accent: "#7c75dd", icon: <GamepadSVG /> },
+  { id: "Trace", title: "ট্রেনিং", sub: "লেখা ও বানান চর্চা\nকরি প্রতিদিন", bg: "#fff0f5", accent: "#f06292", icon: <PencilSVG /> },
+  { id: "Quiz Game", title: "কুইজ", sub: "শব্দ ও ছবি মেলাও", bg: "#fffbee", accent: "#e04e81", icon: <PuzzleSVG /> },
+];
+
 // Supportive student roster for Bangladeshi foundation school classroom (20-40 students context)
 
 const INITIAL_STUDENTS = [
@@ -1292,193 +1351,60 @@ export default function TeacherWorkspacePage() {
           </div>
 
           <div className="tw-activity-cards-grid">
-            {/* Activity 1: Reading Story */}
-            <div
-              className={`tw-activity-card ${
-                selectedActivity === 'Reading Story' ? 'selected' : ''
-              }`}
-              onClick={() => setSelectedActivity('Reading Story')}
-            >
-              <div>
-                <div className="tw-activity-top">
-                  <div className="tw-activity-icon" style={{ padding: 0, overflow: 'hidden' }}>
-                    <img src={iconStoryBook} alt="Reading Story" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8 }} />
+            {DASHBOARD_ACTIVITIES.map((act) => (
+              <div
+                key={act.id}
+                className={`tw-activity-card ${
+                  selectedActivity === act.id ? 'selected' : ''
+                }`}
+                onClick={() => setSelectedActivity(act.id)}
+                style={{
+                  background: act.bg,
+                  border: selectedActivity === act.id ? `3px solid ${act.accent}` : '3px solid transparent',
+                  boxShadow: selectedActivity === act.id ? `0 6px 20px ${act.accent}40` : '0 4px 16px rgba(0,0,0,0.06)',
+                  padding: '24px',
+                  borderRadius: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ transform: 'scale(1.2)' }}>{act.icon}</div>
+                  <div>
+                    <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#1a1a2e', marginBottom: '4px' }}>
+                      {act.title}
+                    </h3>
+                    <p style={{ fontSize: '13px', color: '#687076', whiteSpace: 'pre-line', lineHeight: '1.4' }}>
+                      {act.sub}
+                    </p>
                   </div>
-                  <span className="tw-activity-tag">পুরো ক্লাস</span>
                 </div>
-                <h3>গল্প পড়া (Reading Story)</h3>
-                <p>
-                  শব্দ হাইলাইট ও অডিও সমর্থন সহ ইন্টারেক্টিভ গল্প পড়া।
-                </p>
-              </div>
-              <div
-                style={{
-                  marginTop: 14,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color:
-                    selectedActivity === 'Reading Story' ? '#0f9055' : '#687076',
-                }}
-              >
-                {selectedActivity === 'Reading Story' ? '● নির্বাচিত' : '○ নির্বাচন করুন'}
-              </div>
-            </div>
-
-            {/* Activity 2: BornoBazar */}
-            <div
-              className={`tw-activity-card ${
-                selectedActivity === 'BornoBazar' ? 'selected' : ''
-              }`}
-              onClick={() => setSelectedActivity('BornoBazar')}
-            >
-              <div>
-                <div className="tw-activity-top">
-                  <div className="tw-activity-icon" style={{ padding: 0, overflow: 'hidden' }}>
-                    <img src={iconBornoBazar} alt="BornoBazar" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8 }} />
-                  </div>
-                  <span className="tw-activity-tag">ইন্টারেক্টিভ</span>
+                
+                <div
+                  style={{
+                    marginTop: 'auto',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    color: selectedActivity === act.id ? act.accent : '#94a3b8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <div style={{
+                    width: 24, height: 24, borderRadius: '50%',
+                    background: selectedActivity === act.id ? act.accent : '#e2e8f0',
+                    color: selectedActivity === act.id ? '#fff' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 12
+                  }}>✓</div>
+                  {selectedActivity === act.id ? 'নির্বাচিত' : 'নির্বাচন করুন'}
                 </div>
-                <h3>বর্ণবাজার (BornoBazar)</h3>
-                <p>
-                  বাংলা বর্ণ ও কেনাকাটার দক্ষতা অনুশীলনের মজার বাজার গেম।
-                </p>
               </div>
-              <div
-                style={{
-                  marginTop: 14,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color:
-                    selectedActivity === 'BornoBazar' ? '#0f9055' : '#687076',
-                }}
-              >
-                {selectedActivity === 'BornoBazar' ? '● নির্বাচিত' : '○ নির্বাচন করুন'}
-              </div>
-            </div>
-
-            {/* Activity 3: Quiz Game */}
-            <div
-              className={`tw-activity-card ${
-                selectedActivity === 'Quiz Game' ? 'selected' : ''
-              }`}
-              onClick={() => setSelectedActivity('Quiz Game')}
-            >
-              <div>
-                <div className="tw-activity-top">
-                  <div className="tw-activity-icon">🧩</div>
-                  <span className="tw-activity-tag">কুইজ ও খেলা</span>
-                </div>
-                <h3>মজার কুইজ (Quiz Game)</h3>
-                <p>
-                  শব্দ ও ছবি মেলাও এবং শূন্যস্থান পূরণের ইন্টারেক্টিভ কুইজ গেম।
-                </p>
-              </div>
-              <div
-                style={{
-                  marginTop: 14,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color:
-                    selectedActivity === 'Quiz Game' ? '#0f9055' : '#687076',
-                }}
-              >
-                {selectedActivity === 'Quiz Game' ? '● নির্বাচিত' : '○ নির্বাচন করুন'}
-              </div>
-            </div>
-
-            {/* Activity 4: Word Practice */}
-            <div
-              className={`tw-activity-card ${
-                selectedActivity === 'Word Practice' ? 'selected' : ''
-              }`}
-              onClick={() => setSelectedActivity('Word Practice')}
-            >
-              <div>
-                <div className="tw-activity-top">
-                  <div className="tw-activity-icon">✏️</div>
-                  <span className="tw-activity-tag">নির্দেশিত</span>
-                </div>
-                <h3>শব্দ অনুশীলন (Word Practice)</h3>
-                <p>
-                  ধ্বনি বিশ্লেষণ এবং যুক্তবর্ণ (Conjunct Letters) চর্চা।
-                </p>
-              </div>
-              <div
-                style={{
-                  marginTop: 14,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color:
-                    selectedActivity === 'Word Practice' ? '#0f9055' : '#687076',
-                }}
-              >
-                {selectedActivity === 'Word Practice' ? '● নির্বাচিত' : '○ নির্বাচন করুন'}
-              </div>
-            </div>
-
-            {/* Activity 5: Sentence Builder */}
-            <div
-              className={`tw-activity-card ${
-                selectedActivity === 'Sentence Builder' ? 'selected' : ''
-              }`}
-              onClick={() => setSelectedActivity('Sentence Builder')}
-            >
-              <div>
-                <div className="tw-activity-top">
-                  <div className="tw-activity-icon">📝</div>
-                  <span className="tw-activity-tag">ভাষা গঠন</span>
-                </div>
-                <h3>বাক্য তৈরি (Sentence Builder)</h3>
-                <p>
-                  শব্দ সাজিয়ে সঠিক বাংলা বাক্য তৈরি করার ইন্টারেক্টিভ অনুশীলন।
-                </p>
-              </div>
-              <div
-                style={{
-                  marginTop: 14,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color:
-                    selectedActivity === 'Sentence Builder' ? '#0f9055' : '#687076',
-                }}
-              >
-                {selectedActivity === 'Sentence Builder' ? '● নির্বাচিত' : '○ নির্বাচন করুন'}
-              </div>
-            </div>
-
-            {/* Activity 6: Custom Reading */}
-            <div
-              className={`tw-activity-card ${
-                selectedActivity === 'Custom Reading' ? 'selected' : ''
-              }`}
-              onClick={() => setSelectedActivity('Custom Reading')}
-            >
-              <div>
-                <div className="tw-activity-top">
-                  <div className="tw-activity-icon">🎯</div>
-                  <span className="tw-activity-tag">ফ্লেক্সিবল</span>
-                </div>
-                <h3>কাস্টম পড়া (Custom Reading)</h3>
-                <p>
-                  আজকের নির্দিষ্ট পাঠের জন্য নির্বাচিত শব্দ বা বর্ণ।
-                </p>
-              </div>
-              <div
-                style={{
-                  marginTop: 14,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color:
-                    selectedActivity === 'Custom Reading'
-                      ? '#0f9055'
-                      : '#687076',
-                }}
-              >
-                {selectedActivity === 'Custom Reading'
-                  ? '● নির্বাচিত'
-                  : '○ নির্বাচন করুন'}
-              </div>
-            </div>
+            ))}
           </div>
 
           <div className="tw-start-action-bar">
@@ -2634,13 +2560,17 @@ export default function TeacherWorkspacePage() {
               if (actName === 'BornoBazar') {
                 navigate('/borno-bazar');
               } else if (actName === 'Quiz Game') {
-                navigate('/reading');
+                navigate('/dashboard?view=quiz');
+              } else if (actName === 'Trace') {
+                navigate('/dashboard?view=trace');
               } else if (actName === 'Word Practice') {
-                navigate('/reading');
+                navigate('/reading', { state: { subView: 'word' } });
               } else if (actName === 'Sentence Builder') {
-                navigate('/reading');
+                navigate('/reading', { state: { subView: 'sentence' } });
+              } else if (actName === 'Custom Reading') {
+                navigate('/reading', { state: { subView: 'custom' } });
               } else {
-                navigate('/reading');
+                navigate('/reading', { state: { subView: 'line' } });
               }
             }}
             onClose={() => setTurnSelectorOpen(false)}

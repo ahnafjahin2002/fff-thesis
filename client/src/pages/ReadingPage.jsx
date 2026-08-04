@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import PreferencesPanel from '../components/reader/PreferencesPanel';
 import PhonemeHighlighter from '../components/reader/PhonemeHighlighter';
@@ -230,6 +230,20 @@ const JuktobornoSVG = () => (
   </svg>
 );
 
+const BookSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="8" width="44" height="36" rx="5" fill="#5ba0e0" />
+    <rect x="6" y="10" width="19" height="32" rx="3" fill="#fff" />
+    <rect x="27" y="10" width="19" height="32" rx="3" fill="#f0f0f0" />
+    <line x1="26" y1="10" x2="26" y2="42" stroke="#5ba0e0" strokeWidth="2" />
+    <line x1="9" y1="15" x2="22" y2="15" stroke="#ccc" strokeWidth="1.5" />
+    <line x1="9" y1="22" x2="22" y2="22" stroke="#ccc" strokeWidth="1.5" />
+    <line x1="9" y1="29" x2="22" y2="29" stroke="#ccc" strokeWidth="1.5" />
+    <line x1="9" y1="36" x2="22" y2="36" stroke="#ccc" strokeWidth="1.5" />
+    <text x="36.5" y="28" fontSize="16" fontWeight="bold" fill="#5ba0e0" fontFamily="Hind Siliguri" textAnchor="middle">ক খ</text>
+  </svg>
+);
+
 const PhonemeSVG = () => (
   <svg width="48" height="48" viewBox="0 0 52 52">
     <rect x="4" y="8" width="44" height="36" rx="10" fill="#0ea5e9" />
@@ -246,13 +260,14 @@ const KarChihnoSVG = () => (
 
 function ReadingHub({ onSelect }) {
   const navigate = useNavigate();
+  const { isClassroomMode } = useClassroom();
 
   const cards = [
     {
       id: 'line',
       title: 'লাইন ধরে পড়া',
       sub: 'বাক্য ধরে ধরে পড়ি\nশব্দ বিশ্লেষণ শিখি',
-      emoji: '📖',
+      emoji: <BookSVG />,
       bg: '#eef9f1',
       accent: '#18b368',
     },
@@ -412,14 +427,19 @@ function ReadingHub({ onSelect }) {
 
 // ── Main Page Component ──
 export default function ReadingPage() {
+  const location = useLocation();
   const effectiveUserId = useEffectiveUserId();
-  const { isClassroomMode } = useClassroom();
-  const [subView, setSubView] = useState(null);
+  const { isClassroomMode, activeClassroomStudent } = useClassroom();
+  const [subView, setSubView] = useState(location.state?.subView || null);
   const { isPanelOpen, togglePanel } = usePreferences();
 
   const [tappedWord, setTappedWord] = useState(null);
   const [activeIdx, setActiveIdx] = useState(-1);
-  const [currentLevel, setCurrentLevel] = useState('sohoj');
+  const [currentLevel, setCurrentLevel] = useState(() => {
+    if (location.state?.subView === 'word') return 'shuru';
+    if (location.state?.subView === 'sentence') return 'sohoj';
+    return 'sohoj';
+  });
   const [currentItemIdx, setCurrentItemIdx] = useState(0);
   const [customText, setCustomText] = useState('');
   const [customAnalysisActive, setCustomAnalysisActive] = useState(false);
@@ -569,6 +589,20 @@ export default function ReadingPage() {
       return () => clearTimeout(timer);
     }
   }, [customAnalysisActive, displayText, playAudioWithBackend]);
+
+  useEffect(() => {
+    if (location.state?.subView === 'custom') {
+      setTimeout(() => {
+        const customSection = document.querySelector('.custom-input-section');
+        if (customSection) {
+          customSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // optionally focus the textarea
+          const textarea = customSection.querySelector('textarea');
+          if (textarea) textarea.focus();
+        }
+      }, 500);
+    }
+  }, [location.state]);
 
   const handlePlayToggle = useCallback(() => {
     if (isPlaying || isGeneratingAudio) {

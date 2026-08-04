@@ -366,8 +366,11 @@ const BookSVG = () => (
     <rect x="6" y="10" width="19" height="32" rx="3" fill="#fff" />
     <rect x="27" y="10" width="19" height="32" rx="3" fill="#f0f0f0" />
     <line x1="26" y1="10" x2="26" y2="42" stroke="#5ba0e0" strokeWidth="2" />
-    {[15, 20, 25, 30].map(y => <line key={y} x1="9" y1={y} x2="22" y2={y} stroke="#ccc" strokeWidth="1.5" />)}
-    {[15, 20, 25, 30].map(y => <line key={y} x1="30" y1={y} x2="43" y2={y} stroke="#ccc" strokeWidth="1.5" />)}
+    <line x1="9" y1="15" x2="22" y2="15" stroke="#ccc" strokeWidth="1.5" />
+    <line x1="9" y1="22" x2="22" y2="22" stroke="#ccc" strokeWidth="1.5" />
+    <line x1="9" y1="29" x2="22" y2="29" stroke="#ccc" strokeWidth="1.5" />
+    <line x1="9" y1="36" x2="22" y2="36" stroke="#ccc" strokeWidth="1.5" />
+    <text x="36.5" y="28" fontSize="16" fontWeight="bold" fill="#5ba0e0" fontFamily="Hind Siliguri" textAnchor="middle">ক খ</text>
   </svg>
 );
 

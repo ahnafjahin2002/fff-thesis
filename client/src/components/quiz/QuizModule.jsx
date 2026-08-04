@@ -118,7 +118,8 @@ export default function QuizModule() {
       if (diff === 2) count = 6;
       if (diff === 3) count = 8;
       
-      const res = await fetch(`http://localhost:3001/api/quiz/generate?difficulty=${diff}&count=${count}&category=all`);
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+      const res = await fetch(`${API_URL}/api/quiz/generate?difficulty=${diff}&count=${count}&category=all`);
       const data = await res.json();
       if (data.success) {
         setPairs(data.words);

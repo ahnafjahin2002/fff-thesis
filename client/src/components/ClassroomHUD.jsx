@@ -24,133 +24,146 @@ export default function ClassroomHUD() {
 
   return (
     <motion.div
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: -80, opacity: 0 }}
+      initial={{ y: -100, opacity: 0, scale: 0.95 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      exit={{ y: -100, opacity: 0, scale: 0.95 }}
+      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       style={{
         position: 'fixed',
-        top: 14,
+        top: 24,
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 99999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: 24,
-        padding: '10px 24px',
-        background: 'rgba(15, 23, 42, 0.94)',
-        border: '1px solid rgba(255, 255, 255, 0.16)',
-        borderRadius: 999,
-        boxShadow: '0 12px 36px rgba(0, 0, 0, 0.45)',
-        backdropFilter: 'blur(16px)',
+        gap: 20,
+        padding: '10px 16px',
+        background: 'rgba(15, 23, 42, 0.75)',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+        borderRadius: 40,
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
         color: '#ffffff',
-        fontFamily: "'Outfit', 'Baloo Da 2', sans-serif",
+        fontFamily: "'Inter', 'Outfit', sans-serif",
+        minWidth: '650px',
         maxWidth: '92vw',
       }}
     >
-      {/* Left: Mode Badge & Activity Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* ── Left: Mode Badge & Activity ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <div
           style={{
-            background: 'rgba(16, 185, 129, 0.2)',
-            color: '#34d399',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
-            padding: '4px 12px',
-            borderRadius: 999,
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: 0.8,
+            background: 'rgba(56, 189, 248, 0.15)',
+            color: '#38bdf8',
+            border: '1px solid rgba(56, 189, 248, 0.3)',
+            padding: '6px 12px',
+            borderRadius: 20,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: 0.5,
             textTransform: 'uppercase',
             display: 'flex',
             alignItems: 'center',
             gap: 6,
           }}
         >
-          <span>🖥️</span>
-          <span>Classroom Mode</span>
+          <span style={{ fontSize: 14 }}>🎯</span>
+          <span>Classroom</span>
         </div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', whiteSpace: 'nowrap' }}>
+        <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.15)' }} />
+        <div style={{ fontSize: 15, fontWeight: 600, color: '#f1f5f9', whiteSpace: 'nowrap' }}>
           {classroomActivityTitle}
         </div>
       </div>
 
-      {/* Center: Currently Selected Student */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          background: 'rgba(255, 255, 255, 0.08)',
-          padding: '6px 18px',
-          borderRadius: 999,
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-        }}
-      >
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-          Active Student:
-        </span>
+      {/* ── Center: Active Student ── */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
         <AnimatePresence mode="wait">
           {activeClassroomStudent ? (
             <motion.div
               key={activeClassroomStudent.id}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+              initial={{ scale: 0.9, opacity: 0, y: 5 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: -5 }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                background: 'rgba(255, 255, 255, 0.06)',
+                padding: '6px 20px',
+                borderRadius: 24,
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              }}
             >
-              <span style={{ fontSize: 22 }}>{activeClassroomStudent.avatar || '👦'}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginRight: 4 }}>
+                Active:
+              </span>
+              <span style={{ fontSize: 20 }}>{activeClassroomStudent.avatar || '👦'}</span>
               <span style={{ fontSize: 16, fontWeight: 700, color: '#38bdf8' }}>
                 {activeClassroomStudent.name}
               </span>
-              <span style={{ fontSize: 15, color: '#cbd5e1' }}>
-                ({activeClassroomStudent.nameBangla})
-              </span>
             </motion.div>
           ) : (
-            <motion.span
+            <motion.div
               key="none"
-              style={{ fontSize: 14, color: '#94a3b8', fontStyle: 'italic' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '6px 20px',
+                borderRadius: 24,
+                background: 'rgba(0,0,0,0.2)',
+                border: '1px dashed rgba(255,255,255,0.15)',
+              }}
             >
-              Click &apos;Pick Next&apos; to select a student
-            </motion.span>
+              <span style={{ fontSize: 13, color: '#cbd5e1', fontWeight: 500 }}>
+                Waiting for student...
+              </span>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Right: Projector Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {/* ── Right: Controls ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {remainingPool.length > 0 ? (
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={pickNextRandomStudent}
             style={{
-              background: 'linear-gradient(135deg, #10b981, #059669)',
+              background: '#0ea5e9',
               color: '#ffffff',
               border: 'none',
-              padding: '8px 18px',
-              borderRadius: 999,
-              fontSize: 14,
+              padding: '8px 16px',
+              borderRadius: 24,
+              fontSize: 13,
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
+              boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)',
             }}
           >
-            <span>🎲</span>
-            <span>Pick Next ({remainingPool.length} left)</span>
+            <span style={{ fontSize: 16 }}>🎲</span>
+            <span>Pick Next ({remainingPool.length})</span>
           </motion.button>
         ) : (
           <div
             style={{
-              background: 'rgba(245, 158, 11, 0.2)',
+              background: 'rgba(245, 158, 11, 0.15)',
               color: '#fbbf24',
-              border: '1px solid rgba(245, 158, 11, 0.4)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
               padding: '8px 16px',
-              borderRadius: 999,
-              fontSize: 13,
+              borderRadius: 24,
+              fontSize: 12,
               fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
@@ -158,27 +171,33 @@ export default function ClassroomHUD() {
             }}
           >
             <span>🏆</span>
-            <span>All Students Participated!</span>
+            <span>All Done!</span>
           </div>
         )}
 
-        <button
+        <motion.button
+          whileHover={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleExit}
           style={{
-            background: 'rgba(239, 68, 68, 0.2)',
-            color: '#f87171',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            padding: '8px 14px',
-            borderRadius: 999,
-            fontSize: 13,
-            fontWeight: 700,
+            background: 'transparent',
+            color: '#94a3b8',
+            border: 'none',
+            padding: '8px',
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            fontSize: 16,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             cursor: 'pointer',
             transition: 'all 0.2s',
           }}
           title="Exit Classroom Mode"
         >
-          ✕ Exit
-        </button>
+          ✕
+        </motion.button>
       </div>
     </motion.div>
   );

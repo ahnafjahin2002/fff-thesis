@@ -7,6 +7,66 @@ const toBanglaNum = (num) => {
   return String(num).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d]);
 };
 
+// ─── Shared SVGs from Dashboard ──────────────────────────────────────────────
+const BookSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="6" y="8" width="40" height="34" rx="4" fill="#69b3e7" />
+    <rect x="8" y="10" width="17" height="30" rx="2" fill="white" />
+    <rect x="27" y="10" width="17" height="30" rx="2" fill="white" />
+    <rect x="10" y="8" width="14" height="14" rx="4" fill="#ff6b6b" />
+    <rect x="28" y="8" width="14" height="14" rx="4" fill="#4a90d9" />
+    <rect x="10" y="26" width="14" height="10" rx="3" fill="#3cb371" />
+    <rect x="28" y="26" width="14" height="10" rx="3" fill="#8b5cf6" />
+    <text x="17" y="20" fontSize="10" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">অ</text>
+    <text x="35" y="20" fontSize="10" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">আ</text>
+    <text x="17" y="34" fontSize="10" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">ক</text>
+    <text x="35" y="34" fontSize="10" fill="white" fontFamily="Hind Siliguri" textAnchor="middle">খ</text>
+  </svg>
+);
+
+const GamepadSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="14" width="44" height="28" rx="14" fill="#6b6fba" />
+    <circle cx="14" cy="28" r="7" fill="#5555a0" />
+    <line x1="14" y1="24" x2="14" y2="32" stroke="#888ddd" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="10" y1="28" x2="18" y2="28" stroke="#888ddd" strokeWidth="2.5" strokeLinecap="round" />
+    <circle cx="36" cy="25" r="3" fill="#ff6b6b" />
+    <circle cx="42" cy="28" r="3" fill="#ffd700" />
+    <circle cx="36" cy="31" r="3" fill="#5ba0e0" />
+    <circle cx="30" cy="28" r="3" fill="#3cb371" />
+  </svg>
+);
+
+const PencilSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="22" y="4" width="10" height="36" rx="4" fill="#f5a623" transform="rotate(25 26 26)" />
+    <polygon points="26,42 30,34 22,34" fill="#ff6b6b" transform="rotate(25 26 26)" />
+    <polygon points="26,46 29,42 23,42" fill="#ffd700" transform="rotate(25 26 26)" />
+    <rect x="22" y="4" width="10" height="7" rx="4 4 0 0" fill="#ccc" transform="rotate(25 26 26)" />
+  </svg>
+);
+
+const PuzzleSVG = () => (
+  <svg width="48" height="48" viewBox="0 0 52 52">
+    <rect x="4" y="4" width="20" height="20" rx="4" fill="#e04e81" />
+    <rect x="28" y="4" width="20" height="20" rx="4" fill="#f5a623" />
+    <rect x="4" y="28" width="20" height="20" rx="4" fill="#18b368" />
+    <rect x="28" y="28" width="20" height="20" rx="4" fill="#4a90d9" />
+    <circle cx="24" cy="14" r="6" fill="#e04e81" />
+    <circle cx="24" cy="38" r="6" fill="#18b368" />
+    <circle cx="14" cy="24" r="6" fill="#e04e81" />
+    <circle cx="38" cy="24" r="6" fill="#4a90d9" />
+  </svg>
+);
+
+const DASHBOARD_ACTIVITIES = [
+  { id: "Reading Story", title: "পড়া", sub: "লাইন ধরে পড়ি\nআর অক্ষর চিনি", bg: "#eef9f1", accent: "#18b368", icon: <BookSVG /> },
+  { id: "BornoBazar", title: "বর্ণের দোকান", sub: "খেলার মাধ্যমে\nশিখি আর মজা করি", bg: "#f0efff", accent: "#7c75dd", icon: <GamepadSVG /> },
+  { id: "Trace", title: "ট্রেনিং", sub: "লেখা ও বানান চর্চা\nকরি প্রতিদিন", bg: "#fff0f5", accent: "#f06292", icon: <PencilSVG /> },
+  { id: "Quiz Game", title: "কুইজ", sub: "শব্দ ও ছবি মেলাও", bg: "#fffbee", accent: "#e04e81", icon: <PuzzleSVG /> },
+];
+
+
 export default function ClassroomTurnSelector({ roster, classroomStats, onLaunchActivity, onClose }) {
   const {
     remainingPool,
@@ -437,144 +497,53 @@ export default function ClassroomTurnSelector({ roster, classroomStats, onLaunch
               প্র্যাকটিস অ্যাক্টিভিটি বেছে নিন (Select Activity)
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 18, maxHeight: 220, overflowY: 'auto' }}>
-              <button
-                type="button"
-                onClick={() => setSelectedActivity('Reading Story')}
-                style={{
-                  background: selectedActivity === 'Reading Story' ? '#0369a1' : '#1e293b',
-                  border: selectedActivity === 'Reading Story' ? '2px solid #38bdf8' : '1px solid #334155',
-                  borderRadius: 14,
-                  padding: '12px 14px',
-                  textAlign: 'left',
-                  color: '#ffffff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 24 }}>📖</span>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>গল্প পড়া</div>
-                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Reading Story</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14, marginBottom: 18, maxHeight: 300, overflowY: 'auto', paddingRight: 4 }}>
+              {DASHBOARD_ACTIVITIES.map((act) => (
+                <div
+                  key={act.id}
+                  onClick={() => setSelectedActivity(act.id)}
+                  style={{
+                    background: act.bg,
+                    borderRadius: 22,
+                    padding: '20px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    cursor: 'pointer',
+                    border: selectedActivity === act.id ? `3px solid ${act.accent}` : '3px solid transparent',
+                    boxShadow: selectedActivity === act.id ? `0 4px 16px ${act.accent}40` : '0 2px 12px rgba(0,0,0,0.07)',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <div style={{ flexShrink: 0, transform: 'scale(1.1)' }}>
+                    {act.icon}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: '#1a1a2e', marginBottom: 4, lineHeight: 1.2 }}>
+                      {act.title}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#687076', lineHeight: 1.4, whiteSpace: 'pre-line' }}>
+                      {act.sub}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      background: selectedActivity === act.id ? act.accent : '#e2e8f0',
+                      color: selectedActivity === act.id ? '#fff' : '#94a3b8',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 14,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {selectedActivity === act.id ? '✓' : '→'}
+                  </div>
                 </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSelectedActivity('BornoBazar')}
-                style={{
-                  background: selectedActivity === 'BornoBazar' ? '#0369a1' : '#1e293b',
-                  border: selectedActivity === 'BornoBazar' ? '2px solid #38bdf8' : '1px solid #334155',
-                  borderRadius: 14,
-                  padding: '12px 14px',
-                  textAlign: 'left',
-                  color: '#ffffff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 24 }}>🏪</span>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>বর্ণবাজার</div>
-                  <div style={{ fontSize: 11, color: '#94a3b8' }}>BornoBazar</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSelectedActivity('Quiz Game')}
-                style={{
-                  background: selectedActivity === 'Quiz Game' ? '#0369a1' : '#1e293b',
-                  border: selectedActivity === 'Quiz Game' ? '2px solid #38bdf8' : '1px solid #334155',
-                  borderRadius: 14,
-                  padding: '12px 14px',
-                  textAlign: 'left',
-                  color: '#ffffff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 24 }}>🧩</span>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>মজার কুইজ</div>
-                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Quiz Game</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSelectedActivity('Word Practice')}
-                style={{
-                  background: selectedActivity === 'Word Practice' ? '#0369a1' : '#1e293b',
-                  border: selectedActivity === 'Word Practice' ? '2px solid #38bdf8' : '1px solid #334155',
-                  borderRadius: 14,
-                  padding: '12px 14px',
-                  textAlign: 'left',
-                  color: '#ffffff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 24 }}>✏️</span>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>শব্দ অনুশীলন</div>
-                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Word Practice</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSelectedActivity('Sentence Builder')}
-                style={{
-                  background: selectedActivity === 'Sentence Builder' ? '#0369a1' : '#1e293b',
-                  border: selectedActivity === 'Sentence Builder' ? '2px solid #38bdf8' : '1px solid #334155',
-                  borderRadius: 14,
-                  padding: '12px 14px',
-                  textAlign: 'left',
-                  color: '#ffffff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 24 }}>📝</span>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>বাক্য তৈরি</div>
-                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Sentence Builder</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSelectedActivity('Custom Reading')}
-                style={{
-                  background: selectedActivity === 'Custom Reading' ? '#0369a1' : '#1e293b',
-                  border: selectedActivity === 'Custom Reading' ? '2px solid #38bdf8' : '1px solid #334155',
-                  borderRadius: 14,
-                  padding: '12px 14px',
-                  textAlign: 'left',
-                  color: '#ffffff',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 24 }}>🎯</span>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>কাস্টম পড়া</div>
-                  <div style={{ fontSize: 11, color: '#94a3b8' }}>Custom Reading</div>
-                </div>
-              </button>
+              ))}
             </div>
 
             <button

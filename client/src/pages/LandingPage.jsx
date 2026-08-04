@@ -3,6 +3,17 @@ import { Link } from "react-router-dom";
 import heroKid from "../assets/fff-hero-child-rainbow.png";
 import "./LandingPage.css";
 
+const BookSVG = () => (
+  <svg width="1em" height="1em" viewBox="0 0 52 52" style={{ display: 'block' }}>
+    <rect x="4" y="8" width="44" height="36" rx="5" fill="#5ba0e0" />
+    <rect x="6" y="10" width="19" height="32" rx="3" fill="#fff" />
+    <rect x="27" y="10" width="19" height="32" rx="3" fill="#f0f0f0" />
+    <line x1="26" y1="10" x2="26" y2="42" stroke="#5ba0e0" strokeWidth="2" />
+    {[15, 20, 25, 30].map(y => <line key={y} x1="9" y1={y} x2="22" y2={y} stroke="#ccc" strokeWidth="1.5" />)}
+    {[15, 20, 25, 30].map(y => <line key={y} x1="30" y1={y} x2="43" y2={y} stroke="#ccc" strokeWidth="1.5" />)}
+  </svg>
+);
+
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
@@ -21,7 +32,7 @@ const features = [
   {
     title: "সহজে পড়া",
     text: "ধাপে ধাপে পড়ার চর্চা, বড় অক্ষর ও সহজ শব্দে।",
-    icon: "📖",
+    icon: <BookSVG />,
     className: "mint",
     arrow: "green",
   },
@@ -78,6 +89,7 @@ export default function LandingPage() {
             হোম
           </Link>
           <a href="#how">কিভাবে কাজ করে</a>
+          <Link to="/teacher-workspace">শিক্ষক ওয়ার্কস্পেস</Link>
           <Link to="/parents">অভিভাবকদের জন্য</Link>
           <a href="#resources">সম্পদ</a>
           <a href="#contact">যোগাযোগ</a>
