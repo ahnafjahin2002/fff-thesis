@@ -144,8 +144,29 @@ export default function JuktobornoView({ onBack }) {
               <div style={{ fontSize: 130, fontWeight: 800, color: activeColors.text, lineHeight: 1.1, fontFamily: "'Hind Siliguri',sans-serif", margin: "10px 0" }}>
                 {active.char}
               </div>
-              <div style={{ fontSize: 32, color: "#333", fontWeight: 900, marginBottom: 12, fontFamily: "'Hind Siliguri',sans-serif" }}>
-                {active.breakdown}
+              <div style={{ fontSize: 32, color: "#333", fontWeight: 900, marginBottom: 12, fontFamily: "'Hind Siliguri',sans-serif", display: "flex", justifyContent: "center", gap: "8px" }}>
+                {active.breakdown.split(' ').map((part, idx) => {
+                  if (part === '+') {
+                    return <span key={idx}>{part}</span>;
+                  }
+                  return (
+                    <motion.span 
+                      key={idx}
+                      whileHover={{ scale: 1.2, color: activeColors.text }}
+                      onMouseEnter={() => {
+                        if (speechSynthesis.speaking) {
+                          speechSynthesis.cancel();
+                        }
+                        const u = new SpeechSynthesisUtterance(part.replace('-', ' '));
+                        u.lang = 'bn-BD';
+                        speechSynthesis.speak(u);
+                      }}
+                      style={{ cursor: "pointer", transition: "color 0.2s" }}
+                    >
+                      {part}
+                    </motion.span>
+                  );
+                })}
               </div>
               <div style={{ fontSize: 18, color: "#777", marginBottom: 8, fontWeight: 600, fontFamily: "'Hind Siliguri',sans-serif" }}>
                 যেমন:
@@ -169,6 +190,9 @@ export default function JuktobornoView({ onBack }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: .95 }} 
                 onClick={() => {
+                  if (speechSynthesis.speaking) {
+                    speechSynthesis.cancel();
+                  }
                   const u = new SpeechSynthesisUtterance(active.char);
                   u.lang = 'bn-BD';
                   speechSynthesis.speak(u);
