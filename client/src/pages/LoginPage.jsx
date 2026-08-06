@@ -72,6 +72,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       let users = await getUsers();
+      users = users.filter(u => u.role === 'teacher');
       
       if (users.length === 0) {
         setView("setup");
@@ -363,20 +364,8 @@ export default function LoginPage() {
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <button className="action-btn" onClick={() => setView('createChild')} style={{ background: '#18b368', color: 'white', boxShadow: '0 8px 24px rgba(24,179,104,0.3)' }}>
-                👶 শিশুর প্রোফাইল তৈরি করুন
-              </button>
               <button className="action-btn" onClick={() => { setNewUserName(""); setNewUserSchoolName(""); setNewUserTeacherPin(""); setView('createTeacher'); }} style={{ background: '#0f9055', color: 'white', boxShadow: '0 8px 24px rgba(15,144,85,0.3)' }}>
                 👨‍🏫 শিক্ষক প্রোফাইল তৈরি করুন
-              </button>
-              <button className="action-btn" onClick={() => setView('createParent')} style={{ background: '#f5a623', color: 'white', boxShadow: '0 8px 24px rgba(245,166,35,0.3)' }}>
-                👨‍👩‍👧 অভিভাবক প্রোফাইল তৈরি করুন
-              </button>
-              <button className="action-btn" onClick={handleUseDemo} style={{ background: '#e2e8f0', color: '#4a5568', marginTop: 12 }}>
-                🚀 ডেমো প্রোফাইল ব্যবহার করুন
-              </button>
-              <button className="action-btn" onClick={handleTeacherDemo} style={{ background: '#eef9f1', color: '#18b368', border: '2px solid #18b368', marginTop: 4 }}>
-                👨‍🏫 শিক্ষক ওয়ার্কস্পেস (Teacher Mode)
               </button>
             </div>
           </motion.div>
@@ -500,7 +489,7 @@ export default function LoginPage() {
           <motion.div key="avatar-view" className="login-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 32 }}>
               <img src={loginMascot} alt="" style={{ width: 64, height: 'auto', objectFit: 'contain' }} />
-              <h1 style={{ fontSize: 32, fontWeight: 800, color: '#1d2b2a', margin: 0 }}>তুমি কে?</h1>
+              <h1 style={{ fontSize: 32, fontWeight: 800, color: '#1d2b2a', margin: 0 }}>আপনি কে?</h1>
               <button onClick={() => playAudio("তোমার ছবি বেছে নাও")} style={{ background: '#eef9f1', border: 'none', color: '#18b368', width: 44, height: 44, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <SpeakerSVG />
               </button>
@@ -556,17 +545,8 @@ export default function LoginPage() {
             </motion.button>
 
             <div style={{ textAlign: 'center', marginTop: 24, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 14 }}>
-              <button onClick={() => { setNewUserRole("child"); setView("createChild"); }} style={{ background: 'none', border: 'none', color: '#18b368', fontSize: 15, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
-                + নতুন শিশু প্রোফাইল
-              </button>
               <button onClick={() => { setNewUserName(""); setNewUserSchoolName(""); setNewUserTeacherPin(""); setView("createTeacher"); }} style={{ background: 'none', border: 'none', color: '#0f9055', fontSize: 15, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}>
                 + নতুন শিক্ষক প্রোফাইল
-              </button>
-              <button onClick={() => { setNewUserRole("parent"); setView("createParent"); }} style={{ background: 'none', border: 'none', color: '#f5a623', fontSize: 15, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
-                + অভিভাবক প্রোফাইল
-              </button>
-              <button onClick={handleTeacherDemo} style={{ background: 'none', border: 'none', color: '#687076', fontSize: 14, fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
-                ডেমো শিক্ষক মোড
               </button>
             </div>
           </motion.div>

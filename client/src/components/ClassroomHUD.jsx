@@ -37,8 +37,8 @@ export default function ClassroomHUD() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: 20,
-        padding: '10px 16px',
+        gap: 12,
+        padding: '8px 12px',
         background: 'rgba(15, 23, 42, 0.75)',
         border: '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: 40,
@@ -47,33 +47,33 @@ export default function ClassroomHUD() {
         WebkitBackdropFilter: 'blur(24px)',
         color: '#ffffff',
         fontFamily: "'Inter', 'Outfit', sans-serif",
-        minWidth: '650px',
+        minWidth: 'auto',
         maxWidth: '92vw',
       }}
     >
       {/* ── Left: Mode Badge & Activity ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div
           style={{
             background: 'rgba(56, 189, 248, 0.15)',
             color: '#38bdf8',
             border: '1px solid rgba(56, 189, 248, 0.3)',
-            padding: '6px 12px',
+            padding: '4px 10px',
             borderRadius: 20,
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: 800,
             letterSpacing: 0.5,
             textTransform: 'uppercase',
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
+            gap: 4,
           }}
         >
-          <span style={{ fontSize: 14 }}>🎯</span>
+          <span style={{ fontSize: 12 }}>🎯</span>
           <span>Classroom</span>
         </div>
-        <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.15)' }} />
-        <div style={{ fontSize: 15, fontWeight: 600, color: '#f1f5f9', whiteSpace: 'nowrap' }}>
+        <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)' }} />
+        <div style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9', whiteSpace: 'nowrap' }}>
           {classroomActivityTitle}
         </div>
       </div>
@@ -90,19 +90,19 @@ export default function ClassroomHUD() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
+                gap: 8,
                 background: 'rgba(255, 255, 255, 0.06)',
-                padding: '6px 20px',
+                padding: '4px 16px',
                 borderRadius: 24,
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
               }}
             >
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginRight: 4 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginRight: 4 }}>
                 Active:
               </span>
-              <span style={{ fontSize: 20 }}>{activeClassroomStudent.avatar || '👦'}</span>
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#38bdf8' }}>
+              <span style={{ fontSize: 16 }}>{activeClassroomStudent.avatar || '👦'}</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#38bdf8' }}>
                 {activeClassroomStudent.name}
               </span>
             </motion.div>
@@ -141,18 +141,18 @@ export default function ClassroomHUD() {
               background: '#0ea5e9',
               color: '#ffffff',
               border: 'none',
-              padding: '8px 16px',
+              padding: '6px 12px',
               borderRadius: 24,
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 8,
+              gap: 6,
               boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)',
             }}
           >
-            <span style={{ fontSize: 16 }}>🎲</span>
+            <span style={{ fontSize: 14 }}>🎲</span>
             <span>Pick Next ({remainingPool.length})</span>
           </motion.button>
         ) : (
@@ -183,11 +183,11 @@ export default function ClassroomHUD() {
             background: 'transparent',
             color: '#94a3b8',
             border: 'none',
-            padding: '8px',
-            width: 36,
-            height: 36,
+            padding: '6px',
+            width: 32,
+            height: 32,
             borderRadius: '50%',
-            fontSize: 16,
+            fontSize: 14,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
